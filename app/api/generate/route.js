@@ -83,7 +83,7 @@ export async function POST(req) {
         (enr.keywords?.length ? `- Keywords: ${enr.keywords.join(', ')}\n` : '') +
         (enr.technologies?.length ? `- Tech detected: ${enr.technologies.slice(0, 15).join(', ')}\n` : '') +
         (enr.description ? `- Description: ${enr.description.slice(0, 400)}\n` : '') +
-        (incumbent ? `- Incumbent HR/payroll vendor: ${incumbent.vendor || incumbent.category} (suggested motion: ${incumbent.motion}). Frame the brief around this motion — upsell, displacement, or greenfield.\n` : '') +
+        (incumbent ? `- Incumbent HR/payroll vendor: ${incumbent.vendor || incumbent.category} (suggested motion: ${incumbent.motion}). Frame the brief around this motion — upsell, displacement, or no-incumbent (fresh PEO sale).\n` : '') +
         (openings != null ? `- Open roles (hiring velocity): ~${openings}. Use this only as a growth/timing signal; do not invent specific roles.\n` : '') +
         (partner ? `- Channel partner: their advisor "${partner.name}" (${partner.type}) is a ${partner.tier} channel partner who has influenced ${partner.influencedDeals} deals. Suggest looping in this partner as a warm path in; reference the existing relationship, do not overstate it.\n` : '') +
         (heuristicScore != null ? `\nThe team's targeting model scored this account ${heuristicScore}/100 for PEO fit. Reflect that in fitScore unless the data clearly says otherwise.\n` : '');

@@ -1,7 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { scoreCompany } from '../../../lib/score';
-import { qualify } from '../../../lib/qualify';
+import { qualify, signalsFromEnrichment } from '../../../lib/qualify';
 import { matchPartner } from '../../../lib/partners';
+import { apolloEnabled, enrichCompanies, normalizeDomain } from '../../../lib/apollo';
+import { getOpenings, jobsEnabled } from '../../../lib/jobs';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -12,7 +14,7 @@ const WEB_SEARCH = process.env.COACH_WEB_SEARCH !== '0';
 
 const SYSTEM = `You research a company for a PEO (co-employment HR/payroll/benefits) sales team and return STRUCTURED SIGNALS used to qualify or disqualify it.
 
-Use web search to find current facts. Use ONLY what you can verify; if something is unknown, use null (or false only when you have evidence it's false). NEVER fabricate numbers, funding, or HR details.
+Use web search to find current facts. Use ONLY what you can verify; if something is unknown, use null (or false only when you have evidence it's false). NEVER fabricate numbers, funding, or HR details. If authoritative facts are provided to you (employee count, industry, location), treat those as ground truth and do not contradict them.
 
 Output ONLY valid JSON, no markdown, matching exactly:
 {
@@ -42,10 +44,20 @@ export async function POST(req) {
     }
     const b = await req.json();
     const company = (b.company || '').toString().slice(0, 200);
-    const domain = (b.domain || '').toString().slice(0, 200);
+    const domain = normalizeDomain((b.domain || '').toString());
     if (!company && !domain) return Response.json({ error: 'Enter a company name or domain.' }, { status: 400 });
 
-    const userPrompt = `Research this company and return the signals JSON:\nCompany: ${company || '(unknown)'}\nDomain/website: ${domain || '(unknown)'}\n\nFind: employee count, industry, HQ state, founding year, hiring activity & open roles, recent funding, whether they have a dedicated HR team, multi-state/remote workforce, HR tech stack, public/international status, and any disqualifying signals. Output ONLY the JSON.`;
+    // 1) Authoritative firmographics from Apollo (accurate headcount/industry/location/tech).
+    let apolloOrg = null;
+    if (apolloEnabled() && domain) {
+      try { const [r] = await enrichCompanies([{ name: company, domain }]); if (r?.org) apolloOrg = r.org; } catch {}
+    }
+
+    // 2) AI for the softer signals + summary. Feed it the Apollo facts as ground truth.
+    const facts = apolloOrg
+      ? `\n\nAUTHORITATIVE FACTS (from firmographic data — use as ground truth, do not contradict):\n- Employees: ${apolloOrg.employees ?? 'unknown'}\n- Industry: ${apolloOrg.industry || 'unknown'}\n- HQ State: ${apolloOrg.state || 'unknown'}\n- Founded: ${apolloOrg.foundedYear ?? 'unknown'}`
+      : '';
+    const userPrompt = `Research this company and return the signals JSON:\nCompany: ${company || apolloOrg?.name || '(unknown)'}\nDomain/website: ${domain || '(unknown)'}${facts}\n\nFind the softer signals especially: recent funding, whether they have a dedicated HR team, multi-state/remote workforce, public/international status, and any disqualifying signals. Output ONLY the JSON.`;
     const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }] : undefined;
 
     let text = '';
@@ -53,33 +65,38 @@ export async function POST(req) {
       const msg = await anthropic.messages.create({ model: MODEL, max_tokens: 1500, system: SYSTEM, messages: [{ role: 'user', content: userPrompt }], ...(tools ? { tools } : {}) });
       text = extractText(msg.content);
     } catch (e) {
-      if (tools) {
-        const msg = await anthropic.messages.create({ model: MODEL, max_tokens: 1500, system: SYSTEM, messages: [{ role: 'user', content: userPrompt }] });
-        text = extractText(msg.content);
-      } else throw e;
+      if (tools) { const msg = await anthropic.messages.create({ model: MODEL, max_tokens: 1500, system: SYSTEM, messages: [{ role: 'user', content: userPrompt }] }); text = extractText(msg.content); }
+      else throw e;
     }
 
     const clean = text.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1').replace(/```json\s*/i, '').replace(/```/g, '').trim();
-    let s;
-    try { s = JSON.parse(clean); }
-    catch { return Response.json({ error: 'Could not parse research. Try a more specific name or add the domain.' }, { status: 502 }); }
+    let s = {};
+    try { s = JSON.parse(clean); } catch { if (!apolloOrg) return Response.json({ error: 'Could not parse research. Try a domain, or connect Apollo for exact data.' }, { status: 502 }); }
 
-    const org = {
-      name: s.name || company, domain: s.domain || domain,
-      employees: typeof s.employees === 'number' ? s.employees : null,
-      industry: s.industry || '', state: s.state || '', foundedYear: s.foundedYear || null,
-      technologies: Array.isArray(s.technologies) ? s.technologies : [],
-      keywords: [], description: s.summary || '',
-    };
-    const openings = typeof s.openRoles === 'number' ? s.openRoles : (s.hiring === 'heavy' ? 6 : s.hiring === 'some' ? 2 : null);
+    // 3) Build the authoritative org. Apollo wins on firmographics; AI fills the rest.
+    const org = apolloOrg
+      ? { ...apolloOrg, description: apolloOrg.description || s.summary || '' }
+      : {
+          name: s.name || company, domain: s.domain || domain,
+          employees: typeof s.employees === 'number' ? s.employees : null,
+          industry: s.industry || '', state: s.state || '', foundedYear: s.foundedYear || null,
+          technologies: Array.isArray(s.technologies) ? s.technologies : [], keywords: [], description: s.summary || '',
+        };
+
+    let openings = typeof s.openRoles === 'number' ? s.openRoles : (s.hiring === 'heavy' ? 6 : s.hiring === 'some' ? 2 : null);
+    if (apolloOrg && jobsEnabled()) { try { const o = await getOpenings(org.name); if (o?.count != null) openings = o.count; } catch {} }
+
     const sc = scoreCompany(org, { openings });
-    const qualification = qualify(s);
+    const merged = { ...s, ...signalsFromEnrichment(org) };
+    const qualification = qualify(merged);
 
     const result = {
       name: org.name, domain: org.domain, employees: org.employees, industry: org.industry, state: org.state,
       openings, incumbent: sc.incumbent, partner: matchPartner(org),
       score: sc.score, band: sc.band, reasons: sc.reasons, org,
-      qualification, summary: s.summary || '', confidence: s.confidence || 'medium', researched: true,
+      qualification, summary: s.summary || org.description || '',
+      confidence: apolloOrg ? 'high' : (s.confidence || 'medium'),
+      researched: true, source: apolloOrg ? 'apollo' : 'ai',
     };
     return Response.json({ result });
   } catch (err) {

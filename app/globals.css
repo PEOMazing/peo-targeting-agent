@@ -375,3 +375,33 @@ body { background:
 .subtab:hover { color: var(--text); border-color: #d9cabd; }
 .subtab.on { background: var(--kale); color: #fff; border-color: var(--kale); box-shadow: 0 5px 14px rgba(10,128,128,0.25); }
 .section { animation: fadeup 0.2s ease both; }
+
+/* ---- Correct facts editor ---- */
+.editbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.srcbadge { font-size: 11px; font-weight: 700; color: var(--kale); text-transform: uppercase; letter-spacing: 0.04em; }
+.editlink { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; }
+.editlink:hover { color: var(--guava); border-color: var(--guava); }
+.editpanel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.editgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.editgrid label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; display: flex; flex-direction: column; gap: 4px; }
+.editgrid label.wide { grid-column: 1 / -1; }
+.editgrid input { font-size: 14px; font-weight: 400; text-transform: none; letter-spacing: 0; padding: 9px 11px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--text); }
+.editgrid input:focus { outline: none; border-color: var(--kale); }
+
+/* ---- Correct-facts editor ---- */
+.editbar { display: flex; justify-content: space-between; align-items: center; margin: -4px 0 14px; }
+.srcbadge { font-size: 11px; font-weight: 700; color: var(--kale); letter-spacing: 0.02em; }
+.editlink { background: none; border: none; color: var(--guava); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0; }
+.editlink:hover { text-decoration: underline; }
+.editpanel { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.editgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.editgrid label { display: flex; flex-direction: column; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; gap: 5px; }
+.editgrid label.wide { grid-column: 1 / -1; }
+.editgrid input { font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0; padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--text); }
+.editgrid input:focus { outline: none; border-color: var(--kale); box-shadow: 0 0 0 3px rgba(10,128,128,0.12); }
+
+/* ---- Tech stack ---- */
+.techwrap { display: flex; flex-wrap: wrap; gap: 7px; }
+.techchip { font-size: 12px; font-weight: 600; color: var(--text); background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; }
+.techchip.hr { color: #fff; background: var(--kale); border-color: var(--kale); box-shadow: 0 3px 9px rgba(10,128,128,0.22); }
+.techcount { font-size: 10px; font-weight: 700; color: var(--muted); background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; text-transform: none; letter-spacing: 0; margin-left: 6px; }

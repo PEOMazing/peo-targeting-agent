@@ -13,7 +13,7 @@ const GUARDRAILS = [
 
 const scoreColor = (s) => (s == null ? 'var(--muted)' : s >= 75 ? 'var(--good)' : s >= 60 ? 'var(--good2)' : s >= 40 ? 'var(--warn)' : 'var(--bad)');
 const outcomeColor = (o) => (o === 'Won' ? 'var(--good)' : o === 'Lost' ? 'var(--bad)' : 'var(--muted)');
-const motionColor = (m) => (m === 'Displacement' ? 'var(--warn)' : m === 'Greenfield' ? 'var(--muted)' : 'var(--kale)');
+const motionColor = (m) => (m === 'Displacement' ? 'var(--warn)' : m === 'No incumbent' ? 'var(--muted)' : 'var(--kale)');
 
 function normalizeDomain(input) {
   if (!input) return '';
@@ -66,6 +66,9 @@ export default function Page() {
   const [brief, setBrief] = useState(null);
   const [briefLoading, setBriefLoading] = useState(false);
   const [briefTab, setBriefTab] = useState('value');
+  const [editing, setEditing] = useState(false);
+  const [edit, setEdit] = useState({ employees: '', industry: '', state: '', incumbentVendor: '', openings: '' });
+  const [resaving, setResaving] = useState(false);
 
   const [emailData, setEmailData] = useState(null);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -194,6 +197,33 @@ export default function Page() {
     setTouches((prev) => ({ ...prev, [compKey]: [entry, ...(prev[compKey] || [])] }));
   };
 
+  const openEditor = () => {
+    if (!sel) return;
+    setEdit({
+      employees: sel.employees ?? '', industry: sel.industry || '', state: sel.state || '',
+      incumbentVendor: sel.incumbent?.vendor || '', openings: sel.openings ?? '',
+    });
+    setEditing(true);
+  };
+
+  const applyEdits = async () => {
+    if (!sel || resaving) return;
+    setResaving(true); setError('');
+    try {
+      const res = await fetch('/api/rescore', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: sel.name, domain: sel.domain, baseOrg: sel.org, foundedYear: sel.org?.foundedYear, ...edit }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Re-score failed');
+      const k = keyOf(sel);
+      setResults((prev) => (prev || []).map((r) => (keyOf(r) === k ? data.result : r)));
+      setBriefCache((prev) => { const n = { ...prev }; delete n[k]; return n; });
+      setEditing(false);
+      openRow(data.result);
+    } catch (e) { setError(e.message); } finally { setResaving(false); }
+  };
+
   const saveFeedback = async () => {
     if (!brief?._recordId) return;
     setSavingFb(true);
@@ -251,7 +281,7 @@ export default function Page() {
     const next = [...coachMsgs, { role: 'user', content: t }];
     setCoachMsgs(next); setCoachInput(''); setCoachLoading(true);
     try {
-      const context = sel ? { name: sel.name, industry: sel.industry, state: sel.state, employees: sel.employees, motion: sel.incumbent?.motion, incumbent: sel.incumbent, upsellAngle: brief?.upsellAngle, caseStudies: brief?.caseStudies } : null;
+      const context = sel ? { name: sel.name, domain: sel.domain, industry: sel.industry, state: sel.state, employees: sel.employees, openings: sel.openings, motion: sel.incumbent?.motion, incumbent: sel.incumbent, upsellAngle: brief?.upsellAngle, caseStudies: brief?.caseStudies } : null;
       const res = await fetch('/api/coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: next.map((m) => ({ role: m.role, content: m.content })), context }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Coach failed');
@@ -398,8 +428,26 @@ export default function Page() {
                   </div>
                 </div>
 
+                <div className="editbar">
+                  <span className="srcbadge">{sel.source === 'apollo' ? '● Apollo data' : sel.source === 'manual' ? '● Manually corrected' : sel.researched ? '● AI-researched' : '● Enriched'}{sel.confidence ? ` · ${sel.confidence} confidence` : ''}</span>
+                  <button className="editlink" onClick={editing ? () => setEditing(false) : openEditor}>{editing ? 'Cancel' : '✎ Correct facts'}</button>
+                </div>
+                {editing && (
+                  <div className="editpanel">
+                    <div className="editgrid">
+                      <label>Employees<input value={edit.employees} onChange={(e) => setEdit({ ...edit, employees: e.target.value })} inputMode="numeric" /></label>
+                      <label>Open roles<input value={edit.openings} onChange={(e) => setEdit({ ...edit, openings: e.target.value })} inputMode="numeric" /></label>
+                      <label>Industry<input value={edit.industry} onChange={(e) => setEdit({ ...edit, industry: e.target.value })} /></label>
+                      <label>HQ state<input value={edit.state} onChange={(e) => setEdit({ ...edit, state: e.target.value })} /></label>
+                      <label className="wide">Incumbent payroll / PEO vendor<input value={edit.incumbentVendor} onChange={(e) => setEdit({ ...edit, incumbentVendor: e.target.value })} placeholder="e.g. Paychex Oasis, ADP, Gusto, TriNet" /></label>
+                    </div>
+                    <button className="btn" style={{ marginTop: 12 }} onClick={applyEdits} disabled={resaving}>{resaving ? 'Re-scoring…' : 'Save & re-score'}</button>
+                    <p className="disclaimer" style={{ marginTop: 8 }}>Apollo nails headcount, industry, and location. The incumbent PEO/broker is a service relationship Apollo can't see — set it here and the motion (e.g. Displacement) updates.</p>
+                  </div>
+                )}
+
                 <div className="subtabs">
-                  {[['value', 'Value Prop'], ['objections', 'Objection Handling'], ['benefits', 'Benefits Play'], ['contacts', 'Contacts'], ['outreach', 'Outreach']].map(([id, label]) => {
+                  {[['value', 'Value Prop'], ['objections', 'Objection Handling'], ['benefits', 'Benefits Play'], ['tech', 'Tech Stack'], ['contacts', 'Contacts'], ['outreach', 'Outreach']].map(([id, label]) => {
                     const tc = (touches[keyOf(sel)] || []).length;
                     return <button key={id} className={briefTab === id ? 'subtab on' : 'subtab'} onClick={() => setBriefTab(id)}>{label}{id === 'contacts' && tc > 0 ? ` Â· ${tc}` : ''}</button>;
                   })}
@@ -450,6 +498,30 @@ export default function Page() {
                       </div>
                     )}
                     <p className="disclaimer">{brief.disclaimer || 'Estimates are illustrative and not a binding quote.'}</p>
+                  </div>
+                )}
+
+                {briefTab === 'tech' && (
+                  <div className="section">
+                    {(() => {
+                      const tech = sel.org?.technologies || [];
+                      const HR = ['gusto', 'adp', 'paychex', 'oasis', 'trinet', 'insperity', 'justworks', 'rippling', 'bamboohr', 'namely', 'paylocity', 'paycor', 'workday', 'successfactors', 'ukg', 'dayforce', 'zenefits', 'sequoia', 'vensure', 'greenhouse', 'lever', 'deel', 'remote', 'trinet', 'sap'];
+                      const isHR = (t) => HR.some((h) => t.toLowerCase().includes(h));
+                      const hr = tech.filter(isHR);
+                      const rest = tech.filter((t) => !isHR(t));
+                      return (
+                        <>
+                          {sel.source !== 'apollo' && <p className="disclaimer" style={{ marginBottom: 12 }}>The full tech stack comes from Apollo technographics. Connect Apollo and search by domain to populate it.</p>}
+                          {!tech.length && <p className="empty">No technologies detected{sel.source === 'apollo' ? ' for this company in Apollo.' : ' yet — connect Apollo to see the full stack.'}</p>}
+                          {hr.length > 0 && (
+                            <div className="blk"><h3>HR · Payroll · Benefits</h3><div className="techwrap">{hr.map((t, i) => <span key={i} className="techchip hr">{t}</span>)}</div></div>
+                          )}
+                          {rest.length > 0 && (
+                            <div className="blk"><h3>Full stack <span className="techcount">{tech.length} detected</span></h3><div className="techwrap">{rest.map((t, i) => <span key={i} className="techchip">{t}</span>)}</div></div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
 
