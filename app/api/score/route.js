@@ -2,7 +2,7 @@ import { enrichCompanies, apolloEnabled } from '../../../lib/apollo';
 import { scoreCompany } from '../../../lib/score';
 import { getOpenings, jobsEnabled, pMap } from '../../../lib/jobs';
 import { matchPartner } from '../../../lib/partners';
-import { qualify, signalsFromEnrichment } from '../../../lib/qualify';
+import { qualify, signalsFromEnrichment, reconcileScore } from '../../../lib/qualify';
 import { DEMO_PROSPECTS } from '../../../lib/demodata';
 
 export const runtime = 'nodejs';
@@ -23,12 +23,14 @@ export async function POST(req) {
       const results = DEMO_PROSPECTS.map((org) => {
         const op = typeof org._openings === 'number' ? org._openings : null;
         const sc = scoreCompany(org, { openings: op });
+        const q = qualify(signalsFromEnrichment(org));
+        const rec = reconcileScore(sc.score, sc.band, q);
         return {
           name: org.name, domain: org.domain, employees: org.employees, industry: org.industry, state: org.state,
           openings: op,
           incumbent: sc.incumbent, partner: matchPartner(org),
-          score: sc.score, band: sc.band, reasons: sc.reasons, org, error: null,
-          qualification: qualify(signalsFromEnrichment(org)), qualPartial: true,
+          score: rec.score, band: rec.band, reasons: sc.reasons, org, error: null,
+          qualification: q, qualPartial: true,
         };
       }).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
       return Response.json({ apolloEnabled: false, jobsEnabled: false, demo: true, count: results.length, results });
@@ -48,12 +50,14 @@ export async function POST(req) {
 
     const results = enriched.map((r, i) => {
       const sc = scoreCompany(r.org, { openings: openings[i] });
+      const q = qualify(signalsFromEnrichment(r.org));
+      const rec = reconcileScore(sc.score, sc.band, q);
       return {
         name: r.org?.name || r.input.name || r.input.domain, domain: r.input.domain,
         employees: r.org?.employees ?? null, industry: r.org?.industry || '', state: r.org?.state || '',
         openings: openings[i], incumbent: sc.incumbent, partner: matchPartner(r.org),
-        score: sc.score, band: sc.band, reasons: sc.reasons, org: r.org, error: r.error || null,
-        qualification: qualify(signalsFromEnrichment(r.org)), qualPartial: true,
+        score: rec.score, band: rec.band, reasons: sc.reasons, org: r.org, error: r.error || null,
+        qualification: q, qualPartial: true,
       };
     });
 

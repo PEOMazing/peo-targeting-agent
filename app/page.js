@@ -114,7 +114,8 @@ export default function Page() {
         if (s.briefCache) setBriefCache(s.briefCache);
         if (s.contactsCache) setContactsCache(s.contactsCache);
         if (s.touches) setTouches(s.touches);
-        if (s.selectedKey) setSelectedKey(s.selectedKey);
+        // intentionally do not restore selectedKey — start fresh so the brief panel
+        // shows its prompt rather than a stale selection with no loaded brief.
         if (typeof s.demo === 'boolean') setDemo(s.demo);
       }
     } catch {}
@@ -144,7 +145,7 @@ export default function Page() {
       setApolloOn(data.apolloEnabled);
       setJobsOn(data.jobsEnabled);
       setDemo(!!data.demo);
-    } catch (e) { setError(e.message); } finally { setScoring(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setScoring(false); }
   };
 
   const researchCompany = async () => {
@@ -161,7 +162,7 @@ export default function Page() {
       setResults((prev) => [item, ...((prev || []).filter((x) => keyOf(x) !== k))]);
       setSearchCo('');
       openRow(item);
-    } catch (e) { setError(e.message); } finally { setResearching(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setResearching(false); }
   };
 
   const loadContacts = async (r) => {
@@ -190,7 +191,7 @@ export default function Page() {
       if (!res.ok) throw new Error(data.error || 'Brief failed');
       setBrief(data);
       setBriefCache((prev) => ({ ...prev, [k]: { ...(prev[k] || {}), brief: data } }));
-    } catch (e) { setError(e.message); } finally { setBriefLoading(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setBriefLoading(false); }
   };
 
   const logTouch = (compKey, contact, type) => {
@@ -222,7 +223,7 @@ export default function Page() {
       setBriefCache((prev) => { const n = { ...prev }; delete n[k]; return n; });
       setEditing(false);
       openRow(data.result);
-    } catch (e) { setError(e.message); } finally { setResaving(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setResaving(false); }
   };
 
   const saveFeedback = async () => {
@@ -233,7 +234,7 @@ export default function Page() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save');
       setFbSaved(true);
-    } catch (e) { setError(e.message); } finally { setSavingFb(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setSavingFb(false); }
   };
 
   const loadDeals = useCallback(async () => {
@@ -267,7 +268,7 @@ export default function Page() {
       setEmailData(data);
       const k = keyOf(sel);
       setBriefCache((prev) => ({ ...prev, [k]: { ...(prev[k] || {}), emailData: data } }));
-    } catch (e) { setError(e.message); } finally { setEmailLoading(false); }
+    } catch (e) { setError(e?.message || String(e)); } finally { setEmailLoading(false); }
   };
 
   const copyText = (key, subject, body) => {
@@ -394,6 +395,7 @@ export default function Page() {
           <div className="card">
             <h2>Upsell brief</h2>
             {!sel && !briefLoading && <p className="empty">Score a list or search a company, then tap any row to enrich it into a full payroll → PEO upsell brief — the motion, fit rationale, the angle, talking points, objections, recommended contacts, and the comp/benefits hook. Companies and briefs are saved in your browser, so you can come back to them.</p>}
+            {sel && !brief && !briefLoading && <p className="empty">{error ? `⚠ ${error}` : 'Couldn’t load that brief.'} <button className="editlink" onClick={() => openRow(sel)}>Try again</button></p>}
             {briefLoading && <p className="empty"><span className="dots">Writing the brief</span></p>}
 
             {brief && sel && (

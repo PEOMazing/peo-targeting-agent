@@ -1,5 +1,5 @@
 import { scoreCompany } from '../../../lib/score';
-import { qualify, signalsFromEnrichment } from '../../../lib/qualify';
+import { qualify, signalsFromEnrichment, reconcileScore } from '../../../lib/qualify';
 import { matchPartner } from '../../../lib/partners';
 
 export const runtime = 'nodejs';
@@ -27,11 +27,12 @@ export async function POST(req) {
     const openings = b.openings === '' || b.openings == null ? null : num(b.openings);
     const sc = scoreCompany(org, { openings });
     const qualification = qualify({ ...signalsFromEnrichment(org), employees: org.employees });
+    const rec = reconcileScore(sc.score, sc.band, qualification);
 
     const result = {
       name: org.name, domain: org.domain, employees: org.employees, industry: org.industry, state: org.state,
       openings, incumbent: sc.incumbent, partner: matchPartner(org),
-      score: sc.score, band: sc.band, reasons: sc.reasons, org,
+      score: rec.score, band: rec.band, reasons: sc.reasons, org,
       qualification, summary: org.description || '', confidence: 'high', researched: true, source: 'manual',
     };
     return Response.json({ result });

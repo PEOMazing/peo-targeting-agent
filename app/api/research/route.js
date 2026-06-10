@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { scoreCompany } from '../../../lib/score';
-import { qualify, signalsFromEnrichment } from '../../../lib/qualify';
+import { qualify, signalsFromEnrichment, reconcileScore } from '../../../lib/qualify';
 import { matchPartner } from '../../../lib/partners';
 import { apolloEnabled, enrichCompanies, normalizeDomain } from '../../../lib/apollo';
 import { getOpenings, jobsEnabled } from '../../../lib/jobs';
@@ -101,11 +101,12 @@ export async function POST(req) {
     const sc = scoreCompany(org, { openings });
     const merged = { ...s, ...signalsFromEnrichment(org) };
     const qualification = qualify(merged);
+    const rec = reconcileScore(sc.score, sc.band, qualification);
 
     const result = {
       name: org.name, domain: org.domain, employees: org.employees, industry: org.industry, state: org.state,
       openings, incumbent: sc.incumbent, partner: matchPartner(org),
-      score: sc.score, band: sc.band, reasons: sc.reasons, org,
+      score: rec.score, band: rec.band, reasons: sc.reasons, org,
       qualification, summary: s.summary || org.description || '',
       confidence: apolloOrg ? 'high' : (s.confidence || 'medium'),
       researched: true, source: apolloOrg ? 'apollo' : 'ai',
