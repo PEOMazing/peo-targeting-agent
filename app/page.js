@@ -307,6 +307,7 @@ export default function Page() {
       {tab === 'playbook' && (
         <div className="card">
           <h2>GTM Playbook — PEO off the payroll base</h2>
+          <div className="pbtop"><button className="enginebtn" onClick={() => { setTab('target'); score(); }}>▶  See the Engine</button><span className="enginehint">Jump straight to the ranked prospect list and watch the motion run.</span></div>
           <p className="pblead">Gusto has 500k+ SMB payroll customers — a meaningful share already sit in the PEO sweet spot. This is a <b>monetization layer on the installed base</b>, not new-logo selling: a warm base means far lower CAC and faster payback. The prize = fit-eligible accounts × worksite employees × gross profit per WSE.</p>
 
           <div className="pbsec">The motion — three pillars</div>
@@ -331,7 +332,7 @@ export default function Page() {
 
           <div className="pbguard"><div className="k">Guardrail — protect the core</div><ul style={{ margin: 0, paddingLeft: 18 }}><li>Do no harm to the payroll relationship — a botched co-employment transition can churn the base.</li><li>Disqualify bad-fit / bad-risk accounts to protect the master workers' comp policy.</li><li>Obsess over implementation and time-to-value.</li><li>Responsible AI: it gathers facts, transparent rules decide, humans verify.</li></ul></div>
 
-          <div className="pbcta"><button className="btn" style={{ width: 'auto', marginTop: 0 }} onClick={() => setTab('target')}>See the engine →</button></div>
+          <div className="pbcta"><button className="btn" style={{ width: 'auto', marginTop: 0 }} onClick={() => { setTab('target'); score(); }}>See the engine →</button></div>
         </div>
       )}
 

@@ -438,3 +438,5 @@ body { background:
 .sfmodal h3 { font-size: 20px; margin: 0 0 6px; }
 .sftag { font-size: 12px; font-weight: 700; color: var(--guava); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 14px; }
 .sfbody { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0 0 22px; }
+
+.pbtop { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 4px 0 22px; }
