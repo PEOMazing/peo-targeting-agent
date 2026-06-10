@@ -13,7 +13,7 @@ const GUARDRAILS = [
 
 const scoreColor = (s) => (s == null ? 'var(--muted)' : s >= 75 ? 'var(--good)' : s >= 60 ? 'var(--good2)' : s >= 40 ? 'var(--warn)' : 'var(--bad)');
 const outcomeColor = (o) => (o === 'Won' ? 'var(--good)' : o === 'Lost' ? 'var(--bad)' : 'var(--muted)');
-const motionColor = (m) => (m === 'Displacement' ? 'var(--warn)' : m === 'No incumbent' ? 'var(--muted)' : 'var(--kale)');
+const motionColor = (m) => (m === 'Displacement' ? 'var(--warn)' : m === 'Likely Multi-vendor' ? 'var(--muted)' : 'var(--kale)');
 
 function normalizeDomain(input) {
   if (!input) return '';
@@ -89,6 +89,7 @@ export default function Page() {
   const [coachMsgs, setCoachMsgs] = useState([]);
   const [coachInput, setCoachInput] = useState('');
   const [coachLoading, setCoachLoading] = useState(false);
+  const [showSF, setShowSF] = useState(false);
 
   const resetFeedback = () => { setOutcome(''); setResonated([]); setNotes(''); setFbSaved(false); };
   const toggleTag = (t) => { setResonated((r) => (r.includes(t) ? r.filter((x) => x !== t) : [...r, t])); setFbSaved(false); };
@@ -293,7 +294,7 @@ export default function Page() {
 
   return (
     <div className="wrap">
-      <div className="header"><div className="logo">P</div><h1>PEO Targeting Agent</h1></div>
+      <div className="header"><div className="logo">P</div><h1>PEO Targeting Agent</h1><button className="sfbtn" onClick={() => setShowSF(true)}><i className="ti ti-cloud" aria-hidden="true"></i> Sync to Salesforce</button></div>
       <p className="sub">Feed it payroll-only clients (or one domain). It enriches each via Apollo, checks the incumbent vendor and hiring velocity, ranks them by PEO-fit likelihood, and writes the upsell brief on demand — learning from every outcome.</p>
 
       <div className="tabs">
@@ -336,6 +337,10 @@ export default function Page() {
 
       {tab === 'target' && (
         <>
+        <div className="enginebar">
+          <button className="enginebtn" onClick={score} disabled={scoring}>{scoring ? <span className="dots">Starting the engine</span> : '▶  Start the Engine'}</button>
+          <span className="enginehint">Loads your ranked prospect list instantly — then click any company for the full brief. Or search a specific company below.</span>
+        </div>
         <div className="grid">
           <div className="card">
             <h2>Search a company</h2>
@@ -432,6 +437,9 @@ export default function Page() {
                   <span className="srcbadge">{sel.source === 'apollo' ? '● Apollo data' : sel.source === 'manual' ? '● Manually corrected' : sel.researched ? '● AI-researched' : '● Enriched'}{sel.confidence ? ` · ${sel.confidence} confidence` : ''}</span>
                   <button className="editlink" onClick={editing ? () => setEditing(false) : openEditor}>{editing ? 'Cancel' : '✎ Correct facts'}</button>
                 </div>
+                {sel.employeesAlt != null && (
+                  <p className="recnote"><i className="ti ti-git-compare" aria-hidden="true"></i> Headcount cross-checked — using <b>{sel.employees}</b> ({sel.employeesSource}); other source had {sel.employeesAlt}. Correct it if you know better.</p>
+                )}
                 {editing && (
                   <div className="editpanel">
                     <div className="editgrid">
@@ -700,6 +708,18 @@ export default function Page() {
               ))}
             </>
           )}
+        </div>
+      )}
+
+      {showSF && (
+        <div className="sfoverlay" onClick={() => setShowSF(false)}>
+          <div className="sfmodal" onClick={(e) => e.stopPropagation()}>
+            <div className="sficon"><i className="ti ti-cloud" aria-hidden="true"></i></div>
+            <h3>Salesforce sync</h3>
+            <p className="sftag">Not active in the demo environment</p>
+            <p className="sfbody">In production, this syncs both ways with your Salesforce org — pushing scored companies, recommended contacts, logged touches, and won/lost outcomes into Accounts, Contacts, and Opportunities, and pulling existing CRM records back in so reps work from one source of truth.</p>
+            <button className="btn" style={{ marginTop: 4 }} onClick={() => setShowSF(false)}>Got it</button>
+          </div>
         </div>
       )}
 

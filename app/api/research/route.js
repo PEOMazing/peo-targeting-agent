@@ -14,7 +14,7 @@ const WEB_SEARCH = process.env.COACH_WEB_SEARCH !== '0';
 
 const SYSTEM = `You research a company for a PEO (co-employment HR/payroll/benefits) sales team and return STRUCTURED SIGNALS used to qualify or disqualify it.
 
-Use web search to find current facts. Use ONLY what you can verify; if something is unknown, use null (or false only when you have evidence it's false). NEVER fabricate numbers, funding, or HR details. If authoritative facts are provided to you (employee count, industry, location), treat those as ground truth and do not contradict them.
+Use web search to find current facts. Use ONLY what you can verify; if something is unknown, use null (or false only when you have evidence it's false). NEVER fabricate numbers, funding, or HR details. If authoritative facts are provided (industry, location, founding year), treat those as ground truth. For EMPLOYEE COUNT: firmographic estimates often UNDERCOUNT distributed or field staff — property management with on-site teams, franchises, restaurants, construction crews, multi-location operators. Independently research the company's TRUE total headcount including on-site/field employees (use signals like number of locations/properties times typical staff per site, careers pages, news), and report your best estimate in "employees" with your "confidence".
 
 Output ONLY valid JSON, no markdown, matching exactly:
 {
@@ -55,7 +55,7 @@ export async function POST(req) {
 
     // 2) AI for the softer signals + summary. Feed it the Apollo facts as ground truth.
     const facts = apolloOrg
-      ? `\n\nAUTHORITATIVE FACTS (from firmographic data — use as ground truth, do not contradict):\n- Employees: ${apolloOrg.employees ?? 'unknown'}\n- Industry: ${apolloOrg.industry || 'unknown'}\n- HQ State: ${apolloOrg.state || 'unknown'}\n- Founded: ${apolloOrg.foundedYear ?? 'unknown'}`
+      ? `\n\nAUTHORITATIVE FACTS (ground truth — do not contradict): Industry: ${apolloOrg.industry || 'unknown'}; HQ State: ${apolloOrg.state || 'unknown'}; Founded: ${apolloOrg.foundedYear ?? 'unknown'}.\nFirmographic employee estimate (this often UNDERCOUNTS field/on-site staff — research the true total and report it in "employees"): ${apolloOrg.employees ?? 'unknown'}.`
       : '';
     const userPrompt = `Research this company and return the signals JSON:\nCompany: ${company || apolloOrg?.name || '(unknown)'}\nDomain/website: ${domain || '(unknown)'}${facts}\n\nFind the softer signals especially: recent funding, whether they have a dedicated HR team, multi-state/remote workforce, public/international status, and any disqualifying signals. Output ONLY the JSON.`;
     const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }] : undefined;
@@ -73,12 +73,24 @@ export async function POST(req) {
     let s = {};
     try { s = JSON.parse(clean); } catch { if (!apolloOrg) return Response.json({ error: 'Could not parse research. Try a domain, or connect Apollo for exact data.' }, { status: 502 }); }
 
-    // 3) Build the authoritative org. Apollo wins on firmographics; AI fills the rest.
+    // 3) Build the org. Apollo wins on industry/location/tech; headcount is reconciled.
+    const apolloEmp = apolloOrg && typeof apolloOrg.employees === 'number' ? apolloOrg.employees : null;
+    const aiEmp = typeof s.employees === 'number' ? s.employees : null;
+    let employees = apolloEmp;
+    let employeesSource = apolloOrg ? 'apollo' : (aiEmp != null ? 'web' : null);
+    let employeesAlt = null;
+    if (apolloEmp != null && aiEmp != null) {
+      employeesAlt = apolloEmp;
+      if (aiEmp > apolloEmp) { employees = aiEmp; employeesSource = 'web (higher than Apollo)'; }
+      else { employees = apolloEmp; employeesSource = 'apollo'; employeesAlt = aiEmp !== apolloEmp ? aiEmp : null; }
+    } else if (apolloEmp == null && aiEmp != null) {
+      employees = aiEmp; employeesSource = 'web';
+    }
+
     const org = apolloOrg
-      ? { ...apolloOrg, description: apolloOrg.description || s.summary || '' }
+      ? { ...apolloOrg, employees, description: apolloOrg.description || s.summary || '' }
       : {
-          name: s.name || company, domain: s.domain || domain,
-          employees: typeof s.employees === 'number' ? s.employees : null,
+          name: s.name || company, domain: s.domain || domain, employees,
           industry: s.industry || '', state: s.state || '', foundedYear: s.foundedYear || null,
           technologies: Array.isArray(s.technologies) ? s.technologies : [], keywords: [], description: s.summary || '',
         };
@@ -97,6 +109,7 @@ export async function POST(req) {
       qualification, summary: s.summary || org.description || '',
       confidence: apolloOrg ? 'high' : (s.confidence || 'medium'),
       researched: true, source: apolloOrg ? 'apollo' : 'ai',
+      employeesSource, employeesAlt,
     };
     return Response.json({ result });
   } catch (err) {
