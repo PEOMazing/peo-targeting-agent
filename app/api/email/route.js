@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
 const SYSTEM = `You write B2B sales outreach for a PEO (Professional Employer Organization) sales team. Given a prospect and deal context, write a short first-touch email and a 3-step follow-up sequence.
 
@@ -63,7 +63,7 @@ export async function POST(req) {
     const msg = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 1600,
-      system: SYSTEM,
+      system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userPrompt }],
     });
 

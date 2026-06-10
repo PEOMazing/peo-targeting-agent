@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 45;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 const WEB_SEARCH = process.env.COACH_WEB_SEARCH !== '0'; // on unless explicitly disabled
 
 const BASE_SYSTEM = `You are a real-time sales coach for reps selling a PEO (co-employment HR, payroll, and benefits) solution to SMBs. Reps message you mid-call with objections or quick questions. Reply FAST and SHORT — 2-4 sentences or a few tight bullets, phrased so the rep can say it almost word-for-word. Practical, not theoretical. No preamble like "Great question."
@@ -52,7 +52,7 @@ export async function POST(req) {
     if (!messages.length) return Response.json({ error: 'No message.' }, { status: 400 });
 
     const system = buildSystem(b.context);
-    const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }] : undefined;
+    const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }] : undefined;
 
     let reply = '';
     try {

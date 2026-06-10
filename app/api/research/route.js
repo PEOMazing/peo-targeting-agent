@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 const WEB_SEARCH = process.env.COACH_WEB_SEARCH !== '0';
 
 const SYSTEM = `You research a company for a PEO (co-employment HR/payroll/benefits) sales team and return STRUCTURED SIGNALS used to qualify or disqualify it.
@@ -58,7 +58,7 @@ export async function POST(req) {
       ? `\n\nAUTHORITATIVE FACTS (ground truth — do not contradict): Industry: ${apolloOrg.industry || 'unknown'}; HQ State: ${apolloOrg.state || 'unknown'}; Founded: ${apolloOrg.foundedYear ?? 'unknown'}.\nFirmographic employee estimate (this often UNDERCOUNTS field/on-site staff — research the true total and report it in "employees"): ${apolloOrg.employees ?? 'unknown'}.`
       : '';
     const userPrompt = `Research this company and return the signals JSON:\nCompany: ${company || apolloOrg?.name || '(unknown)'}\nDomain/website: ${domain || '(unknown)'}${facts}\n\nFind the softer signals especially: recent funding, whether they have a dedicated HR team, multi-state/remote workforce, public/international status, and any disqualifying signals. Output ONLY the JSON.`;
-    const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4 }] : undefined;
+    const tools = WEB_SEARCH ? [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }] : undefined;
 
     let text = '';
     try {

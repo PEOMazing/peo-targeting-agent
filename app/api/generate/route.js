@@ -6,7 +6,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 30;
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6';
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
 const SYSTEM = `You are a sales-enablement engine for a PEO (Professional Employer Organization) sales team selling into SMBs — including upselling payroll-only customers into a full PEO co-employment offering. Given a prospect, produce a concise, rep-ready deal brief.
 
@@ -104,8 +104,8 @@ export async function POST(req) {
 
     const msg = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 1900,
-      system: SYSTEM,
+      max_tokens: 1300,
+      system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       messages: [{ role: 'user', content: userPrompt }],
     });
 
