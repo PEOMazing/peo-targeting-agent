@@ -440,3 +440,21 @@ body { background:
 .sfbody { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0 0 22px; }
 
 .pbtop { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 4px 0 22px; }
+
+/* ---- My Day dashboard ---- */
+.dayhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.daysub { font-size: 13.5px; color: var(--muted); margin: 6px 0 0; line-height: 1.5; }
+.dsec { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--kale); font-weight: 700; margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+.dcount { font-size: 11px; font-weight: 800; color: #fff; background: var(--guava); border-radius: 999px; padding: 1px 8px; letter-spacing: 0; }
+.dcard { display: flex; align-items: center; gap: 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 13px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease; }
+.dcard:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(42,42,48,0.07); border-color: #d9cabd; }
+.dcard.followup { background: #FBF7EE; border-color: #ECDFC4; }
+.dscore { font-size: 24px; font-weight: 800; min-width: 40px; text-align: center; letter-spacing: -0.02em; }
+.dmain { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.dco { font-size: 15px; font-weight: 700; }
+.dmeta { font-size: 12.5px; color: var(--muted); }
+.dwhy { font-size: 12px; font-weight: 600; color: var(--guava); display: inline-flex; align-items: center; gap: 5px; }
+.dnext { font-size: 12px; color: var(--text); display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; }
+.dnext b { font-weight: 600; }
+.dright { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.dgo { font-size: 12px; font-weight: 700; color: var(--kale); white-space: nowrap; }

@@ -47,7 +47,7 @@ function parseList(text) {
 }
 
 export default function Page() {
-  const [tab, setTab] = useState('playbook');
+  const [tab, setTab] = useState('myday');
   const [listText, setListText] = useState('');
   const [scoring, setScoring] = useState(false);
   const [results, setResults] = useState(null);
@@ -84,6 +84,8 @@ export default function Page() {
   const [dealsLoading, setDealsLoading] = useState(false);
   const [partnerData, setPartnerData] = useState(null);
   const [partnerLoading, setPartnerLoading] = useState(false);
+  const [dailyData, setDailyData] = useState(null);
+  const [dailyLoading, setDailyLoading] = useState(false);
 
   const [coachOpen, setCoachOpen] = useState(false);
   const [coachMsgs, setCoachMsgs] = useState([]);
@@ -253,7 +255,33 @@ export default function Page() {
   }, []);
   useEffect(() => { if (tab === 'partners') loadPartners(); }, [tab, loadPartners]);
 
+  const loadDaily = useCallback(async () => {
+    setDailyLoading(true);
+    try { const res = await fetch('/api/daily'); setDailyData(await res.json()); }
+    catch { setDailyData({ targets: [], followUps: [] }); }
+    finally { setDailyLoading(false); }
+  }, []);
+  useEffect(() => { if (tab === 'myday') loadDaily(); }, [tab, loadDaily]);
+
+  const openTarget = (r) => {
+    const k = keyOf(r);
+    setResults((prev) => [r, ...((prev || []).filter((x) => keyOf(x) !== k))]);
+    setTab('target');
+    openRow(r);
+  };
+
   const sel = selectedKey != null && results ? results.find((r) => keyOf(r) === selectedKey) || null : null;
+
+  const realFollowUps = Object.entries(touches).map(([k, ts]) => {
+    if (!ts || !ts.length) return null;
+    const r = (results || []).find((x) => keyOf(x) === k);
+    if (!r) return null;
+    const last = ts[0];
+    const daysAgo = Math.max(0, Math.floor((Date.now() - new Date(last.at).getTime()) / 86400000));
+    return { ...r, lastTouchType: last.type, lastTouchDaysAgo: daysAgo, nextAction: 'Follow up on your last touch.' };
+  }).filter(Boolean);
+  const followUpList = realFollowUps.length ? realFollowUps : (dailyData?.followUps || []);
+  const followUpsAreDemo = !realFollowUps.length && (dailyData?.followUps?.length > 0);
 
   const draftEmail = async () => {
     if (!sel || !brief) return;
@@ -299,41 +327,55 @@ export default function Page() {
       <p className="sub">Feed it payroll-only clients (or one domain). It enriches each via Apollo, checks the incumbent vendor and hiring velocity, ranks them by PEO-fit likelihood, and writes the upsell brief on demand — learning from every outcome.</p>
 
       <div className="tabs">
-        <button className={tab === 'playbook' ? 'tab on' : 'tab'} onClick={() => setTab('playbook')}>Playbook</button>
+        <button className={tab === 'myday' ? 'tab on' : 'tab'} onClick={() => setTab('myday')}>My Day</button>
         <button className={tab === 'target' ? 'tab on' : 'tab'} onClick={() => setTab('target')}>Target &amp; Rank</button>
         <button className={tab === 'partners' ? 'tab on' : 'tab'} onClick={() => setTab('partners')}>Partner Intel</button>
         <button className={tab === 'deals' ? 'tab on' : 'tab'} onClick={() => setTab('deals')}>Deals &amp; Learning</button>
       </div>
 
-      {tab === 'playbook' && (
+      {tab === 'myday' && (
         <div className="card">
-          <h2>GTM Playbook — PEO off the payroll base</h2>
-          <div className="pbtop"><button className="enginebtn" onClick={() => { setTab('target'); score(); }}>▶  See the Engine</button><span className="enginehint">Jump straight to the ranked prospect list and watch the motion run.</span></div>
-          <p className="pblead">Gusto has 500k+ SMB payroll customers — a meaningful share already sit in the PEO sweet spot. This is a <b>monetization layer on the installed base</b>, not new-logo selling: a warm base means far lower CAC and faster payback. The prize = fit-eligible accounts × worksite employees × gross profit per WSE.</p>
-
-          <div className="pbsec">The motion — three pillars</div>
-          <div className="pbpillars">
-            <div className="pbpill lead"><span className="pbnum">1</span><span className="pbtag">Lead</span><h4>Accountant &amp; advisor channel</h4><p>Gusto already owns the trusted-advisor relationship through its tiered partner program + People Advisory. Activate the highest-fit partner books first (see Partner Intel), and certify and incentivize advisors to co-sell PEO.</p></div>
-            <div className="pbpill"><span className="pbnum">2</span><h4>Specialist overlay + routing</h4><p>PEO is a consultative co-employment sale, not a payroll add-on. A PEO specialist team fed by PEO-Qualified Leads from the propensity score, AM/CSM signals, and accountant referrals.</p></div>
-            <div className="pbpill"><span className="pbnum">3</span><h4>AI targeting &amp; enablement</h4><p>This app: scores and ranks the base, qualifies/disqualifies with reasons, briefs and coaches reps, drafts outreach, ranks advisor books, and learns from every outcome.</p></div>
+          <div className="dayhead">
+            <div>
+              <h2 style={{ margin: 0 }}>Your day{dailyData?.date ? `, ${dailyData.date}` : ''}</h2>
+              <p className="daysub">The agent scanned the base overnight. Here are today’s top targets and the follow-ups you owe.</p>
+            </div>
+            <span className="chip" onClick={loadDaily}>↻ Refresh</span>
           </div>
 
-          <div className="pbsec">Lead flow</div>
-          <div className="pbflow"><span className="pbnode">Base propensity</span><span className="pbarr">+</span><span className="pbnode">Accountant referral</span><span className="pbarr">+</span><span className="pbnode">AM/CSM signal</span><span className="pbarr">→</span><span className="pbnode">PEO-Qualified Lead</span><span className="pbarr">→</span><span className="pbnode">PEO specialist</span><span className="pbarr">→</span><span className="pbnode">Co-sell w/ advisor</span></div>
+          <div className="dsec">Follow-ups due {followUpList.length > 0 && <span className="dcount">{followUpList.length}</span>}</div>
+          {followUpsAreDemo && <p className="demobanner" style={{ marginBottom: 12 }}><i className="ti ti-flask" aria-hidden="true"></i> Demo data — sample follow-ups. Your real logged touches appear here automatically.</p>}
+          {followUpList.length === 0 && <p className="empty">No follow-ups due. Log a touch on any prospect and it’ll show up here.</p>}
+          {followUpList.map((r, i) => (
+            <div className="dcard followup" key={'f' + i} onClick={() => openTarget(r)}>
+              <span className="dscore" style={{ color: scoreColor(r.score) }}>{r.score}</span>
+              <div className="dmain">
+                <span className="dco">{r.name}</span>
+                <span className="dmeta">{[r.industry, r.employees && r.employees + ' emp'].filter(Boolean).join(' · ')}</span>
+                <span className="dnext"><i className="ti ti-arrow-back-up" aria-hidden="true"></i> Last: {r.lastTouchType} {r.lastTouchDaysAgo}d ago — <b>{r.nextAction}</b></span>
+              </div>
+              <span className="dgo">Open →</span>
+            </div>
+          ))}
 
-          <div className="pbsec">Phased rollout</div>
-          <div className="pbphase">
-            <div className="pbph"><div className="k">Crawl — pilot</div><p>One high-fit cohort (comp-heavy + multi-state + on Gusto + hiring) and a few Prioritize-tier accountants. Prove win rate, CAC payback, time-to-value.</p></div>
-            <div className="pbph"><div className="k">Walk — expand</div><p>More cohorts and states; scale People Advisory PEO certification; tune the score on real won/lost outcomes.</p></div>
-            <div className="pbph"><div className="k">Run — scale</div><p>Full base and channel; automate targeting (nightly scan surfaces top accounts to reps and partners).</p></div>
-          </div>
-
-          <div className="pbsec">Metrics scorecard</div>
-          <div className="pbmetrics"><span className="pbm">Attach rate on base</span><span className="pbm">PEO NRR</span><span className="pbm">CAC payback (upsell)</span><span className="pbm">Win rate by fit band</span><span className="pbm">Time-to-value</span><span className="pbm">Partner-sourced %</span></div>
-
-          <div className="pbguard"><div className="k">Guardrail — protect the core</div><ul style={{ margin: 0, paddingLeft: 18 }}><li>Do no harm to the payroll relationship — a botched co-employment transition can churn the base.</li><li>Disqualify bad-fit / bad-risk accounts to protect the master workers' comp policy.</li><li>Obsess over implementation and time-to-value.</li><li>Responsible AI: it gathers facts, transparent rules decide, humans verify.</li></ul></div>
-
-          <div className="pbcta"><button className="btn" style={{ width: 'auto', marginTop: 0 }} onClick={() => { setTab('target'); score(); }}>See the engine →</button></div>
+          <div className="dsec" style={{ marginTop: 26 }}>Today’s top targets {dailyData?.targets && <span className="dcount">{dailyData.targets.length}</span>}</div>
+          {dailyData?.demo && <p className="demobanner" style={{ marginBottom: 12 }}><i className="ti ti-flask" aria-hidden="true"></i> Demo data — sample feed. In production the nightly scan surfaces these from your real base + fresh signals.</p>}
+          {dailyLoading && <p className="empty"><span className="dots">Loading today’s targets</span></p>}
+          {dailyData?.targets?.map((r, i) => (
+            <div className="dcard" key={'t' + i} onClick={() => openTarget(r)}>
+              <span className="dscore" style={{ color: scoreColor(r.score) }}>{r.score}</span>
+              <div className="dmain">
+                <span className="dco">{r.name}{r.qualification?.recommendation === 'Disqualify' && <span className="rankdq" style={{ marginLeft: 8 }}>Disqualify</span>}</span>
+                <span className="dmeta">{[r.industry, r.employees && r.employees + ' emp', r.openings != null && r.openings + ' open roles'].filter(Boolean).join(' · ')}</span>
+                {r.whyNow && <span className="dwhy"><i className="ti ti-bolt" aria-hidden="true"></i> {r.whyNow}</span>}
+                {r.partner && <span className="rankpartner"><i className="ti ti-plug-connected" aria-hidden="true"></i> {r.partner.name} · {r.partner.influencedDeals} deals</span>}
+              </div>
+              <span className="dright">
+                <span className="rankmotion" style={{ color: motionColor(r.incumbent?.motion), borderColor: motionColor(r.incumbent?.motion) }}>{r.incumbent?.motion}</span>
+                <span className="dgo">Open →</span>
+              </span>
+            </div>
+          ))}
         </div>
       )}
 
