@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, createContext, useContext } from "react";
 
 /* ============================================================
    GABE × GUSTO — HEAD OF PEO SALES
@@ -151,6 +151,25 @@ const css = `
 .explain.miss { border-color: var(--error); background: var(--error-soft); }
 .explain .tag { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; display: block; margin-bottom: 4px; }
 
+.term { background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; border-bottom: 1.5px dotted var(--guava); cursor: pointer; }
+.term:hover { color: var(--guava-deep); }
+.term:focus-visible { outline: 2px solid var(--guava); outline-offset: 1px; }
+.term-overlay { position: fixed; inset: 0; background: rgba(35, 42, 53, 0.45); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 60; }
+.term-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; padding: 30px 30px 28px; max-width: 540px; width: 100%; max-height: 82vh; overflow-y: auto; box-shadow: 0 16px 60px rgba(35,42,53,0.22); }
+.term-acro { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); }
+.term-full { font-weight: 800; font-size: 21px; letter-spacing: -0.01em; margin: 6px 0 8px; }
+.term-def { font-size: 14.5px; line-height: 1.65; margin: 0; }
+.gloss-item { padding: 11px 0; border-bottom: 1px dashed var(--rule); font-size: 14px; }
+.gloss-item b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+.gloss-item p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 4px 0 0; }
+.path-wrap { max-width: 720px; margin: 0 auto 22px; }
+.path-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--guava-deep); border: 1px solid var(--guava); background: var(--guava-soft); border-radius: 999px; padding: 2px 9px; margin-left: 9px; vertical-align: 2px; white-space: nowrap; }
+.sources { border-top: 1px dashed var(--rule); margin-top: 22px; padding-top: 12px; }
+.src-tag { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; color: var(--ink-soft); display: block; margin-bottom: 7px; }
+.sources ul { margin: 0; padding-left: 16px; }
+.sources li { font-size: 12.5px; margin-bottom: 4px; line-height: 1.5; }
+.sources a { color: var(--guava-deep); text-decoration: none; }
+.sources a:hover { text-decoration: underline; }
 .score-wrap { text-align: center; padding: 20px 0 8px; }
 .score-num { font-family: 'IBM Plex Mono', monospace; font-size: 44px; font-weight: 600; }
 .score-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 22px; }
@@ -170,6 +189,18 @@ const css = `
 .t-list { margin: 7px 0 0; padding-left: 18px; }
 .t-list li { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 5px; }
 .t-list b { color: var(--ink); }
+.agent-card { margin-bottom: 10px; }
+.agent-head { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 18px; cursor: pointer; transition: border-color .15s; }
+.agent-head:hover { border-color: var(--guava); }
+.agent-head:focus-visible { outline: 2px solid var(--guava); outline-offset: 2px; }
+.agent-detail { border: 1px solid var(--rule); border-top: none; border-radius: 0 0 12px 12px; background: var(--surface); padding: 2px 18px 16px; }
+.sig-wrap { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 12px; }
+.sig-chip { display: inline-flex; gap: 6px; align-items: center; border: 1px dashed var(--rule); border-radius: 999px; padding: 5px 11px; font-size: 12px; color: var(--ink-soft); background: var(--bg); }
+.sig-chip b { font-family: 'IBM Plex Mono', monospace; color: var(--green); font-weight: 600; }
+.score-pill { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 6px 12px; border-radius: 999px; flex-shrink: 0; white-space: nowrap; }
+.score-pill.hot { background: var(--guava-soft); color: var(--guava-deep); border: 1px solid var(--guava); }
+.score-pill.warm { background: #F6EDDC; color: var(--gold); border: 1px solid var(--gold); }
+.score-pill.watch { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--rule); }
 .swot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
 .swot-cell { border-radius: 14px; padding: 20px 22px; border: 1px solid var(--rule); background: var(--surface); }
 .swot-cell h3 { margin: 0 0 10px; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
@@ -231,6 +262,11 @@ const COURSE = [
           { t: "p", x: "The industry's origin story matters because buyers' lawyers remember it. The model grew out of 1970s–80s 'employee leasing,' which exploded after a 1982 tax law (TEFRA) created a pension safe harbor that let owners exclude leased workers from retirement plans — a loophole closed in 1986. The 1990s and early 2000s brought real abuses: undercapitalized operators, unfunded health plans, and 'SUTA dumping' — shuffling payroll between entities to shed bad unemployment ratings, which Congress outlawed in the SUTA Dumping Prevention Act of 2004." },
           { t: "p", x: "The modern industry is the regulated descendant of that era: state registration and licensing regimes in the large majority of states, the ESAC accreditation program with bonded financial assurance, IRS certification (CPEO) since 2017, and a rebrand from 'staff leasing' to 'professional employer organization.' Today 500+ PEOs serve more than 230,000 client businesses and four-million-plus WSEs, with industry revenue of roughly $414 billion — more than quadruple its 2012 size. (Note for lesson seven: that headline figure is gross billings, including pass-through payroll — the distinction that separates operators from press-release readers.)" },
           { t: "callout", tag: "WHY THE HISTORY MATTERS", x: "When a prospect's attorney or CPA bristles at 'leasing my employees,' they're reacting to the 1990s version of this industry. Naming the history — and the licensing, bonding, ESAC, and CPEO regimes built in response — is how you show you know more about their objection than they do." },
+          { t: "sources", items: [
+            { l: "NAPEO — Industry Research & Data (500+ PEOs, 230K+ clients, $414B revenue, 4x since 2012)", u: "https://napeo.org/intro-to-peos/industry-research-data/" },
+            { l: "IRS — Certified Professional Employer Organization program", u: "https://www.irs.gov/tax-professionals/certified-professional-employer-organization" },
+            { l: "SUTA Dumping Prevention Act of 2004 (P.L. 108-295)", u: "https://www.congress.gov/bill/108th-congress/house-bill/3463" },
+          ]},
         ],
       },
       {
@@ -266,7 +302,7 @@ const COURSE = [
       {
         title: "Inside the Client Service Agreement",
         blocks: [
-          { t: "p", x: "The CSA is the product. Everything else is implementation. A consultant should be able to read any PEO's CSA and brief a client on six provisions:" },
+          { t: "p", x: "The CSA is the product. Everything else is implementation. A consultant should be able to walk a client through our CSA with total confidence — six provisions matter most:" },
           { t: "list", items: [
             "Allocation of responsibilities. The schedule defining which employer obligations the PEO assumes, which the client retains, and which are shared. This is the legal heart of co-employment.",
             "Pricing exhibits. Where the billing structure actually lives — admin fee or rate, what's bundled, pass-through definitions, and the PEO's rights to adjust rates (especially SUTA and comp 'true-ups' and benefits renewals).",
@@ -290,7 +326,14 @@ const COURSE = [
             "Form 8973. Each CPEO–customer relationship is reported to the IRS on Form 8973, filed at the start and end of every service contract. It's the paper trail that makes the sole-liability and successor rules operate.",
           ]},
           { t: "p", x: "Certification itself requires annual audited financials, quarterly assertions verified by a CPA, background and experience standards for responsible individuals, and a bond — generally the greater of $50,000 or 10% of the prior year's federal employment tax liability, capped at $1 million. Maintaining certification is an ongoing compliance burden, which is exactly why it signals financial discipline." },
-          { t: "p", x: "Keep CPEO distinct from ESAC accreditation. ESAC is the industry's independent accreditation program, backed by surety bonding that protects clients if an accredited PEO fails to remit payroll, taxes, or contributions. CPEO is federal tax status; ESAC is financial assurance. The strongest operators hold both, and you should know the credential set of every PEO you put in front of a client." },
+          { t: "p", x: "Keep CPEO distinct from ESAC accreditation. ESAC is the industry's independent accreditation program, backed by surety bonding that protects clients if an accredited PEO fails to remit payroll, taxes, or contributions. CPEO is federal tax status; ESAC is financial assurance. The strongest operators hold both — and the Gusto PEO's path to certification is part of our story, so know exactly what each credential means when a client asks." },
+          { t: "sources", items: [
+            { l: "IRS — CPEO program (certification, bond, requirements)", u: "https://www.irs.gov/tax-professionals/certified-professional-employer-organization" },
+            { l: "IRS — About Form 8973 (CPEO/Customer Reporting Agreement)", u: "https://www.irs.gov/forms-pubs/about-form-8973" },
+            { l: "26 U.S.C. § 3511 — sole liability, successor treatment, customer-level credits", u: "https://www.law.cornell.edu/uscode/text/26/3511" },
+            { l: "26 U.S.C. § 7705 — certification requirements", u: "https://www.law.cornell.edu/uscode/text/26/7705" },
+            { l: "ESAC — accreditation & financial assurance", u: "https://www.esac.org/" },
+          ]},
         ],
       },
       {
@@ -318,7 +361,7 @@ const COURSE = [
             ["Turnover", "12% lower employee turnover", "Benefits and HR quality showing up where it costs the most"],
             ["Profitability", "16% higher than non-PEO peers", "The bottom-line close"],
             ["Scale", "500+ PEOs, 230,000+ clients, ~$414B in industry revenue — quadrupled since 2012", "A category in structural growth, not a niche"],
-            ["Penetration", "Only ~17% of SMB employers use a PEO", "The market is mostly unconverted — category education wins deals incumbents never see"],
+            ["Penetration", "~15% of employers with 10–499 employees use a PEO (~14% in the 20–499 band) — and only ~4% of all US businesses", "Headroom on every axis: the core segment is six-in-seven unconverted, and the total market is barely touched"],
             ["Client profile", "Nearly two-thirds of PEO clients have 10–49 employees; almost half are in professional services, manufacturing, or construction", "Defines the ICP — and proves blue-collar is core PEO territory, not adjacent"],
           ]},
           { t: "callout", tag: "SOURCE DISCIPLINE", x: "These are NAPEO-commissioned benchmarks. Quote them as industry research, keep them current, and close on the prospect's own census and invoices — their numbers beat any benchmark, and the rep who uses both is unbeatable." },
@@ -331,7 +374,15 @@ const COURSE = [
             "Float and scale. Interest on funds held between collection and remittance, plus the operating leverage of running one platform across thousands of clients.",
           ]},
           { t: "p", x: "One more concept that marks an operator: gross billings versus net revenue. PEO 'revenue' headlines usually quote gross billings — which include client payroll passing through. The real business is net service revenue: fees plus spreads. When you evaluate a PEO's financial strength, or read a public PEO's earnings, that's the number that matters." },
-          { t: "callout", tag: "SAY IT THIS WAY", x: "\"I'll tell you exactly how every PEO in this comparison makes its money on your account — fee, comp spread, tax spread, and benefits load. Once you see all four, you can compare anything they put in front of you.\"" },
+          { t: "callout", tag: "SAY IT THIS WAY", x: "\"Every PEO makes money on your account in four places: the admin fee you can see — plus what they make on workers' comp pricing, on unemployment taxes, and inside the benefits rates. Most quotes only show you the first one. I'll show you exactly how the Gusto PEO works in all four — published, line by line — next to what you're paying to employ people today.\"" },
+          { t: "sources", items: [
+            { l: "ROI (27%, $1,273 per $1,000) and per-employee cost vs savings — NAPEO: The ROI of Using a PEO", u: "https://napeo.org/wp-content/uploads/2025/03/white-paper-7-the-roi-of-using-a-peo.pdf" },
+            { l: "Growth (4.3% vs 1.6%), 12% lower turnover, 50% less likely to fail — NAPEO: PEO Clients — Faster Growing, More Resilient Businesses (2024)", u: "https://napeo.org/wp-content/uploads/2025/03/2024-white-paper-final.pdf" },
+            { l: "16% higher profitability, retirement-plan access, industry scale ($414B, 4x since 2012) — NAPEO Industry Research & Data", u: "https://napeo.org/intro-to-peos/industry-research-data/" },
+            { l: "Penetration (~15% of 10–499 EE employers; ~14% of 20–499; ~4% of all US businesses) — NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
+            { l: "Penetration headline (230K+ clients = ~15% of 10–499) — NAPEO press release, Oct 2025", u: "https://www.prnewswire.com/news-releases/new-napeo-research-highlights-growth-and-diversity-of-peo-clients-302586964.html" },
+            { l: "Client profile (two-thirds at 10–49 EEs; ~half in professional services, manufacturing, construction) — NAPEO: PEO Clients — An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
+          ]},
         ],
       },
     ],
@@ -392,7 +443,7 @@ const COURSE = [
             "Below gross profit: service delivery (payroll ops, HR business partners), technology, and sales cost — commissions plus the customer-acquisition math.",
           ]},
           { t: "p", x: "That last line explains the industry's obsession with retention. Acquiring and implementing a client is expensive; the account often isn't truly profitable until well into the relationship. A client retained through several renewals is the entire business model; a client churned at month fourteen is a loss dressed as a logo. When a PEO fights hard at renewal, that's not pride — it's the P&L." },
-          { t: "callout", tag: "EXEC LENS", x: "Three questions reveal any PEO's economic quality: What's your gross profit per WSE trend? What share of it comes from insurance spreads versus fees? And what's your WSE retention rate? Fee-led, high-retention books are durable. Spread-led books are leveraged bets on claims." },
+          { t: "callout", tag: "EXEC LENS", x: "The three numbers that will define the Gusto PEO's economic quality: the gross-profit-per-WSE trend, the share of it coming from fees versus insurance spreads, and WSE retention. Fee-led, high-retention books are durable — that's the book we're building." },
         ],
       },
       {
@@ -414,9 +465,9 @@ const COURSE = [
           { t: "p", x: "The last piece of the construct is how service is actually produced — because the service model is a P&L choice, not just a customer-experience choice." },
           { t: "list", items: [
             "Implementation. Data collection, benefits enrollment, comp binding, state account work, then the first payroll — the trust milestone. Implementation quality is the strongest early predictor of retention, which is why mature PEOs run it as a specialized function, not a sales afterthought.",
-            "Service models span a cost spectrum. Dedicated HR business partners and named teams (the premium, service-heavy model) sit at one end; pooled service centers and software-first self-serve (the transparent-PEPM model) at the other. Neither is 'better' — they are different cost structures sold to different buyers at different price points. An exec evaluating PEOs should map the service model to what their managers will actually use.",
+            "Service models span a cost spectrum. Dedicated HR business partners and named teams (the premium, service-heavy model) sit at one end; pooled service centers and software-first self-serve (the transparent-PEPM model) at the other. Neither is 'better' — they are different cost structures sold to different buyers at different price points. Ours must map to how our clients actually operate: self-serve with genuinely reachable humans, matched to the base.",
             "The renewal cycle. The benefits renewal is the annual moment of truth where underwriting reality, allocation philosophy, and relationship quality all surface at once. Most churn is conceived at a renewal and executed at the next one.",
-            "Exit and churn drivers. Accounts leave over renewal shock, service failures, M&A, outgrowing the model (graduating to self-funded plans around a few hundred employees), or a sharper rep running an unbundling play. Each is predictable; the operating question is which ones your model prevents.",
+            "Exit and churn drivers. Accounts leave over renewal shock, service failures, M&A, outgrowing the model (graduating to self-funded plans around a few hundred employees), or a sharper competitor re-selling the account. Each is predictable; the operating question is which ones your model prevents.",
           ]},
           { t: "callout", tag: "EXEC LENS", x: "Connect the three lessons: risk selection determines the book, the book's claims determine gross profit per WSE, and service model plus renewal philosophy determine whether the book stays. That loop — select, price, serve, retain — is the construct of a PEO." },
         ],
@@ -448,13 +499,13 @@ const COURSE = [
             "Percent-of-payroll escalates silently. Every raise, every bonus, every commission check increases the PEO's fee — with no additional service delivered. A 3% admin rate on a team averaging $80K is $200 PEPM; give everyone a 10% raise and the fee rises 10% too.",
           ]},
           { t: "callout", tag: "DO THE MATH", x: "Always convert percent-of-payroll quotes to effective PEPM: (annual payroll × rate) ÷ headcount ÷ 12. A '2.8%' quote sounds small; '$187 per employee per month' is a number a buyer can actually compare." },
-          { t: "p", x: "Bundled quotes go a step further and blend the admin fee into a single rate that also includes taxes and comp. Bundling isn't automatically bad — but it makes the admin fee invisible, which makes comparison impossible without unbundling. That skill is next." },
+          { t: "p", x: "Bundled quotes go a step further and blend the admin fee into a single rate that also includes taxes and comp. Bundling makes the admin fee invisible. The Gusto PEO takes the opposite road — published and itemized — and the next lesson shows what's actually inside any PEO bill, ours included." },
         ],
       },
       {
         title: "Anatomy of a PEO invoice",
         blocks: [
-          { t: "p", x: "Every PEO bill, however it's formatted, is built from the same five components. Your job in any deal is to be able to decompose both the incumbent's bill and your proposal into this stack:" },
+          { t: "p", x: "Every PEO bill, however it's formatted, is built from the same five components. A consultant should be able to explain every line of a Gusto PEO bill — and understand the bills clients bring from whatever world they're coming from:" },
           { t: "table", head: ["Component", "What it should be", "Where margin hides"], rows: [
             ["Gross wages", "Pure pass-through", "Nothing — if wages are marked up, run"],
             ["FICA / FUTA", "Statutory pass-through", "Rarely padded, but verify caps are applied"],
@@ -462,9 +513,9 @@ const COURSE = [
             ["Workers' comp", "Manual rate × class code × e-mod, or net rate", "Net rates marked up over the PEO's true cost"],
             ["Benefits + admin fee", "Premiums + disclosed fee", "Benefit 'loads' on top of premium; fee buried in a bundled rate"],
           ]},
-          { t: "p", x: "A transparent PEO will show each line. A bundled biller will show one blended rate per employee or per pay period. When you unbundle a blended rate — subtract true statutory taxes, true comp cost, and actual benefit premiums — whatever remains is the real administrative fee. That number is often two or three times what the buyer thinks they're paying." },
-          { t: "p", x: "Know the industry's most effective camouflage tactic: line-item migration, also called premium shifting. A PEO quotes the same underlying health plan as everyone else, but moves a slice of the true premium out of the premium line and into its fee lines — a benefit administration fee here, a co-employment risk fee there, a technology service fee, a markup line. If the true premium is $500, shifting $70 into the benefits admin fee and $50 into a risk fee lets the proposal display a $380 premium next to competitors' $500 for the identical plan. Buyers anchor on the premium line, the 'cheaper' quote wins, and total cost was never different. The defense is mechanical: total every line, per employee per month, and compare totals only — never any single line." },
-          { t: "callout", tag: "FIELD NOTE", x: "Ask the prospect for one full invoice and their SUI rate notice. If the SUTA rate on the invoice doesn't match the rate notice, you've found the conversation." },
+          { t: "p", x: "A transparent PEO shows each line — that is the Gusto PEO standard. In the market you'll also meet blended billing: one rate per employee that combines taxes, comp, benefits, and fee into a single number, making the fee itself invisible. Know how blended rates are built (the components above) so you can answer a client's questions about where they're coming from — and explain, concretely, why an itemized bill protects them." },
+          { t: "p", x: "Know the industry's most effective camouflage tactic: line-item migration, also called premium shifting. A PEO quotes the same underlying health plan as everyone else, but moves a slice of the true premium out of the premium line and into its fee lines — a benefit administration fee here, a co-employment risk fee there, a technology service fee, a markup line. If the true premium is $500, shifting $70 into the benefits admin fee and $50 into a risk fee lets the proposal display a $380 premium next to competitors' $500 for the identical plan. Buyers anchor on the premium line, the 'cheaper' quote wins, and total cost was never different. Know the tactic exists so nothing in the market confuses you — and so you can explain why the Gusto PEO's structure makes it impossible: published pricing, itemized bills, nothing blended, nothing to migrate." },
+          { t: "callout", tag: "FIELD NOTE", x: "SUI rate notices, comp dec pages, and a current invoice aren't ammunition — they're the underwriting and baseline artifacts that let us quote accurately and build the client's honest current-state picture." },
         ],
       },
       {
@@ -497,101 +548,88 @@ const COURSE = [
           { t: "list", items: [
             "Composite vs age-banded. Composite rates charge one blended rate per tier (EE, EE+spouse, family). Age-banded rates vary by each employee's age. A young group often does better age-banded; an older group benefits from composite blending. Know which structure each quote uses before comparing.",
             "Participation requirements. Plans typically require a minimum share of eligible employees to enroll. A group that can't hit participation can blow up after the sale — verify during discovery, not at implementation.",
-            "Renewal behavior. Year one is the honeymoon; the renewal is the marriage. Ask any incumbent's client what their last two renewals were. Double-digit renewals on a 'great' master plan are the most common reason accounts go back to market — and your best prospecting trigger.",
+            "Renewal behavior. Year one is the honeymoon; the renewal is the marriage. Clients arriving from other PEOs usually arrive because of renewal shock — double-digit increases on a 'great' master plan are the most common reason accounts go back to market. Our renewal philosophy, in writing, is the answer to the fear every one of them brings.",
           ]},
-          { t: "callout", tag: "SAY IT THIS WAY", x: "\"Anyone can buy your business with a year-one rate. I'll show you the renewal history and the rate structure, because that's what you'll actually live with.\"" },
+          { t: "callout", tag: "SAY IT THIS WAY", x: "\"Anyone can buy your business with a year-one rate. I'll show you our rate structure and put our renewal philosophy in writing — because year two is what you actually live with.\"" },
         ],
       },
     ],
     quiz: [
       { q: "A client has $4.0M in annual payroll and 50 employees. A PEO quotes a 3% of payroll admin structure. What's the effective PEPM?", opts: ["$100", "$150", "$200", "$240"], a: 2, x: "$4,000,000 × 3% = $120,000 ÷ 50 employees ÷ 12 months = $200 PEPM. Always convert percentage quotes to PEPM so buyers can compare structures honestly." },
       { q: "The core problem with percent-of-payroll admin pricing for the client is:", opts: ["It's illegal in most states", "Fees escalate automatically with every raise and bonus, with no added service", "It can't include workers' comp", "It only works for hourly workforces"], a: 1, x: "Percent-of-payroll pricing ties the fee to compensation, not to service delivered. Payroll grows, the fee grows. It's the quiet escalator in bundled deals." },
-      { q: "You unbundle a blended bill rate by:", opts: ["Dividing it by headcount", "Asking the PEO for its margin", "Subtracting true statutory taxes, actual comp cost, and actual benefit premiums — the remainder is the real admin fee", "Multiplying the e-mod by the SUTA rate"], a: 2, x: "Whatever survives after stripping out the real pass-throughs is administration and margin. That residual is frequently far larger than the buyer believes." },
+      { q: "A client arrives from a PEO that billed one blended rate per employee. What was inside that single number?", opts: ["Only the administrative fee", "Wages only", "Statutory taxes, workers' comp, benefits, and the admin fee — combined so the fee itself is invisible", "A format required by state law"], a: 2, x: "Blended billing folds the pass-throughs and the fee into one rate. Understand it so you can answer questions about where a client is coming from — and explain why the Gusto PEO bills the opposite way: published, itemized, line by line." },
       { q: "A company leaves a non-certified PEO in July. The main tax consequence to flag:", opts: ["FUTA is forgiven for the year", "FICA and SUTA wage bases can restart, duplicating taxes on wages already taxed", "The e-mod resets to 1.00", "Benefits premiums become taxable"], a: 1, x: "Mid-year EIN transitions with a non-CPEO can restart wage bases. Quantify it per employee — and note that CPEO arrangements eliminate the federal restart." },
       { q: "An e-mod of 1.25 means:", opts: ["The client gets a 25% comp discount", "Claims experience is 25% worse than industry expectation, surcharging premium 25%", "The class code is high hazard", "Payroll grew 25%"], a: 1, x: "The experience modifier scales premium to actual loss history versus expected losses. High e-mod clients are exactly the profile that benefits most from a PEO master policy." },
       { q: "The main client benefit of pay-as-you-go workers' comp is:", opts: ["Lower manual rates", "No class codes", "Premiums track actual payroll each cycle — no big deposit, far smaller audit surprises", "It removes the e-mod"], a: 2, x: "Pay-as-you-go is a cash-flow and predictability story. It doesn't change rates; it changes when and how accurately premium is paid." },
       { q: "Comparing two benefit quotes, one composite-rated and one age-banded, you should first:", opts: ["Pick the lower family tier rate", "Recognize the structures price differently by group demographics — model both against the actual census", "Assume composite is always cheaper", "Assume age-banded is always cheaper"], a: 1, x: "A young census often wins age-banded; an older census benefits from composite blending. Quote structures must be run against the real census before any rate comparison means anything." },
-      { q: "A proposal shows a $380 premium for the same plan every competitor quotes at $500 — alongside a benefits admin fee, a co-employment risk fee, a technology fee, and other line items. The most likely explanation:", opts: ["They negotiated a better carrier rate", "Premium shifting: real premium dollars migrated into the fee lines so the displayed premium anchors cheaper, while total cost is unchanged", "The plan has a much higher deductible", "A state premium subsidy"], a: 1, x: "Line-item migration. Same plan, same carrier, same total — dollars moved out of the premium line because buyers anchor on premiums. The counter is mechanical: total every line per employee per month and compare totals only." },
+      { q: "A proposal shows a $380 premium for the same plan every competitor quotes at $500 — alongside a benefits admin fee, a co-employment risk fee, a technology fee, and other line items. The most likely explanation:", opts: ["They negotiated a better carrier rate", "Premium shifting: real premium dollars migrated into the fee lines so the displayed premium anchors cheaper, while total cost is unchanged", "The plan has a much higher deductible", "A state premium subsidy"], a: 1, x: "Line-item migration. Same plan, same carrier, same total — dollars moved out of the premium line because buyers anchor on premiums. Totals, not single lines, are how honest comparisons work — and published, itemized pricing is why the tactic can't hide in a Gusto PEO quote." },
     ],
   },
   {
-    id: "landscape",
+    id: "gustopeo",
     num: "04",
-    title: "Competitive Landscape",
-    tagline: "Who the players are, how they position, and how to pick the right fit.",
+    title: "Selling the Gusto PEO",
+    tagline: "Our product, our market, our motion \u2014 what we're building and who it's for.",
     lessons: [
       {
-        title: "The big nationals",
+        title: "The market we're entering",
         blocks: [
-          { t: "table", head: ["PEO", "Positioning", "What to know in a deal"], rows: [
-            ["ADP TotalSource", "Largest PEO by WSE count; full ADP ecosystem", "Scale and brand comfort; pricing often bundled — unbundle it. Service model is structured, not boutique."],
-            ["Insperity", "Premium, service-heavy; deep HR consulting model", "Sells on service intensity and is priced accordingly. Wins relationship buyers; vulnerable on price transparency and tech experience."],
-            ["TriNet", "Vertical-specific practices (tech, life sciences, financial services, nonprofits)", "Industry-tailored benefits and expertise. Strong in venture-backed and professional verticals."],
-            ["Paychex PEO", "PEO arm of the payroll giant (incl. legacy Oasis)", "Often enters through existing Paychex payroll relationships. Watch for payroll-bundle pricing framing."],
+          { t: "p", x: "Everything in Modules 1\u20133 is category knowledge \u2014 what a PEO is, how one runs, and what builds a bill. This module is about ours. Start with the market: a ~$414B industry that has more than quadrupled since 2012, serving 230,000+ businesses \u2014 yet only ~15% of employers with 10\u2013499 employees, and roughly 4% of all US businesses, use a PEO. We are entering a large, growing, and mostly unconverted category." },
+          { t: "p", x: "Three broad archetypes operate in it today. Service-heavy nationals sell depth: named HR teams, consulting intensity, premium pricing. Tech-forward platforms sell product: software experience, speed, and in some cases published pricing. Regional specialists sell flexibility: underwriting creativity and local relationships. Know these shapes the way you'd know the geography of any market you sell in \u2014 because clients will ask what else is out there, and a confident, fair answer builds more trust than a rehearsed attack." },
+          { t: "callout", tag: "HOW WE TALK ABOUT THE MARKET", x: "We don't run teardowns and we don't sell against anyone's invoice. We sell the Gusto PEO: what it is, what it costs, and what it does for the client \u2014 next to what they're paying to employ people today. If a client brings another quote, we answer questions honestly and normalize structures so they can see clearly. That's the whole policy." },
+          { t: "sources", items: [
+            { l: "Market size, growth, client counts \u2014 NAPEO Industry Research & Data", u: "https://napeo.org/intro-to-peos/industry-research-data/" },
+            { l: "Penetration (~15% of 10\u2013499 EE employers; ~4% of all US businesses) \u2014 NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
           ]},
-          { t: "p", x: "The nationals win on scale, plan depth, and brand safety. They are most exposed on price opacity, service consistency at the account level, and — against tech-forward rivals — user experience." },
         ],
       },
       {
-        title: "Tech-forward entrants",
+        title: "The Gusto PEO: one platform, three tiers",
         blocks: [
-          { t: "table", head: ["PEO", "Positioning", "What to know in a deal"], rows: [
-            ["Justworks", "Transparent flat PEPM pricing, self-serve, SMB-first", "Published pricing is its weapon. Strongest with small, simple, young groups; thinner on hands-on HR service and complex comp."],
-            ["Rippling PEO", "Software-first; PEO as a toggle on its HR/IT platform", "Sells the platform; the PEO can be switched off while staying on the software. Compelling for tech buyers; service depth is the question to probe."],
-            ["Gusto (entering PEO)", "Payroll-native SMB base moving upmarket into PEO", "Massive installed payroll base to upsell. Watch this space — distribution through an existing product is a structurally different motion."],
-          ]},
-          { t: "callout", tag: "FIELD NOTE", x: "Tech-forward PEOs reframe the category: the product is the software, and co-employment is a feature. Against them, sell underwriting depth, renewal history, comp expertise, and a named human who answers the phone. Selling for them, sell speed, transparency, and the demo." },
-        ],
-      },
-      {
-        title: "Mid-market, regional, and the aggregation trend",
-        blocks: [
-          { t: "p", x: "Below the nationals sits a deep bench: Vensure and its large family of acquired PEOs, Engage, Nextep, and dozens of strong regionals. Two things to understand about this tier:" },
+          { t: "p", x: "The Gusto PEO is built as a ladder, not a single product. Same platform, same payroll engine clients already trust \u2014 three ways to buy co-employment:" },
           { t: "list", items: [
-            "Flexibility is the pitch. Regionals often out-hustle nationals on underwriting creativity, comp programs for tough class codes, and willingness to customize. Their risk surface is service scalability and financial depth — this is where CPEO/ESAC credentials matter most.",
-            "Aggregation is reshaping the tier. Roll-ups have been acquiring regional PEOs for years. A client signed with a friendly local PEO can wake up inside a platform with different service and pricing philosophy. Know the ownership story of any PEO you put on the table.",
+            "PEO 1 \u2014 the flagship. Full co-employment with the master benefits program: large-group medical, dental, vision, ancillary lines, workers' comp, EPLI, and the complete HR and compliance stack. This is the product for the benefits-driven buyer \u2014 the majority of the market.",
+            "PEO 2 \u2014 full co-employment without benefits enrollment. Identical foundation, platform, and pricing logic; the only difference is the client keeps its own benefits and broker. This is how we serve clients with broker relationships they value \u2014 and how brokers stay allies instead of obstacles.",
+            "PEO 3 \u2014 the certified exchange, once CPEO certification lands. IRS certification under IRC \u00A77705 brings sole federal employment-tax liability and successor-employer treatment under \u00A73511 \u2014 no wage-base restart, which makes mid-year starts clean and removes the January-only constraint most of the industry lives with.",
           ]},
+          { t: "callout", tag: "THE LADDER", x: "Payroll \u2192 PEO 2 \u2192 PEO 1, and someday back down \u2014 without ever leaving Gusto. A client can graduate up as they grow and step down if their needs simplify, on one platform, with their data intact. Most of the industry treats leaving a PEO as a breakup; we treat it as a floor change in the same building." },
         ],
       },
       {
-        title: "What's in the fee: the inclusions matrix",
+        title: "Who we serve and how we reach them",
         blocks: [
-          { t: "p", x: "The most common comparison mistake in this industry is lining up admin fees that don't buy the same things. Before any rate goes in front of a client, build the inclusions picture: what each PEO's fee covers as standard, and what shows up later as an add-on. The matrix below reflects typical packaging as of mid-2026 — treat it as a starting map, and verify against the actual proposal every time, because packaging changes and most of these providers quote custom." },
-          { t: "table", head: ["PEO", "Pricing structure", "Standard with the admin fee", "Typically extra"], rows: [
-            ["ADP TotalSource", "Custom quote; PEPM or % of payroll, often bundled", "Payroll & tax admin, HR support, compliance, benefits administration, WC program access, learning/talent tools", "All insurance premiums; enhanced recruiting/HR services; unbundle the blended rate to find the real fee"],
-            ["Insperity", "Custom quote; allocation often presented as comprehensive PEPM", "Dedicated HR service team, payroll, compliance, performance & training resources, EPLI", "Premiums; specialty consulting and retained recruiting; premium service intensity is priced into the fee itself"],
-            ["TriNet", "Custom PEPM, often by industry vertical", "Payroll & tax admin, benefits administration, compliance, vertical-specific HR expertise, platform", "Premiums; enhanced HR service tiers; certain time/recruiting products as add-ons"],
-            ["Paychex PEO", "Custom quote, frequently framed alongside payroll bundles", "Payroll, HR generalist support, compliance, benefits administration", "Premiums; time & attendance and recruiting modules; watch the payroll-bundle framing in comparisons"],
-            ["CoAdvantage", "Custom quote; PEPM or % of payroll", "Payroll & tax admin, CoAdQuantum platform, benefits administration, WC claims & safety support, HR compliance guidance", "Premiums; recruiting, performance-management and other add-on programs; verify current CPEO/ESAC credential status"],
-            ["Justworks", "Published flat PEPM — Basic and Plus tiers (volume discounts at headcount breaks); 3 WSE minimum; month-to-month, no setup fees", "Basic: payroll, compliance, WC administration, 401(k) access, HR tools, 24/7 support", "Master medical/dental/vision access requires the Plus tier — recently raised from $109 to ~$129 PEPM; premiums always extra; time tracking, international contractors, and marketplace perks billed per item"],
-            ["Rippling", "Modular: base platform PEPM plus per-module fees; PEO service custom-quoted on top", "Software platform (HR records, workflows); PEO quote includes payroll, tax filing, WC and EPLI coverage, compliance support", "Nearly everything is a module — benefits admin, time, IT, spend each add PEPM; implementation fees can apply; premiums extra. Strength and risk in one design: pay for what you use, but the stack adds up"],
-          ]},
-          { t: "p", x: "Two disciplines turn this matrix into wins. First, normalize before comparing: convert every structure to effective PEPM on the same census, then list what that PEPM actually buys at each provider. A $59 fee without master-plan access, a $109 fee with it, a custom bundled rate hiding the fee entirely, and a modular stack that grows per feature are four different products wearing one label. Second, ask the inclusion question out loud in every deal — 'walk me through exactly what the administrative fee covers, and show me the add-on price list' — because the answer is the comparison." },
-          { t: "callout", tag: "ALWAYS EXTRA — EVERYWHERE", x: "No admin fee at any PEO includes: gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Any proposal implying otherwise is blending, not including — unbundle it." },
-        ],
-      },
-      {
-        title: "A positioning framework",
-        blocks: [
-          { t: "p", x: "Every PEO deal is won by matching the buyer's dominant need to the right archetype. Three axes cover most of it:" },
+          { t: "p", x: "Our ICP comes straight from the industry's own demographics: nearly two-thirds of all PEO clients have 10\u201349 employees, and roughly half are in professional services, manufacturing, or construction. Layer on the strongest propensity signals \u2014 multi-state footprint, benefits-seeking behavior, growth, comp complexity \u2014 and that's the target." },
+          { t: "p", x: "What makes our motion different is where those targets already live: inside Gusto's payroll base of 500,000+ businesses. The in-base motion runs on lifecycle triggers \u2014 a new state registration, a headcount crossing, a benefits question asked in-app, a renewal window opening \u2014 surfaced and prioritized so the team starts each day with the accounts most likely to need us now." },
           { t: "list", items: [
-            "Service vs software. Does this buyer want a named HR partner and white-glove handling, or a clean product they mostly self-serve? Founders who hate vendors lean software; owners who hate HR lean service.",
-            "Benefits vs cost. Is the deal driven by richer plans for recruiting, or by total cost reduction? Lead the proposal with whichever the discovery surfaced — not with your favorite slide.",
-            "Simplicity vs complexity. Multi-state, high e-mod, certified payroll, tough class codes → depth and underwriting muscle. Ten salaried employees in one state → speed and transparency.",
+            "Internal partnership is a rule, not a vibe. Payroll account owners are partners in every conversion: written rules of engagement, shared credit, and a warm handoff. The payroll team wins every time we win, or the motion dies.",
+            "The accountant channel multiplies us. Thousands of accountants already recommend Gusto; equipping them to spot PEO fit in their own client books is distribution no competitor can copy quickly.",
+            "The season is real. PEO selling concentrates September through December ahead of January 1 benefits starts \u2014 pipeline builds in summer, proposals surge in fall, implementation peaks in December. Plan the year around it.",
           ]},
-          { t: "callout", tag: "SAY IT THIS WAY", x: "\"There's no best PEO — there's a best PEO for your census, your states, your class codes, and your renewal. Let me show you how I'd match it.\"" },
+          { t: "callout", tag: "FIELD NOTE", x: "The trigger beats the list. An account that just registered in a second state or just lost a candidate over benefits is worth ten cold names \u2014 the event creates the conversation, and we can see the event." },
+          { t: "sources", items: [
+            { l: "Client profile (two-thirds at 10\u201349 EEs; ~half in professional services, manufacturing, construction) \u2014 NAPEO: PEO Clients \u2014 An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
+          ]},
+        ],
+      },
+      {
+        title: "Our pricing promise",
+        blocks: [
+          { t: "p", x: "Module 3 taught the four places any PEO makes money: the admin fee, workers' comp pricing, unemployment taxes, and benefits rates. Our promise is structural transparency in all four \u2014 a published PEPM admin fee anyone can look up, itemized bills where taxes, comp, and premiums each show as their own line, and a renewal philosophy we put in writing before the first invoice." },
+          { t: "p", x: "Published pricing does in this category what it did for Gusto in payroll: it converts a traditionally opaque, quote-gated sale into one a buyer can start by themselves. In a market where most providers custom-quote everything, the published number is a trust signal before a rep ever speaks." },
+          { t: "callout", tag: "ALWAYS EXTRA \u2014 EVERYWHERE, INCLUDING HERE", x: "No PEO's admin fee \u2014 ours included \u2014 covers gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Those are pass-throughs. Saying this out loud, unprompted, is part of how we sell." },
+          { t: "callout", tag: "SAY IT THIS WAY", x: "\"Our admin fee is published \u2014 you can see it without talking to me. Your bill will show every component on its own line: wages, taxes, comp, premiums, our fee. And before you sign, I'll put our renewal philosophy in writing, because year two matters more than year one.\"" },
         ],
       },
     ],
     quiz: [
-      { q: "Which PEO is best known for a premium, service-intensive model and is priced accordingly?", opts: ["Justworks", "Insperity", "Rippling", "Paychex PEO"], a: 1, x: "Insperity leads with service depth and HR consulting intensity. It wins relationship buyers and is most exposed on price transparency and tech experience." },
-      { q: "Justworks' core differentiator in the market is:", opts: ["Vertical industry practices", "The largest WSE count", "Published, transparent flat PEPM pricing with a self-serve experience", "Specialty workers' comp programs"], a: 2, x: "Transparent flat PEPM pricing is the Justworks weapon — it converts a traditionally opaque sale into a published-price one, which is devastating against bundled quotes." },
-      { q: "Rippling's distinctive PEO claim is:", opts: ["You can turn the PEO off and stay on the same software platform", "It guarantees the lowest comp rates", "It only serves companies over 500 employees", "It includes a staffing agency"], a: 0, x: "The PEO-as-toggle pitch addresses the exit fear directly: leave co-employment without re-implementing systems. Probe service depth when competing against it." },
-      { q: "A 9-person fully-remote software startup wants benefits live in three weeks and hates sales calls. The archetype most likely to fit:", opts: ["A premium service-heavy national", "A regional PEO with specialty comp programs", "A transparent-PEPM, self-serve, tech-forward PEO", "An ASO"], a: 2, x: "Small, simple, young, speed-sensitive, software-native — the tech-forward transparent-pricing profile. Match the archetype to the buyer, not the buyer to your archetype." },
-      { q: "The main caution to understand about the regional PEO tier right now:", opts: ["Regionals can't offer health benefits", "Roll-up acquisitions can change a client's service and pricing reality after signing", "Regionals are not legal in most states", "They cannot hold CPEO status"], a: 1, x: "Aggregators have been consolidating regionals for years. Ownership trajectory is part of due diligence — a great local PEO today may be a platform brand tomorrow." },
-      { q: "Why does a payroll-native player entering PEO (e.g., upselling an existing payroll base) represent a structurally different sales motion?", opts: ["It avoids state licensing", "Distribution: it sells co-employment into an installed base it already serves, rather than cold-acquiring clients", "Payroll companies are exempt from underwriting", "It eliminates the CSA"], a: 1, x: "Selling an upgrade into an existing, trusting customer base is cheaper and faster than net-new acquisition. It changes CAC, sales cycle, and who controls the relationship." },
-      { q: "A client compares Justworks Basic at ~$59 PEPM against a competitor's fee and asks why it's so cheap. The key packaging fact:", opts: ["Justworks includes health premiums at that price", "Master medical/dental/vision access requires the Plus tier — Basic doesn't include the benefits engine most PEO buyers are actually shopping for", "Basic includes dedicated HR business partners", "There is no difference between tiers"], a: 1, x: "Basic covers payroll, compliance, WC admin, and HR tools; large-group health access is what the Plus tier buys — recently raised from $109 to ~$129 PEPM. Comparing Basic's fee to a benefits-inclusive structure is the classic inclusions mistake." },
-      { q: "Which costs are NEVER inside any PEO's administrative fee, at any provider?", opts: ["Compliance support and tax filing", "Payroll processing", "Gross wages, employer taxes, insurance premiums, and 401(k) employer contributions", "HR technology platform access"], a: 2, x: "Wages, statutory taxes, and premiums are always pass-throughs (or spread-bearing pass-throughs). A proposal implying they're 'included' is blending them into a bundled rate — your cue to unbundle." },
+      { q: "The only difference between PEO 1 and PEO 2 is:", opts: ["PEO 2 runs on a different platform", "PEO 2 is full co-employment without benefits enrollment \u2014 the client keeps its own benefits and broker", "PEO 2 has no compliance support", "PEO 2 is only for companies over 100 employees"], a: 1, x: "Same foundation, same platform, same co-employment \u2014 PEO 2 simply leaves benefits with the client's existing broker. It's how broker relationships become bridges instead of blockers." },
+      { q: "What does CPEO certification unlock for the future PEO 3 tier?", opts: ["Exemption from state licensing", "Permission to blend rates", "Sole federal employment-tax liability and successor-employer treatment \u2014 no wage-base restart, so mid-year starts are clean", "Lower health premiums by law"], a: 2, x: "IRC \u00A73511 makes a certified PEO solely liable for federal employment taxes and grants successor treatment, eliminating the wage-base restart that makes mid-year moves expensive across most of the industry." },
+      { q: "Per NAPEO's client research, the heart of the PEO market \u2014 and our ICP \u2014 is:", opts: ["Businesses with 500+ employees", "Businesses with 10\u201349 employees", "Solo founders", "Only tech companies"], a: 1, x: "Nearly two-thirds of all PEO clients have 10\u201349 employees, with professional services, manufacturing, and construction making up about half the client base." },
+      { q: "Why is selling the Gusto PEO into the existing payroll base structurally different from how most PEOs sell?", opts: ["It skips underwriting", "Trust, CAC, and cycle length: we offer an upgrade to customers who already know us, instead of cold-acquiring strangers", "It avoids the CSA", "Payroll clients are legally required to convert"], a: 1, x: "An installed, trusting base changes the economics of every deal \u2014 cheaper acquisition, shorter cycles, and a relationship that starts warm. The discipline is prioritizing it intelligently." },
+      { q: "The non-negotiable rule of the internal co-sell motion:", opts: ["PEO reps work accounts secretly to move fast", "The payroll account owner wins \u2014 in credit and comp \u2014 every time we convert their account", "Payroll AEs must not be told about PEO", "Conversions only happen in January"], a: 1, x: "Written rules of engagement and shared credit make the payroll org our distribution engine. Without them, the motion creates enemies inside our own building \u2014 the one channel conflict that can kill this product." },
+      { q: "PEO selling concentrates September through December because:", opts: ["State law requires fall enrollment", "Most benefits programs start January 1, so decisions cluster in the months before \u2014 pipeline builds in summer, implementation peaks in December", "PEOs close their books in August", "Buyers prefer holiday shopping"], a: 1, x: "The January 1 benefits start drives the calendar: summer pipeline, fall proposals and underwriting, December implementation. Plan capacity \u2014 marketing, risk, ops \u2014 around the season, not after it arrives." },
+      { q: "Which costs are NEVER inside any PEO's administrative fee \u2014 including ours?", opts: ["Compliance support and tax filing", "Payroll processing", "Gross wages, employer taxes, insurance premiums, and 401(k) employer contributions", "HR technology platform access"], a: 2, x: "Wages, statutory taxes, and premiums are always pass-throughs. We say it out loud, unprompted \u2014 transparency about what the fee isn't is part of selling what it is." },
+      { q: "Published PEPM pricing matters strategically because:", opts: ["It is required by NAPEO", "It guarantees we're cheapest", "It converts an opaque, quote-gated category into one a buyer can start by themselves \u2014 a trust signal before any rep speaks", "It eliminates underwriting"], a: 2, x: "Most of the category custom-quotes everything. A published number changes the buyer's first experience from 'talk to sales to learn anything' to 'I already know where this starts' \u2014 the same move Gusto made in payroll." },
     ],
   },
   {
@@ -607,9 +645,9 @@ const COURSE = [
           { t: "list", items: [
             "Census — every employee, age, zip, salary, state. This drives benefits underwriting and every cost model.",
             "Current benefits — plan summaries, current rates, renewal date, and the last two renewal increases. The renewal date sets your deal clock.",
-            "SUI rate notices — the client's actual statutory unemployment rates by state. Your unbundling weapon.",
+            "SUI rate notices — the client's actual statutory unemployment rates by state. How we verify rates and quote accurately.",
             "Workers' comp dec page and e-mod worksheet — class codes, payroll by code, current rates, mod history.",
-            "A full current invoice — payroll provider or incumbent PEO. You can't beat a number you've never seen.",
+            "A full current invoice — payroll or otherwise. You can't build an honest baseline from a number you've never seen.",
           ]},
           { t: "p", x: "Then the qualitative layer: what triggered this conversation? A compliance scare, a brutal renewal, a key hire demanding better benefits, a new state? The trigger tells you what the proposal must lead with." },
           { t: "callout", tag: "FIELD NOTE", x: "The best timing trigger in this industry is the benefits renewal, 60–120 days out. Build your prospecting calendar around renewal dates the way realtors build theirs around lease expirations." },
@@ -620,9 +658,9 @@ const COURSE = [
         blocks: [
           { t: "p", x: "Most PEO proposals lose because they compare the PEO's bundle to the client's payroll invoice — apples to a fruit basket. The winning frame is total cost of employment: everything the client pays today to employ people (payroll fees, benefits premiums and broker costs, comp premium and audit true-ups, HR tools, plus the owner's own time) against everything in your proposal, line by line." },
           { t: "list", items: [
-            "Unbundle the incumbent first. If they're with a bundled-billing PEO, decompose the blended rate before showing yours. The reveal of the real admin fee often does more work than your price does.",
-            "Normalize the structures. Convert everything to effective PEPM, same census, same plan tiers. Never let two quotes with different rate structures sit side by side unconverted.",
-            "Show the year-two story. Rate structure, renewal philosophy, and what happens to percent-of-payroll fees as compensation grows. Buyers remember the person who told them the truth about year two.",
+            "Anchor on their real current state. Most of our buyers aren't in a PEO today — build their true total cost of employment (payroll fees, benefits premiums and broker costs, comp premium and audit true-ups, the owner's time) and put the Gusto PEO next to it, line by line.",
+            "Normalize structures when a client is comparing. If they've gathered other quotes, convert everything to effective PEPM on the same census — clarity serves the client, and transparency is our home field.",
+            "Show the year-two story. Our rate structure and our renewal philosophy, in writing. Buyers remember the person who told them the truth about year two.",
           ]},
         ],
       },
@@ -647,14 +685,14 @@ const COURSE = [
           { t: "list", items: [
             "Anchor to a date. Benefits renewal or January 1. Open enrollment, comp binding, and payroll cutover all chain backwards from it — a deal without a start date is a pipeline fiction.",
             "Set implementation expectations honestly. Data collection, benefits enrollment, first payroll. The first payroll run is the trust milestone; over-communicate until it lands clean.",
-            "Stay in the room after the close. The first renewal is where clients are won for a decade or lost to the next rep running your own unbundling play against you.",
+            "Stay in the room after the close. The first renewal is where clients are won for a decade — or lost at a renewal someone else made painful.",
           ]},
           { t: "callout", tag: "SAY IT THIS WAY", x: "\"My job isn't to sell you a PEO. It's to make sure the version of this you're living with in year three is the one you thought you bought.\"" },
         ],
       },
     ],
     quiz: [
-      { q: "Which set of discovery artifacts gives you what you need to build an honest cost comparison?", opts: ["Mission statement and org chart", "Census, current benefit rates and renewal date, SUI rate notices, comp dec page/e-mod, and a full current invoice", "Last year's tax return", "The employee handbook"], a: 1, x: "Those five artifacts drive underwriting and unbundling. Without them, your proposal is an estimate competing against another estimate." },
+      { q: "Which set of discovery artifacts gives you what you need to build an honest cost comparison?", opts: ["Mission statement and org chart", "Census, current benefit rates and renewal date, SUI rate notices, comp dec page/e-mod, and a full current invoice", "Last year's tax return", "The employee handbook"], a: 1, x: "Those five artifacts drive underwriting and the honest current-state baseline. Without them, your proposal is an estimate competing against another estimate." },
       { q: "A prospect says, \"I don't want some PEO controlling my people.\" The accurate response centers on:", opts: ["Offering a discount", "Explaining that direction and control of day-to-day work stays entirely with the owner; the PEO is the administrative employer", "Agreeing that control is shared 50/50", "Suggesting an EOR instead"], a: 1, x: "The control objection is answered by the structure itself. Hiring, firing, pay, and management never leave the client. Make Monday morning concrete." },
       { q: "The strongest frame for handling \"it's too expensive\" is:", opts: ["Matching the competitor's price", "Total cost of employment: everything they pay today across payroll, benefits, comp, and owner time vs. the proposal, line by line", "Extending the contract term", "Removing benefits from the quote"], a: 1, x: "Most buyers compare your all-in number to their payroll fee alone. Rebuild the full current-state cost stack first; the comparison usually flips." },
       { q: "The most honest and effective answer to \"what if we want to leave?\" includes:", opts: ["\"Nobody ever leaves\"", "Refusing to discuss exit before signing", "Explaining exit timing (year-end is cleanest), benefits transition planning, and CPEO protection against federal wage-base restart", "Pointing to the termination fee"], a: 2, x: "Exit honesty is a trust accelerant. Buyers who hear a straight answer about leaving become dramatically more comfortable arriving." },
@@ -670,20 +708,138 @@ const COURSE = [
    COMPONENTS
    ============================================================ */
 
+const GLOSSARY = {
+  "PEO": ["Professional Employer Organization", "A firm that enters a co-employment relationship with client businesses, becoming the administrative employer for payroll, employment taxes, benefits sponsorship, and workers' compensation while the client retains full direction and control of the work."],
+  "CPEO": ["Certified Professional Employer Organization", "A PEO certified by the IRS under IRC §7705: annual audited financials, CPA-verified quarterly assertions, a bond, and background standards. Under IRC §3511 a CPEO is solely liable for federal employment taxes on WSE wages, gets successor-employer treatment (no mid-year wage-base restart), and preserves specified tax credits at the customer level."],
+  "ESAC": ["Employer Services Assurance Corporation", "The PEO industry's independent accreditation program, backed by surety bonding that protects clients if an accredited PEO fails to remit payroll, taxes, or contributions. Separate from IRS certification — the strongest PEOs hold both."],
+  "NAPEO": ["National Association of Professional Employer Organizations", "The PEO industry's trade association and the primary source of industry research, benchmarks, and client data."],
+  "WSE": ["Worksite Employee", "A client company's employee covered under the co-employment arrangement. Industry scale is measured in WSEs."],
+  "CSA": ["Client Service Agreement", "The governing contract between PEO and client. It allocates employer responsibilities, sets pricing structure and rate-adjustment rights, and defines termination notice, benefits exit terms, and indemnification."],
+  "ASO": ["Administrative Services Organization", "HR and payroll administration without co-employment: taxes file under the client's own EIN and the client keeps its own benefit plans and rates. No master plan access."],
+  "EOR": ["Employer of Record", "A provider that becomes the sole legal employer — beyond co-employment — typically used to hire in states or countries where the client has no legal entity."],
+  "EIN": ["Employer Identification Number", "The federal tax ID a business files employment taxes under. Whose EIN the wages run under is the cleanest dividing line between PEO and ASO arrangements."],
+  "PEPM": ["Per Employee Per Month", "A flat administrative fee charged per employee each month — and the unit every quote should be normalized to before comparing structures."],
+  "FICA": ["Federal Insurance Contributions Act", "Social Security and Medicare payroll taxes, shared by employer and employee. Social Security applies up to an annual wage base — which is why mid-year EIN changes can duplicate tax."],
+  "FUTA": ["Federal Unemployment Tax Act", "The federal unemployment tax, applied to a small annual wage base per employee."],
+  "SUTA": ["State Unemployment Tax Act", "State unemployment tax, experience-rated per employer with state-specific rates and wage bases. How PEOs report SUTA (client-level vs PEO-level account) varies by state — and is where blended-rate margin can hide."],
+  "SUI": ["State Unemployment Insurance", "The state unemployment system funded by SUTA. The client's SUI rate notice is a core discovery artifact — it's how you verify the rate on any invoice."],
+  "e-mod": ["Experience Modifier", "The multiplier that scales workers' comp premium to an employer's actual loss history versus industry expectation. 1.00 is average; 1.25 means a 25% surcharge; 0.85 means a 15% credit."],
+  "WC": ["Workers' Compensation", "Insurance covering workplace injuries. In a PEO, coverage typically runs through the PEO's master policy — often pay-as-you-go, priced by class code and e-mod."],
+  "EPLI": ["Employment Practices Liability Insurance", "Coverage for discrimination, harassment, and wrongful-termination claims. 'Included' EPLI deserves one question: what's the deductible?"],
+  "MEP": ["Multiple Employer Plan", "A single retirement plan (typically 401(k)) that many employers adopt into — the standard PEO structure, pooling pricing and administration while adopting employers retain some fiduciary duty."],
+  "MEWA": ["Multiple Employer Welfare Arrangement", "The ERISA classification for a health plan covering employees of multiple unrelated employers — the long-running regulatory question around PEO-sponsored plans."],
+  "ERISA": ["Employee Retirement Income Security Act", "The federal law governing employer-sponsored benefit plans, including fiduciary duties and plan classification."],
+  "ACA": ["Affordable Care Act", "The federal health law that created the employer mandate and 1094/1095 reporting."],
+  "ALE": ["Applicable Large Employer", "An employer with 50+ full-time (or equivalent) employees under the ACA, subject to the employer mandate. Determined by the client's own headcount — joining a PEO doesn't change it."],
+  "COBRA": ["Consolidated Omnibus Budget Reconciliation Act", "Federal continuation coverage allowing employees to keep group health insurance after employment ends — administration usually handled by the PEO."],
+  "HSA": ["Health Savings Account", "A tax-advantaged medical savings account paired with a high-deductible health plan."],
+  "FSA": ["Flexible Spending Account", "A tax-advantaged account for medical or dependent-care expenses, generally use-it-or-lose-it."],
+  "WOTC": ["Work Opportunity Tax Credit", "A federal hiring credit for employing individuals from targeted groups — one of the specified credits preserved at the customer level under IRC §3511(d)."],
+  "IRC": ["Internal Revenue Code", "The federal tax statute. The PEO-relevant sections: §7705 (CPEO certification) and §3511 (CPEO tax treatment)."],
+  "TEFRA": ["Tax Equity and Fiscal Responsibility Act of 1982", "The 1982 tax law whose pension safe harbor fueled the original staff-leasing boom — closed in 1986, but the industry it sparked became the modern PEO."],
+  "OSHA": ["Occupational Safety and Health Administration", "The federal workplace-safety regulator. Worksite safety obligations stay with the client, since the worksite and its hazards belong to them."],
+  "EEOC": ["Equal Employment Opportunity Commission", "The federal agency enforcing workplace discrimination law — which analyzes actual control, so the client never stops being an employer in its eyes."],
+  "ACH": ["Automated Clearing House", "The electronic bank-transfer network the PEO funds flow runs on — the debit that lands one to two banking days before check date."],
+  "EWA": ["Earned Wage Access", "Letting employees access wages they've already earned before payday — a recruiting and retention lever, especially for hourly and blue-collar workforces."],
+  "ICP": ["Ideal Customer Profile", "The definition of the accounts most likely to convert and retain — in PEO, typically 10–49 employees, multi-state, benefits-seeking."],
+  "CAC": ["Customer Acquisition Cost", "The fully loaded cost to win a customer. Selling into an installed base structurally beats cold acquisition on CAC."],
+  "GTM": ["Go-To-Market", "The strategy and motion for bringing a product to customers: targeting, channels, pricing, and sales process."],
+  "SLA": ["Service Level Agreement", "A committed performance standard — like time to a clean first payroll."],
+  "HRBP": ["HR Business Partner", "A dedicated HR professional assigned to support a client — the premium end of the PEO service-model spectrum."],
+};
+
+const INLINE_EXCLUDE = new Set(["PEO"]);
+const TERM_KEYS = Object.keys(GLOSSARY).filter((k) => !INLINE_EXCLUDE.has(k)).sort((a, b) => b.length - a.length);
+const TERM_RE = new RegExp("\\b(?:" + TERM_KEYS.map((k) => k.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&")).join("|") + ")s?\\b", "g");
+
+const TermContext = createContext(null);
+
+function Term({ k, text }) {
+  const open = useContext(TermContext);
+  if (!open) return text;
+  return (
+    <button className="term" onClick={(e) => { e.stopPropagation(); open(k); }} title={GLOSSARY[k][0]}>
+      {text}
+    </button>
+  );
+}
+
+function glossarize(text) {
+  if (typeof text !== "string") return text;
+  const out = [];
+  let last = 0, m;
+  TERM_RE.lastIndex = 0;
+  while ((m = TERM_RE.exec(text)) !== null) {
+    const raw = m[0];
+    const key = GLOSSARY[raw] ? raw : raw.replace(/s$/, "");
+    if (!GLOSSARY[key]) continue;
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(<Term key={m.index} k={key} text={raw} />);
+    last = m.index + raw.length;
+  }
+  if (out.length === 0) return text;
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+function TermPopup({ termKey, onClose }) {
+  const [browseAll, setBrowseAll] = useState(termKey === "__LEGEND__");
+  const entry = !browseAll && GLOSSARY[termKey];
+  return (
+    <div className="term-overlay" onClick={onClose} role="dialog" aria-modal="true" aria-label="Glossary">
+      <div className="term-card" onClick={(e) => e.stopPropagation()}>
+        {entry ? (
+          <div>
+            <span className="term-acro">{termKey}</span>
+            <div className="term-full">{entry[0]}</div>
+            <p className="term-def">{entry[1]}</p>
+            <div style={{ display: "flex", gap: 10, marginTop: 20, flexWrap: "wrap" }}>
+              <button className="btn primary" onClick={onClose}>Got it</button>
+              <button className="btn ghost" onClick={() => setBrowseAll(true)}>Browse all terms</button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <span className="term-acro">THE OPERATOR'S GLOSSARY</span>
+            <div className="term-full">Key terms & acronyms</div>
+            <div style={{ marginTop: 10 }}>
+              {Object.keys(GLOSSARY).sort().map((k) => (
+                <div className="gloss-item" key={k}>
+                  <b>{k}</b> — {GLOSSARY[k][0]}
+                  <p>{GLOSSARY[k][1]}</p>
+                </div>
+              ))}
+            </div>
+            <button className="btn primary" style={{ marginTop: 18 }} onClick={onClose}>Close</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Block({ b }) {
-  if (b.t === "p") return <p>{b.x}</p>;
-  if (b.t === "list") return <ul>{b.items.map((it, i) => <li key={i}>{it}</li>)}</ul>;
+  if (b.t === "p") return <p>{glossarize(b.x)}</p>;
+  if (b.t === "list") return <ul>{b.items.map((it, i) => <li key={i}>{glossarize(it)}</li>)}</ul>;
   if (b.t === "callout") return (
-    <div className="callout"><span className="tag">{b.tag}</span>{b.x}</div>
+    <div className="callout"><span className="tag">{b.tag}</span>{glossarize(b.x)}</div>
   );
   if (b.t === "table") return (
     <div style={{ overflowX: "auto" }}>
       <table className="ledger-table">
         <thead><tr>{b.head.map((h, i) => <th key={i}>{h}</th>)}</tr></thead>
         <tbody>{b.rows.map((r, i) => (
-          <tr key={i}>{r.map((c, j) => <td key={j}>{c}</td>)}</tr>
+          <tr key={i}>{r.map((c, j) => <td key={j}>{glossarize(c)}</td>)}</tr>
         ))}</tbody>
       </table>
+    </div>
+  );
+  if (b.t === "sources") return (
+    <div className="sources">
+      <span className="src-tag">SOURCES</span>
+      <ul>{b.items.map((s, i) => (
+        <li key={i}><a href={s.u} target="_blank" rel="noopener noreferrer">{s.l}</a></li>
+      ))}</ul>
     </div>
   );
   return null;
@@ -732,7 +888,7 @@ function Quiz({ mod, onPass, onExit }) {
   return (
     <div className="card">
       <div className="q-count">QUESTION {idx + 1} / {qs.length} · PASS AT {passMark}/{qs.length}</div>
-      <p className="q-text">{q.q}</p>
+      <p className="q-text">{glossarize(q.q)}</p>
       {q.opts.map((o, i) => {
         let cls = "opt";
         if (picked !== null) {
@@ -750,7 +906,7 @@ function Quiz({ mod, onPass, onExit }) {
           <span className="tag" style={{ color: picked === q.a ? "var(--stamp-green)" : "var(--stamp-red)" }}>
             {picked === q.a ? "CORRECT" : "NOT QUITE"}
           </span>
-          {q.x}
+          {glossarize(q.x)}
         </div>
       )}
       <div className="btn-row">
@@ -901,7 +1057,7 @@ function AboutTab() {
             <ul className="t-list">
               <li>Independent brokerage platform covering <b>28 PEOs across 46 states</b> — comparison engine, savings calculator, PEO directory, referral portal, full SEO/content system</li>
               <li><b>PEOLens</b> — forensic proposal-audit tool that normalizes competing quotes to a canonical cost ontology and exposes the real admin fee inside bundled rates</li>
-              <li>The unbundling discipline taught in this site's certification course, productized</li>
+              <li>Total-cost transparency — exposing what bundled structures hide — productized</li>
             </ul>
           </div>
           <div className="t-item">
@@ -915,8 +1071,8 @@ function AboutTab() {
         <p>
           Gusto's PEO is a distribution play: selling co-employment into an installed base that
           already trusts the platform, amplified through the accountant channel. That motion needs a
-          leader who knows the PEO category cold — underwriting, pricing mechanics, competitive
-          teardowns — and who builds systems, playbooks, and reps rather than just carrying a bag.
+          leader who knows the PEO category cold — underwriting, pricing mechanics, the competitive
+          landscape — and who builds systems, playbooks, and reps rather than just carrying a bag.
           That intersection is exactly where I've spent the last eight years.
         </p>
         <p>
@@ -927,10 +1083,88 @@ function AboutTab() {
         </p>
         <div className="callout"><span className="tag">SALES PHILOSOPHY</span>
           Player-coach. Metrics over vibes. Consultants, not pitchmen: reps who can read a census,
-          unbundle an invoice, and tell a buyer the truth about year two — because that's what
+          build an honest total-cost baseline, and tell a buyer the truth about year two — because that's what
           retains the book that makes PEO economics work.
         </div>
       </div>
+    </div>
+  );
+}
+
+const AGENT_ACCOUNTS = [
+  { name: "Bluebird Dental Group", industry: "Professional services", ees: 18, states: ["CO"],
+    signals: [["Benefits quote requested in-app", 25], ["Medical renewal in ~90 days", 20], ["Headcount in 10–49 sweet spot", 15], ["Two open roles posted", 10]],
+    talk: "You asked about group health options last month, and your renewal lands in about 90 days — exactly the window where a comparison is worth running. Want me to model your census on a large-group master plan next to your current quote, line by line?" },
+  { name: "Cedar Creek Veterinary", industry: "Healthcare services", ees: 14, states: ["CO", "NM"],
+    signals: [["New NM clinic opening", 20], ["Benefits renewal in ~60 days", 20], ["Headcount in 10–49 sweet spot", 15], ["Multi-state payroll begins", 13]],
+    talk: "Congrats on the Las Cruces clinic. The week you run payroll in a second state, your compliance surface doubles — and with your benefits renewal about 60 days out, this is the natural moment to look at handling both in one move." },
+  { name: "Summit Peak Builders", industry: "Construction", ees: 34, states: ["CO", "WY"],
+    signals: [["Workers' comp renewal in ~75 days", 20], ["Crossed 25 employees", 15], ["Hourly workforce — EWA fit", 15], ["Multi-state footprint", 10]],
+    talk: "With comp renewal coming and the crew past 25, two numbers decide everything: your class-code rates and your mod. Bring the dec page and loss runs — if a master program prices your codes better, you'll see it in black and white." },
+  { name: "Pixel & Pine Studio", industry: "Software & design", ees: 12, states: ["CO", "NY", "TX"],
+    signals: [["Lost a candidate over benefits", 20], ["Three-state remote team", 15], ["Hiring four roles", 12], ["Headcount in sweet spot", 10]],
+    talk: "Losing a candidate over benefits at 12 people usually means the small-group quote can't compete. A master plan changes the math — same census, large-group rates — and with employees in three states, the compliance lift comes with it." },
+  { name: "Harvest Lane Logistics", industry: "Logistics", ees: 47, states: ["CO", "UT", "AZ"],
+    signals: [["Registered in AZ three weeks ago", 15], ["Hourly workforce — EWA fit", 15], ["Approaching 50-employee threshold", 10], ["Multi-state footprint", 10]],
+    talk: "Saw the new Arizona registration — that's three states of wage-and-hour rules now. Worth a 20-minute look at what consolidating compliance, comp, and earned wage access for an hourly team would do for both retention and the back office." },
+  { name: "Iron Horse Fabrication", industry: "Manufacturing", ees: 28, states: ["CO"],
+    signals: [["Comp claims frequency rising", 15], ["Renewal in ~140 days", 10], ["Headcount in sweet spot", 15]],
+    talk: "Your mod is moving the wrong direction, and that compounds at every renewal. The fix is claims management and safety programs — exactly what a master program is incentivized to provide. We have 140 days, which is enough time to do it right." },
+  { name: "Front Range Accounting", industry: "Professional services", ees: 9, states: ["CO"],
+    signals: [["Firm is a Gusto accountant partner", 18], ["Asked about 401(k) options", 12], ["Under 10 employees", 5]],
+    talk: "As a partner firm you already know the platform — the question is whether a PEO tier fits your own practice, and whether your clients should hear about it from you first. Happy to walk through both." },
+  { name: "Aspen Trail Hospitality", industry: "Restaurants", ees: 52, states: ["CO"],
+    signals: [["High turnover flag", 12], ["Hourly workforce — EWA fit", 15], ["No group health offered", 6]],
+    talk: "Turnover is the quiet tax in hospitality. Earned wage access plus even a basic benefits package measurably moves retention — and participation requirements are the first thing to verify before anyone quotes you, so let's check that before pricing anything." },
+];
+
+function AgentDemo() {
+  const [open, setOpen] = useState(0);
+  const scored = AGENT_ACCOUNTS
+    .map((a) => ({ ...a, score: Math.min(99, 25 + a.signals.reduce((s, x) => s + x[1], 0)) }))
+    .sort((x, y) => y.score - x.score);
+  const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
+  return (
+    <div>
+      {scored.map((a, i) => {
+        const [label, cls] = tier(a.score);
+        const isOpen = open === i;
+        return (
+          <div className="agent-card" key={a.name}>
+            <div
+              className="agent-head"
+              role="button"
+              tabIndex={0}
+              style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
+              onClick={() => setOpen(isOpen ? -1 : i)}
+              onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}
+            >
+              <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
+              <span className="row-main">
+                <p className="row-title">{a.name}</p>
+                <p className="row-sub">{a.industry} · {a.ees} EEs · {a.states.join(", ")}</p>
+              </span>
+              <span className={"score-pill " + cls}>{a.score} · {label}</span>
+            </div>
+            {isOpen && (
+              <div className="agent-detail">
+                <div className="sig-wrap">
+                  {a.signals.map(([s, pts]) => (
+                    <span className="sig-chip" key={s}>{s}<b>+{pts}</b></span>
+                  ))}
+                </div>
+                <div className="callout" style={{ marginTop: 12, marginBottom: 4 }}>
+                  <span className="tag">OPENING TALK TRACK</span>{a.talk}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "12px 4px 0", lineHeight: 1.55 }}>
+        Sample data, real scoring logic. In production this runs against the live base — and the
+        signals, weights, and talk tracks are tuned every week in the win/loss loop with the team.
+      </p>
     </div>
   );
 }
@@ -939,38 +1173,73 @@ function AgentTab() {
   return (
     <div className="shell">
       <div className="hero">
-        <div className="eyebrow">BUILT LIVE DURING THIS PROCESS</div>
+        <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING DEMO BELOW</div>
         <h1>The PEO Targeting Agent<span className="hl">.</span></h1>
         <p className="lede">
-          A working Next.js application built during this interview process: it scores SMB payroll
-          accounts for PEO propensity and hands reps a ranked, reasoned target list — the
-          in-base upsell motion, productized.
+          My initial thinking on letting data lead our path to market: score the payroll base for
+          PEO propensity, and hand the team a ranked, reasoned list instead of an alphabetical one.
+          A working demo on sample data is below — tap any account.
         </p>
       </div>
 
-      <div className="card">
+      <div className="card" style={{ marginBottom: 14 }}>
         <div className="kicker">WHAT IT DOES</div>
         <h2>From payroll base to PEO pipeline</h2>
         <ul style={{ marginTop: 14 }}>
           <li><b>ICP scoring.</b> Ranks accounts on PEO propensity signals: headcount band (the 5–100 sweet spot), multi-state footprint, industry and class-code profile, benefits-seeking behavior, and growth trajectory.</li>
-          <li><b>Ranked target lists.</b> Reps start each day with the accounts most likely to convert, with the reasons attached — not a flat alphabetical book.</li>
+          <li><b>Ranked target lists.</b> The team starts each day with the accounts most likely to convert, with the reasons attached — not a flat alphabetical book.</li>
           <li><b>Talk-track generation.</b> Each target gets a tailored opening built on its specific signals: the new state they just registered in, the headcount they just crossed, the renewal window they're entering.</li>
         </ul>
         <h3>Why it matters for this role</h3>
         <p>
-          Gusto's structural advantage is distribution — co-employment sold into an existing,
-          trusting base changes CAC, cycle length, and who controls the relationship. But an installed
-          base is only an advantage if it's prioritized intelligently. This agent is the prioritization
-          layer, and it's also the centerpiece of the 90-day plan's pilot motion: score the base,
-          pull a pilot cohort, run the playbook, codify what closes.
+          Gusto's structural advantage is distribution — co-employment offered to a base that
+          already trusts the platform changes CAC, cycle length, and who controls the relationship.
+          But an installed base is only an advantage if it's prioritized intelligently, and that's
+          what this is: a prioritization layer, and the engine behind the pilot motion in the
+          90-day plan — score the base, pull a cohort, run the playbook, learn from what closes.
         </p>
-        <div className="callout"><span className="tag">THE POINT</span>
-          I didn't make a slide about the in-base motion. I shipped it.
+        <div className="callout"><span className="tag">A STARTING POINT, NOT A FINISHED ANSWER</span>
+          The signals, weights, and talk tracks here are a first draft. They're built to be
+          pressure-tested and rebuilt with the team, with product, and with the people who know
+          this base far better than any model does — that's the feedback loop working as intended.
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="kicker">LIVE DEMO · SAMPLE ACCOUNTS</div>
+        <h2>Today's ranked list</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Tap an account to see why it scored — and the opening the agent drafts.</p>
+        <div style={{ marginTop: 16 }}>
+          <AgentDemo />
         </div>
       </div>
     </div>
   );
 }
+
+const MATRIX_REFERENCE = {
+        title: "What's in the fee: the inclusions matrix",
+        blocks: [
+          { t: "p", x: "The most common comparison mistake in this industry is lining up admin fees that don't buy the same things. Before any rate goes in front of a client, build the inclusions picture: what each PEO's fee covers as standard, and what shows up later as an add-on. The matrix below reflects typical packaging as of mid-2026 — treat it as a starting map, and verify against the actual proposal every time, because packaging changes and most of these providers quote custom." },
+          { t: "table", head: ["PEO", "Pricing structure", "Standard with the admin fee", "Typically extra"], rows: [
+            ["ADP TotalSource", "Custom quote; PEPM or % of payroll, often bundled", "Payroll & tax admin, HR support, compliance, benefits administration, WC program access, learning/talent tools", "All insurance premiums; enhanced recruiting/HR services; unbundle the blended rate to find the real fee"],
+            ["Insperity", "Custom quote; allocation often presented as comprehensive PEPM", "Dedicated HR service team, payroll, compliance, performance & training resources, EPLI", "Premiums; specialty consulting and retained recruiting; premium service intensity is priced into the fee itself"],
+            ["TriNet", "Custom PEPM, often by industry vertical", "Payroll & tax admin, benefits administration, compliance, vertical-specific HR expertise, platform", "Premiums; enhanced HR service tiers; certain time/recruiting products as add-ons"],
+            ["Paychex PEO", "Custom quote, frequently framed alongside payroll bundles", "Payroll, HR generalist support, compliance, benefits administration", "Premiums; time & attendance and recruiting modules; watch the payroll-bundle framing in comparisons"],
+            ["CoAdvantage", "Custom quote; PEPM or % of payroll", "Payroll & tax admin, CoAdQuantum platform, benefits administration, WC claims & safety support, HR compliance guidance", "Premiums; recruiting, performance-management and other add-on programs; verify current CPEO/ESAC credential status"],
+            ["Justworks", "Published flat PEPM — Basic and Plus tiers (volume discounts at headcount breaks); 3 WSE minimum; month-to-month, no setup fees", "Basic: payroll, compliance, WC administration, 401(k) access, HR tools, 24/7 support", "Master medical/dental/vision access requires the Plus tier — recently raised from $109 to ~$129 PEPM; premiums always extra; time tracking, international contractors, and marketplace perks billed per item"],
+            ["Rippling", "Modular: base platform PEPM plus per-module fees; PEO service custom-quoted on top", "Software platform (HR records, workflows); PEO quote includes payroll, tax filing, WC and EPLI coverage, compliance support", "Nearly everything is a module — benefits admin, time, IT, spend each add PEPM; implementation fees can apply; premiums extra. Strength and risk in one design: pay for what you use, but the stack adds up"],
+          ]},
+          { t: "p", x: "Two disciplines turn this matrix into wins. First, normalize before comparing: convert every structure to effective PEPM on the same census, then list what that PEPM actually buys at each provider. A $59 fee without master-plan access, a $109 fee with it, a custom bundled rate hiding the fee entirely, and a modular stack that grows per feature are four different products wearing one label. Second, ask the inclusion question out loud in every deal — 'walk me through exactly what the administrative fee covers, and show me the add-on price list' — because the answer is the comparison." },
+          { t: "callout", tag: "ALWAYS EXTRA — EVERYWHERE", x: "No admin fee at any PEO includes: gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Any proposal implying otherwise is blending, not including — unbundle it." },
+          { t: "p", x: "Sourcing note: published pricing links below. Competitor service-model and fee-structure details (service tiering, EPLI deductibles, individual fee line items) are field-verified as of mid-2026 from live deals and proposals — packaging changes, so confirm every figure against the actual proposal in front of you." },
+          { t: "sources", items: [
+            { l: "Justworks — published PEO pricing (Basic / Plus tiers)", u: "https://www.justworks.com/pricing" },
+            { l: "Rippling — modular pricing structure analysis (Vendr)", u: "https://www.vendr.com/marketplace/rippling" },
+            { l: "CoAdvantage — services overview", u: "https://coadvantage.com/" },
+          ]},
+        ],
+      };
 
 function LandscapeTab() {
   const comps = [
@@ -1003,7 +1272,7 @@ function LandscapeTab() {
       bad: ["Smaller benefits scale and carrier leverage than the nationals", "Platform experience trails the tech-forward tier", "Limited brand awareness; custom-quote opacity"],
       win: "The platform and brand gaps are widest here — lead with product experience and national trust, and put published pricing against custom-quote opacity. Concede the tough-class-code deals their underwriting hustle wins; that's risk Gusto's early book shouldn't want anyway." },
   ];
-  const matrixLesson = COURSE.find((m) => m.id === "landscape").lessons.find((l) => l.title.includes("inclusions matrix"));
+  const matrixLesson = MATRIX_REFERENCE;
   return (
     <div className="shell">
       <div className="hero">
@@ -1089,7 +1358,7 @@ function SwotTab() {
           <h3>Opportunities</h3>
           <ul>
             <li><b>Stop the graduation churn.</b> Gusto payroll clients who outgrow software today leave for Justworks, Rippling, or TriNet. A native PEO retains them.</li>
-            <li><b>A growing, underpenetrated category.</b> Industry revenue has more than quadrupled since 2012 to ~$414B, yet only ~17% of SMB employers use a PEO — secular growth plus conversion headroom.</li>
+            <li><b>A growing, underpenetrated category.</b> Industry revenue has more than quadrupled since 2012 to ~$414B, yet only ~15% of employers with 10–499 employees — and roughly 4% of all US businesses — use a PEO. Secular growth plus enormous conversion headroom.</li>
             <li><b>Displace opacity.</b> Published pricing plus an unbundling sales motion attacks the incumbents' bundled-rate model at its weakest point.</li>
             <li><b>CPEO as trust accelerant.</b> Certification converts "new entrant" into "federally certified" — a credential worth racing toward.</li>
           </ul>
@@ -1392,8 +1661,7 @@ function WelcomeLetter({ onClose }) {
           team I want to build with.
         </p>
         <p className="body">
-          So rather than send a document, I built you this — working side by side with AI, the
-          way I work every day. Inside: the certification course I'd use to train our team, the
+          So rather than send a document, I built you this. Inside: the certification course I'd use to train our team, the
           market intelligence we'd carry into every conversation, a product construct, and the
           ideas I'd bring to a go-to-market our team shapes and executes together.
         </p>
@@ -1405,10 +1673,11 @@ function WelcomeLetter({ onClose }) {
           vibes, develop the people, and let the data coach all of us.
         </p>
         <p className="body">
-          Gusto has one shot at entering PEO right — and I have one shot at showing you I'm the
-          person to help build it. Eight years selling and leading PEO taught me the category.
-          Building products with AI as a daily teammate taught me to ship. This site is both
-          at once.
+          Gusto has one shot at entering PEO right — and my record is the case that I can help
+          build it: eight years selling and leading in this category, a #1-ranked team, nine of
+          nine consultants at President's Club, Leader of the Year. Every page of this site comes
+          from that experience. And none of it works alone — which is why everything here is
+          written as a starting point for what we build together.
         </p>
         <p className="body">
           Explore in any order. Take the certification quizzes if you're feeling competitive.
@@ -1427,9 +1696,24 @@ function WelcomeLetter({ onClose }) {
    APP SHELL
    ============================================================ */
 
+const PATHS = [
+  { id: "ic", label: "Individual Contributor", route: ["fundamentals", "operating", "pricing", "gustopeo", "sales"],
+    blurb: "Full certification, front to back. Every module, every quiz — nobody touches a prospect until all five stamps are on the board." },
+  { id: "am", label: "Account Manager", route: ["fundamentals", "gustopeo", "sales", "pricing"],
+    blurb: "Own the relationship after the sale: fundamentals, our product, the conversations clients actually have — then pricing mechanics, because renewal season is where account managers earn the decade." },
+  { id: "mgmt", label: "Management", route: ["fundamentals", "operating", "pricing", "gustopeo", "sales"],
+    blurb: "Coach the motion. You certify everything your team certifies, with extra weight on Module 02 — your daily decisions about deals and discounting move the P&L." },
+  { id: "senior", label: "Senior Manager", route: ["operating", "gustopeo", "sales", "fundamentals"],
+    blurb: "The machine, the product, the motion. Operating model first — risk selection, retention economics, and capacity are the decisions made at your level." },
+  { id: "csuite", label: "C-Suite", route: ["fundamentals", "operating", "gustopeo"],
+    blurb: "The construct and the financial engine: what co-employment is, how a PEO makes money and where the risk lives, and what the Gusto PEO is building. Three modules — quizzes optional, though stamps look good on anyone." },
+];
+
 export default function App() {
   const [unlocked, setUnlocked] = useState(false);
   const [showLetter, setShowLetter] = useState(false);
+  const [termKey, setTermKey] = useState(null);
+  const [selectedPath, setSelectedPath] = useState(null);
   const [tab, setTab] = useState("about");
   const [courseView, setCourseView] = useState("home");
   const [progress, setProgress] = useState(() => {
@@ -1458,8 +1742,8 @@ export default function App() {
             <div className="eyebrow">TRAINING SYSTEM · REPS & EXECS</div>
             <h1>The PEO Operator Course<span className="hl">.</span></h1>
             <p className="lede">
-              Five modules: co-employment fundamentals, the PEO operating model, pricing forensics,
-              the competitive map, and the sales process. Pass each certification quiz at 80% to
+              Five modules: co-employment fundamentals, the PEO operating model, pricing mechanics,
+              the Gusto PEO and our market, and the sales process. Pass each certification quiz at 80% to
               stamp the module. This is the course our team would complete before touching
               a prospect.
             </p>
@@ -1474,13 +1758,44 @@ export default function App() {
               {certified} OF {COURSE.length} MODULES CERTIFIED
             </div>
           </div>
+          <div className="path-wrap">
+            <span className="src-tag" style={{ textAlign: "center" }}>START TRAINING AS</span>
+            <div className="lesson-nav" style={{ justifyContent: "center", marginBottom: 0 }}>
+              {PATHS.map((p) => (
+                <button
+                  key={p.id}
+                  className={"lesson-pill" + (selectedPath === p.id ? " active" : "")}
+                  onClick={() => setSelectedPath(selectedPath === p.id ? null : p.id)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+            {selectedPath && (() => {
+              const p = PATHS.find((x) => x.id === selectedPath);
+              return (
+                <div className="callout" style={{ marginTop: 14 }}>
+                  <span className="tag">YOUR ROUTE — {p.label.toUpperCase()}</span>
+                  {p.blurb}{" "}
+                  <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, display: "block", marginTop: 8 }}>
+                    {p.route.map((id) => COURSE.find((m) => m.id === id).num).join(" → ")}
+                  </span>
+                </div>
+              );
+            })()}
+          </div>
           {COURSE.map((m) => {
             const pr = progress[m.id];
             return (
               <button key={m.id} className="ledger-row" onClick={() => setCourseView(m.id)}>
                 <span className="row-num">{m.num}</span>
                 <span className="row-main">
-                  <p className="row-title">{m.title}</p>
+                  <p className="row-title">
+                    {m.title}
+                    {selectedPath && PATHS.find((x) => x.id === selectedPath).route.includes(m.id) && (
+                      <span className="path-chip">STEP {PATHS.find((x) => x.id === selectedPath).route.indexOf(m.id) + 1}</span>
+                    )}
+                  </p>
                   <p className="row-sub">{m.tagline}</p>
                 </span>
                 {pr.passed ? (
@@ -1493,6 +1808,10 @@ export default function App() {
               </button>
             );
           })}
+          <div style={{ textAlign: "center", marginTop: 14 }}>
+            <button className="btn ghost" onClick={() => setTermKey("__LEGEND__")}>Key terms & acronyms →</button>
+            <p style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 8 }}>Every dotted-underline term in the lessons is tappable — or browse the full glossary here.</p>
+          </div>
         </div>
       );
     }
@@ -1519,6 +1838,8 @@ export default function App() {
   return (
     <div className="peo-app">
       <style>{css}</style>
+      <TermContext.Provider value={(k) => setTermKey(k)}>
+      {termKey && <TermPopup key={termKey} termKey={termKey} onClose={() => setTermKey(null)} />}
       {showLetter && <WelcomeLetter onClose={() => setShowLetter(false)} />}
       <div className="topbar">
         <div className="topbar-inner">
@@ -1549,6 +1870,7 @@ export default function App() {
       <div className="footer">
         <span className="eyebrow">BUILT BY GABRIEL REVNEW · NOT AN OFFICIAL GUSTO PROPERTY · v2.0</span>
       </div>
+      </TermContext.Provider>
     </div>
   );
 }
