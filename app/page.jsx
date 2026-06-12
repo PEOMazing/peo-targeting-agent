@@ -162,6 +162,11 @@ const css = `
 .gloss-item { padding: 11px 0; border-bottom: 1px dashed var(--rule); font-size: 14px; }
 .gloss-item b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
 .gloss-item p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 4px 0 0; }
+.roi-input { font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-size: 15px; width: 100%; background: var(--surface); color: var(--ink); }
+.roi-input:focus { outline: none; border-color: var(--guava); }
+.roi-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
+.roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
 .path-wrap { max-width: 720px; margin: 0 auto 22px; }
 .path-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--guava-deep); border: 1px solid var(--guava); background: var(--guava-soft); border-radius: 999px; padding: 2px 9px; margin-left: 9px; vertical-align: 2px; white-space: nowrap; }
 .sources { border-top: 1px dashed var(--rule); margin-top: 22px; padding-top: 12px; }
@@ -1383,6 +1388,54 @@ function SwotTab() {
   );
 }
 
+function RoiCalc() {
+  const [ees, setEes] = useState(25);
+  const [wage, setWage] = useState(65000);
+  const [years, setYears] = useState(5);
+  const e = Math.max(1, Number(ees) || 0);
+  const w = Math.max(0, Number(wage) || 0);
+  const adminNet = e * 380;
+  const turnover = Math.round(e * 0.20 * 0.12 * (0.20 * w));
+  const annual = adminNet + turnover;
+  const fmt = (n) => "$" + Math.round(n).toLocaleString();
+  return (
+    <div>
+      <div className="roi-grid">
+        <div>
+          <span className="roi-label">EMPLOYEES</span>
+          <input className="roi-input" type="number" min="1" value={ees} onChange={(ev) => setEes(ev.target.value)} />
+        </div>
+        <div>
+          <span className="roi-label">AVERAGE ANNUAL WAGE</span>
+          <input className="roi-input" type="number" min="0" step="1000" value={wage} onChange={(ev) => setWage(ev.target.value)} />
+        </div>
+        <div>
+          <span className="roi-label">HORIZON</span>
+          <div className="lesson-nav" style={{ marginBottom: 0 }}>
+            {[3, 4, 5].map((y) => (
+              <button key={y} className={"lesson-pill" + (years === y ? " active" : "")} onClick={() => setYears(y)}>{y} yr</button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="stat-grid" style={{ marginTop: 16 }}>
+        <div className="stat"><div className="v">{fmt(annual)}</div><div className="l">Estimated annual benefit: HR cost savings ({fmt(adminNet)}) plus turnover avoidance ({fmt(turnover)})</div></div>
+        <div className="stat"><div className="v">{fmt(annual * years)}</div><div className="l">Cumulative over {years} years, holding headcount flat</div></div>
+        <div className="stat"><div className="v">$1.27</div><div className="l">Returned per $1 of PEO cost, per NAPEO's published ROI research</div></div>
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.6, marginTop: 12 }}>
+        Directional model built entirely on NAPEO-published benchmarks: net $380 per employee per year
+        ($1,775 saved vs $1,395 cost), 12% lower turnover applied to a 20% baseline at a replacement
+        cost of 20% of wage. Growth effects are deliberately excluded even though PEO clients grow
+        4.3% vs 1.6%, so this is the conservative case. A live engagement runs on the client's own
+        census and invoices. Sources:{" "}
+        <a href="https://napeo.org/wp-content/uploads/2025/03/white-paper-7-the-roi-of-using-a-peo.pdf" target="_blank" rel="noopener noreferrer" style={{ color: "var(--guava-deep)" }}>NAPEO ROI white paper</a>{" · "}
+        <a href="https://napeo.org/wp-content/uploads/2025/03/2024-white-paper-final.pdf" target="_blank" rel="noopener noreferrer" style={{ color: "var(--guava-deep)" }}>NAPEO 2024 client outcomes</a>
+      </p>
+    </div>
+  );
+}
+
 function ConstructTab() {
   const tiers = [
     { badge: "GUSTO PEO 1", name: "Full PEO with Benefits", theme: "The flagship: co-employment plus the benefits engine.",
@@ -1433,14 +1486,61 @@ function ConstructTab() {
         </div>
       ))}
       <div className="phase">
-        <div className="phase-head"><span className="phase-days">CROSS-TIER PLAY</span><h3>Earned Wage Access</h3></div>
-        <p className="theme">A product Gusto should do its best to offer across every tier, and a wedge into the segment the incumbents serve worst.</p>
+        <div className="phase-head"><span className="phase-days">CROSS-TIER PLAY 01</span><h3>Earned Wage Access</h3></div>
+        <p className="theme">A product to offer across every tier, and the wedge into the segment incumbents serve worst.</p>
         <ul>
-          <li><b>Huge for blue-collar industries.</b> For hourly workforces, construction trades within appetite, field services, logistics, restaurants, healthcare staffing, access to earned wages before payday is a recruiting and retention weapon that matters more to the employee than a marginally richer health plan.</li>
-          <li><b>It opens the market the benefits pitch can't.</b> The incumbents' PEO motion leads with white-collar master plans, yet NAPEO's own client research shows almost half of all PEO clients sit in professional services, manufacturing, or construction, blue-collar is core PEO territory, not adjacent. EWA gives Gusto a benefits-grade headline for the hourly employer, pairing naturally with PEO 2 for clients who keep their own coverage.</li>
-          <li><b>Gusto is structurally positioned to do it right.</b> The PEO already runs the funds flow, calculating earned wages in real time and fronting them safely is far more natural for the payroll/PEO platform than for a third-party app bolted onto someone else's data.</li>
-          <li><b>Client retention compounds.</b> Employees who rely on EWA push their employers to stay; employers whose workers love a benefit stay with the PEO that provides it. It's stickiness at both layers of the relationship.</li>
+          <li><b>Huge for blue-collar industries.</b> For hourly workforces, construction trades within appetite, field services, logistics, restaurants, healthcare staffing, access to earned wages before payday matters more to the employee than a marginally richer health plan.</li>
+          <li><b>It's a hiring weapon for the client.</b> "Work today, get paid today" goes straight into the client's job postings. The PEO stops being a back-office vendor and becomes part of how the client recruits.</li>
+          <li><b>It opens the market the benefits pitch can't.</b> Incumbents lead with white-collar master plans, yet NAPEO's client research shows almost half of all PEO clients sit in professional services, manufacturing, or construction. Blue-collar is core PEO territory, not adjacent. EWA pairs naturally with PEO 2 for clients who keep their own coverage.</li>
+          <li><b>Gusto is structurally positioned to do it right.</b> The PEO already runs the funds flow. Calculating earned wages in real time and fronting them safely is native to the payroll platform, not an app bolted onto someone else's data.</li>
+          <li><b>Retention compounds at both layers.</b> Employees who rely on EWA push their employers to stay; employers whose workers love a benefit stay with the PEO that provides it.</li>
         </ul>
+      </div>
+
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">CROSS-TIER PLAY 02</span><h3>The benefits small business has never been offered</h3></div>
+        <p className="theme">Fortune-500 benefits, delivered at 15-employee scale through aggregation.</p>
+        <ul>
+          <li><b>Fertility and family-building.</b> Nearly 40% of large employers now offer fertility benefits through platforms like Carrot, Progyny, and Kindbody. Small businesses are locked out: those platforms serve self-funded employers with hundreds of workers. A PEO aggregating hundreds of thousands of WSEs can negotiate one master partnership and hand a 15-person company IVF support, egg freezing, adoption and surrogacy assistance, and maternity return-to-work programs. Nobody in the SMB market offers this today. For talent-competing small companies, it is the single most differentiating benefit we could put in a quote.</li>
+          <li><b>The gap-coverage stack, engineered on purpose.</b> Accident, critical illness, and hospital indemnity plans exist everywhere as voluntary add-ons. The play is using them deliberately: pair a lower-premium high-deductible medical plan with employer-funded gap coverage that absorbs the deductible. The employee experiences rich coverage; the employer pays less in total premium. That's plan design as a product, and almost nobody packages it for small groups.</li>
+        </ul>
+      </div>
+
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">CROSS-TIER PLAY 03</span><h3>Workers' comp as a weapon, in both directions</h3></div>
+        <p className="theme">Reward the clean groups. Underwrite the tough ones nobody else will take.</p>
+        <ul>
+          <li><b>Performance credits for lean groups.</b> Clients with clean loss runs earn a renewal credit, real dollars back, structured as a retention credit. Yes, it trades comp spread for retention. That's the right trade: the renewal is where PEO clients are lost, a visible reward for safety changes client behavior in the direction underwriting wants, and sharing the spread we teach clients to look for is the most credible transparency move in the industry.</li>
+          <li><b>A secondary high-risk comp program.</b> Mainstream and tech-forward PEOs decline high-mod groups and tough class codes outright. An entire specialty-broker industry exists just to place the construction, trucking, and staffing groups everyone else turns away, and those are precisely the businesses where PEO value is largest, because high class rates make the savings absolute dollars, not rounding. A second program with a specialty carrier, separate underwriting, and its own pricing expands our appetite into that whitespace while protecting the main master policy's loss experience. Scope expansion without contaminating the flagship book.</li>
+        </ul>
+      </div>
+
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">CROSS-TIER PLAY 04</span><h3>Money the client can see</h3></div>
+        <p className="theme">Make the financial case visible, quantified, and standard in every quote.</p>
+        <ul>
+          <li><b>A credits analysis in every quote.</b> WOTC screening and the R&D payroll-tax credit (worth up to hundreds of thousands per year for qualifying startups) get evaluated up front and shipped as a page of the proposal, found money, quantified before the client signs. Gusto already runs R&D credit services inside payroll, so this is native plumbing, not a new build. And CPEO certification preserves these credits at the customer level, which makes the credits page a permanent feature, not a transition casualty.</li>
+          <li><b>Published pricing wraps all of it.</b> Every play above shows up itemized on a bill anyone can read, under an admin fee anyone can look up. Transparency isn't one of the products; it's the container the products ship in.</li>
+          <li><b>The 3-to-5 year ROI model, in every consultant's hands.</b> NAPEO's research gives us defensible economics: 27% ROI, $1,775 saved vs $1,395 spent per employee, 12% lower turnover, double the growth rate. Put a calculator on it, train every consultant to run it live in discovery, and the long-term case stops being a claim and becomes arithmetic. Working demo below.</li>
+        </ul>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">DEMO · THE CONSULTANT'S ROI MODEL</div>
+        <h2>What does a PEO return over 3 to 5 years?</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>The tool every consultant runs live in discovery. Adjust the inputs.</p>
+        <div style={{ marginTop: 16 }}>
+          <RoiCalc />
+        </div>
+      </div>
+
+      <div className="callout"><span className="tag">THE GAP THIS STACK EXPLOITS</span>
+        Fertility platforms serve large self-funded employers; small business is locked out until
+        someone aggregates. High-risk comp groups get declined by mainstream PEOs and absorbed by
+        a specialty-broker cottage industry. Gap coverage exists as scattered voluntary add-ons,
+        never engineered as deliberate plan design for small groups. Tax credits get mentioned in
+        sales conversations and quantified after signing, if ever. Each play above takes something
+        the market treats as an exception and makes it standard, on one platform, in one quote.
       </div>
 
       <div className="callout"><span className="tag">THE LADDER</span>
