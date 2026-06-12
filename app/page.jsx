@@ -1654,36 +1654,37 @@ function WelcomeLetter({ onClose }) {
     <div className="letter-overlay" role="dialog" aria-modal="true" aria-label="Welcome letter from Gabriel Revnew">
       <div className="letter-card">
         <span className="eyebrow">YOU'RE IN · A NOTE BEFORE YOU EXPLORE</span>
-        <div className="salutation">To the Gusto team —</div>
+        <div className="salutation">To the Gusto team,</div>
         <p className="body">
-          Thank you for the time you've invested in this process. These conversations have felt
-          less like interviews and more like working sessions — which is exactly the kind of
-          team I want to build with.
+          Thank you for the time you've put into this process. These conversations haven't felt
+          like interviews. They've felt like working sessions, and that's the kind of team I
+          want to be part of.
         </p>
         <p className="body">
-          So rather than send a document, I built you this. Inside: the certification course I'd use to train our team, the
-          market intelligence we'd carry into every conversation, a product construct, and the
-          ideas I'd bring to a go-to-market our team shapes and executes together.
+          So instead of sending over a document, I built this. Inside you'll find the
+          certification course I'd use to train our team, the market knowledge we'd carry into
+          every conversation, a product construct, and my ideas for a go-to-market plan that
+          we'd shape and execute together.
         </p>
         <p className="body">
-          The biggest opportunity here isn't winning strangers — it's growing with the 500,000+
-          businesses that already trust Gusto, and building tight feedback loops
-          between the field, underwriting, and product so every win and every loss makes the
-          next motion sharper. That's how I've led for eight years: player-coach, metrics over
-          vibes, develop the people, and let the data coach all of us.
+          The biggest opportunity here isn't winning strangers. It's growing with the 500,000+
+          businesses that already trust Gusto, and building real feedback loops between the
+          field, underwriting, and product so every win and every loss makes us sharper. That's
+          how I've led for the last eight years. Player-coach style, driven by the numbers,
+          focused on developing people.
         </p>
         <p className="body">
-          Gusto has one shot at entering PEO right — and my record is the case that I can help
-          build it: eight years selling and leading in this category, a #1-ranked team, nine of
-          nine consultants at President's Club, Leader of the Year. Every page of this site comes
-          from that experience. And none of it works alone — which is why everything here is
-          written as a starting point for what we build together.
+          Gusto has one shot at entering PEO the right way, and my record is why I believe I
+          can help build it. Eight years selling and leading in this category. A number one
+          ranked team. Nine of nine consultants at President's Club. Leader of the Year. Every
+          page of this site comes from that experience. And I know none of it works alone, so
+          treat everything here as a starting point for what we'd build together.
         </p>
         <p className="body">
           Explore in any order. Take the certification quizzes if you're feeling competitive.
-          And the password you just typed? That's the thesis.
+          And the password you typed to get in here? I meant every word of it.
         </p>
-        <div className="signoff">— <span className="sig">Gabriel Revnew</span></div>
+        <div className="signoff"><span className="sig">Gabriel Revnew</span></div>
         <div style={{ marginTop: 26 }}>
           <button className="btn primary" style={{ width: "100%" }} onClick={onClose}>Explore the site →</button>
         </div>
