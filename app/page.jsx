@@ -162,6 +162,15 @@ const css = `
 .gloss-item { padding: 11px 0; border-bottom: 1px dashed var(--rule); font-size: 14px; }
 .gloss-item b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
 .gloss-item p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 4px 0 0; }
+.myday-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding-top: 12px; font-size: 13.5px; line-height: 1.5; }
+@media (max-width: 560px) { .myday-meta { grid-template-columns: 1fr; } }
+.agent-builder { border: 1px solid var(--rule); border-radius: 14px; padding: 20px; background: var(--bg); }
+.sig-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.sig-toggle { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--rule); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; color: var(--ink); cursor: pointer; transition: all .12s; font-family: inherit; }
+.sig-toggle:hover { border-color: var(--guava); }
+.sig-toggle b { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+.sig-toggle.on { background: var(--guava-soft); border-color: var(--guava); color: var(--guava-deep); }
+.sig-toggle.on b { color: var(--guava-deep); }
 .roi-input { font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-size: 15px; width: 100%; background: var(--surface); color: var(--ink); }
 .roi-input:focus { outline: none; border-color: var(--guava); }
 .roi-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
@@ -579,12 +588,12 @@ const COURSE = [
       {
         title: "The market we're entering",
         blocks: [
-          { t: "p", x: "Everything in Modules 1\u20133 is category knowledge, what a PEO is, how one runs, and what builds a bill. This module is about ours. Start with the market: a ~$414B industry that has more than quadrupled since 2012, serving 230,000+ businesses, yet only ~15% of employers with 10\u2013499 employees, and roughly 4% of all US businesses, use a PEO. We are entering a large, growing, and mostly unconverted category." },
+          { t: "p", x: "Everything in Modules 1–3 is category knowledge, what a PEO is, how one runs, and what builds a bill. This module is about ours. Start with the market: a ~$414B industry that has more than quadrupled since 2012, serving 230,000+ businesses, yet only ~15% of employers with 10–499 employees, and roughly 4% of all US businesses, use a PEO. We are entering a large, growing, and mostly unconverted category." },
           { t: "p", x: "Three broad archetypes operate in it today. Service-heavy nationals sell depth: named HR teams, consulting intensity, premium pricing. Tech-forward platforms sell product: software experience, speed, and in some cases published pricing. Regional specialists sell flexibility: underwriting creativity and local relationships. Know these shapes the way you'd know the geography of any market you sell in, because clients will ask what else is out there, and a confident, fair answer builds more trust than a rehearsed attack." },
           { t: "callout", tag: "HOW WE TALK ABOUT THE MARKET", x: "We don't run teardowns and we don't sell against anyone's invoice. We sell the Gusto PEO: what it is, what it costs, and what it does for the client, next to what they're paying to employ people today. If a client brings another quote, we answer questions honestly and normalize structures so they can see clearly. That's the whole policy." },
           { t: "sources", items: [
             { l: "Market size, growth, client counts, NAPEO Industry Research & Data", u: "https://napeo.org/intro-to-peos/industry-research-data/" },
-            { l: "Penetration (~15% of 10\u2013499 EE employers; ~4% of all US businesses), NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
+            { l: "Penetration (~15% of 10–499 EE employers; ~4% of all US businesses), NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
           ]},
         ],
       },
@@ -603,7 +612,7 @@ const COURSE = [
       {
         title: "Who we serve and how we reach them",
         blocks: [
-          { t: "p", x: "Our ICP comes straight from the industry's own demographics: nearly two-thirds of all PEO clients have 10\u201349 employees, and roughly half are in professional services, manufacturing, or construction. Layer on the strongest propensity signals, multi-state footprint, benefits-seeking behavior, growth, comp complexity, and that's the target." },
+          { t: "p", x: "Our ICP comes straight from the industry's own demographics: nearly two-thirds of all PEO clients have 10–49 employees, and roughly half are in professional services, manufacturing, or construction. Layer on the strongest propensity signals, multi-state footprint, benefits-seeking behavior, growth, comp complexity, and that's the target." },
           { t: "p", x: "What makes our motion different is where those targets already live: inside Gusto's payroll base of 500,000+ businesses. The in-base motion runs on lifecycle triggers, a new state registration, a headcount crossing, a benefits question asked in-app, a renewal window opening, surfaced and prioritized so the team starts each day with the accounts most likely to need us now." },
           { t: "list", items: [
             "Internal partnership is a rule, not a vibe. Payroll account owners are partners in every conversion: written rules of engagement, shared credit, and a warm handoff. The payroll team wins every time we win, or the motion dies.",
@@ -612,7 +621,7 @@ const COURSE = [
           ]},
           { t: "callout", tag: "FIELD NOTE", x: "The trigger beats the list. An account that just registered in a second state or just lost a candidate over benefits is worth ten cold names, the event creates the conversation, and we can see the event." },
           { t: "sources", items: [
-            { l: "Client profile (two-thirds at 10\u201349 EEs; ~half in professional services, manufacturing, construction), NAPEO: PEO Clients, An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
+            { l: "Client profile (two-thirds at 10–49 EEs; ~half in professional services, manufacturing, construction), NAPEO: PEO Clients, An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
           ]},
         ],
       },
@@ -629,7 +638,7 @@ const COURSE = [
     quiz: [
       { q: "The only difference between PEO 1 and PEO 2 is:", opts: ["PEO 2 runs on a different platform", "PEO 2 is full co-employment without benefits enrollment, the client keeps its own benefits and broker", "PEO 2 has no compliance support", "PEO 2 is only for companies over 100 employees"], a: 1, x: "Same foundation, same platform, same co-employment, PEO 2 simply leaves benefits with the client's existing broker. It's how broker relationships become bridges instead of blockers." },
       { q: "What does CPEO certification make possible for the future PEO 3 tier?", opts: ["Exemption from state licensing", "Permission to blend rates", "Sole federal employment-tax liability and successor-employer treatment, no wage-base restart, so mid-year starts are clean", "Lower health premiums by law"], a: 2, x: "IRC \u00A73511 makes a certified PEO solely liable for federal employment taxes and grants successor treatment, eliminating the wage-base restart that makes mid-year moves expensive across most of the industry." },
-      { q: "Per NAPEO's client research, the heart of the PEO market, and our ICP, is:", opts: ["Businesses with 500+ employees", "Businesses with 10\u201349 employees", "Solo founders", "Only tech companies"], a: 1, x: "Nearly two-thirds of all PEO clients have 10\u201349 employees, with professional services, manufacturing, and construction making up about half the client base." },
+      { q: "Per NAPEO's client research, the heart of the PEO market, and our ICP, is:", opts: ["Businesses with 500+ employees", "Businesses with 10–49 employees", "Solo founders", "Only tech companies"], a: 1, x: "Nearly two-thirds of all PEO clients have 10–49 employees, with professional services, manufacturing, and construction making up about half the client base." },
       { q: "Why is selling the Gusto PEO into the existing payroll base structurally different from how most PEOs sell?", opts: ["It skips underwriting", "Trust, CAC, and cycle length: we offer an upgrade to customers who already know us, instead of cold-acquiring strangers", "It avoids the CSA", "Payroll clients are legally required to convert"], a: 1, x: "An installed, trusting base changes the economics of every deal, cheaper acquisition, shorter cycles, and a relationship that starts warm. The discipline is prioritizing it intelligently." },
       { q: "The non-negotiable rule of the internal co-sell motion:", opts: ["PEO reps work accounts secretly to move fast", "The payroll account owner wins, in credit and comp, every time we convert their account", "Payroll AEs must not be told about PEO", "Conversions only happen in January"], a: 1, x: "Written rules of engagement and shared credit make the payroll org our distribution engine. Without them, the motion creates enemies inside our own building, the one channel conflict that can kill this product." },
       { q: "PEO selling concentrates September through December because:", opts: ["State law requires fall enrollment", "Most benefits programs start January 1, so decisions cluster in the months before, pipeline builds in summer, implementation peaks in December", "PEOs close their books in August", "Buyers prefer holiday shopping"], a: 1, x: "The January 1 benefits start drives the calendar: summer pipeline, fall proposals and underwriting, December implementation. Plan capacity, marketing, risk, ops, around the season, not after it arrives." },
@@ -1123,52 +1132,297 @@ const AGENT_ACCOUNTS = [
     talk: "Turnover is the quiet tax in hospitality. Earned wage access plus even a basic benefits package measurably moves retention, and participation requirements are the first thing to verify before anyone quotes you, so let's check that before pricing anything." },
 ];
 
-function AgentDemo() {
-  const [open, setOpen] = useState(0);
-  const scored = AGENT_ACCOUNTS
-    .map((a) => ({ ...a, score: Math.min(99, 25 + a.signals.reduce((s, x) => s + x[1], 0)) }))
+const SIGNAL_LIBRARY = [
+  { id: "benefits_q", label: "Asked about benefits / health coverage", pts: 25, why: "active benefits intent" },
+  { id: "renewal", label: "Benefits or comp renewal in ~90 days", pts: 20, why: "a renewal window is open" },
+  { id: "new_state", label: "Just registered in a new state", pts: 18, why: "multi-state compliance just got harder" },
+  { id: "sweet_spot", label: "Headcount in the 10–49 sweet spot", pts: 15, why: "the core of the PEO market" },
+  { id: "hourly", label: "Hourly / blue-collar workforce (EWA + comp fit)", pts: 15, why: "earned wage access and comp savings land hard here" },
+  { id: "crossed_25", label: "Recently crossed 25 employees", pts: 12, why: "HR complexity outgrew the back office" },
+  { id: "lost_candidate", label: "Lost a hire over benefits", pts: 20, why: "small-group coverage just cost them talent" },
+  { id: "comp_claims", label: "Workers' comp mod climbing / claims rising", pts: 15, why: "a master program is the fix they need" },
+  { id: "multistate", label: "Already multi-state", pts: 10, why: "compliance surface is already wide" },
+  { id: "growth", label: "Hiring / growing fast", pts: 10, why: "growth multiplies HR load" },
+  { id: "partner", label: "Accountant-partner referral", pts: 18, why: "a trusted advisor is already in the room" },
+  { id: "no_health", label: "Offers no group health today", pts: 8, why: "greenfield for the benefits story" },
+];
+
+function buildTalkTrack(acct, chosen) {
+  const has = (id) => chosen.includes(id);
+  const name = acct.name || "this account";
+  if (has("lost_candidate"))
+    return "Losing a candidate over benefits usually means a small-group quote that can't compete. A master plan changes the math, same census, large-group rates. Worth twenty minutes to model it?";
+  if (has("benefits_q") && has("renewal"))
+    return "You were already asking about coverage, and your renewal is inside ninety days. That's the exact window to put your current quote next to a master-plan option, line by line. Want me to run it?";
+  if (has("new_state") || has("multistate"))
+    return "The week you run payroll in another state, your compliance surface doubles. That's the natural moment to look at consolidating payroll, benefits, and compliance into one relationship, before the next registration.";
+  if (has("comp_claims"))
+    return "When the mod moves the wrong way it compounds at every renewal. The fix is claims management and safety programs inside a master comp program. Bring the dec page and loss runs and we'll see what your codes really price at.";
+  if (has("hourly"))
+    return "For an hourly team, earned wage access plus a real benefits floor moves retention more than almost anything else, and a master comp program usually prices your class codes better. Both ride on the same platform you already run payroll on.";
+  if (has("renewal"))
+    return "Your renewal window is open, which is the one time a year a comparison actually costs you nothing. Let's put your current state next to a Gusto PEO quote and see if it's worth a move.";
+  return "Based on what we're seeing, you look like a strong fit for the Gusto PEO. It usually takes about fifteen minutes to gather the few documents I need to build a full quote, and more often than not we can show a net-positive ROI for you and your team. Want to grab those together?";
+}
+
+function scoreAccount(acct) {
+  const pts = acct.signals.reduce((s, id) => {
+    const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+    return s + (sig ? sig.pts : 0);
+  }, 0);
+  return Math.min(99, 25 + pts);
+}
+
+const SAMPLE_INPUT = [
+  { name: "Bluebird Dental Group", industry: "Professional services", ees: 18, states: "CO", signals: ["benefits_q", "renewal", "sweet_spot", "growth"] },
+  { name: "Summit Peak Builders", industry: "Construction", ees: 34, states: "CO, WY", signals: ["comp_claims", "crossed_25", "hourly", "multistate"] },
+  { name: "Pixel & Pine Studio", industry: "Software & design", ees: 12, states: "CO, NY, TX", signals: ["lost_candidate", "multistate", "growth", "sweet_spot"] },
+  { name: "Front Range Accounting", industry: "Professional services", ees: 9, states: "CO", signals: ["partner", "benefits_q"] },
+];
+
+function AgentEngine() {
+  const [accounts, setAccounts] = useState([]);
+  const [draft, setDraft] = useState({ name: "", industry: "", ees: "", states: "", signals: [] });
+  const [open, setOpen] = useState(-1);
+
+  const addAccount = () => {
+    if (!draft.name.trim()) return;
+    setAccounts([...accounts, { ...draft, ees: Number(draft.ees) || 0 }]);
+    setDraft({ name: "", industry: "", ees: "", states: "", signals: [] });
+  };
+  const loadSamples = () => { setAccounts(SAMPLE_INPUT.slice()); setOpen(-1); };
+  const clearAll = () => { setAccounts([]); setOpen(-1); };
+  const toggleSig = (id) =>
+    setDraft((d) => ({ ...d, signals: d.signals.includes(id) ? d.signals.filter((x) => x !== id) : [...d.signals, id] }));
+
+  const ranked = accounts
+    .map((a, idx) => ({ ...a, _idx: idx, score: scoreAccount(a) }))
     .sort((x, y) => y.score - x.score);
   const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
+
+  const [query, setQuery] = useState("");
+  const [domain, setDomain] = useState("");
+  const [researching, setResearching] = useState(false);
+  const [researchNote, setResearchNote] = useState(null);
+
+  const runResearch = async () => {
+    if (!query.trim() && !domain.trim()) return;
+    setResearching(true); setResearchNote(null);
+    try {
+      const r = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company: query.trim(), domain: domain.trim() }),
+      });
+      const data = await r.json();
+      if (!data.ok) {
+        setResearchNote(data.message || "Live research is unavailable. Enter details manually below.");
+      } else {
+        const acct = {
+          name: data.company,
+          industry: data.industry || "",
+          ees: data.employees || 0,
+          states: data.states || "",
+          signals: data.signals || [],
+          _summary: data.summary || "",
+          _source: data.employeesSource,
+          _alt: data.employeesAlt,
+          _confidence: data.employeesConfidence,
+          _apollo: data.apolloUsed,
+        };
+        setAccounts((a) => [...a, acct]);
+        setOpen(0);
+        setQuery(""); setDomain("");
+      }
+    } catch {
+      setResearchNote("Live research is unavailable right now. Enter details manually below.");
+    } finally {
+      setResearching(false);
+    }
+  };
+
   return (
     <div>
-      {scored.map((a, i) => {
-        const [label, cls] = tier(a.score);
-        const isOpen = open === i;
-        return (
-          <div className="agent-card" key={a.name}>
-            <div
-              className="agent-head"
-              role="button"
-              tabIndex={0}
-              style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
-              onClick={() => setOpen(isOpen ? -1 : i)}
-              onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}
-            >
-              <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
-              <span className="row-main">
-                <p className="row-title">{a.name}</p>
-                <p className="row-sub">{a.industry} · {a.ees} EEs · {a.states.join(", ")}</p>
-              </span>
-              <span className={"score-pill " + cls}>{a.score} · {label}</span>
-            </div>
-            {isOpen && (
-              <div className="agent-detail">
-                <div className="sig-wrap">
-                  {a.signals.map(([s, pts]) => (
-                    <span className="sig-chip" key={s}>{s}<b>+{pts}</b></span>
-                  ))}
-                </div>
-                <div className="callout" style={{ marginTop: 12, marginBottom: 4 }}>
-                  <span className="tag">OPENING TALK TRACK</span>{a.talk}
-                </div>
-              </div>
-            )}
+      <div className="agent-builder" style={{ marginBottom: 14 }}>
+        <span className="roi-label">LIVE RESEARCH, LET THE AGENT DO THE WORK</span>
+        <div className="roi-grid" style={{ gridTemplateColumns: "2fr 1.4fr auto" }}>
+          <div><input className="roi-input" value={query} placeholder="Company name, e.g. Landlocked Cards" onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && runResearch()} /></div>
+          <div><input className="roi-input" value={domain} placeholder="domain (optional)" onChange={(e) => setDomain(e.target.value)} onKeyDown={(e) => e.key === "Enter" && runResearch()} /></div>
+          <div><button className="btn primary" style={{ width: "100%" }} disabled={researching} onClick={runResearch}>{researching ? "Researching..." : "Research & score"}</button></div>
+        </div>
+        {researching && <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 2px 0" }}>Searching the web, verifying headcount, detecting signals. This takes a few seconds.</p>}
+        {researchNote && <div className="callout" style={{ marginTop: 12 }}><span className="tag">MANUAL MODE</span>{researchNote}</div>}
+      </div>
+
+      <div className="agent-builder">
+        <span className="roi-label" style={{ marginBottom: 8, display: "block" }}>OR BUILD AN ACCOUNT BY HAND</span>
+        <div className="roi-grid">
+          <div><span className="roi-label">ACCOUNT NAME</span>
+            <input className="roi-input" value={draft.name} placeholder="Acme Co." onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+          <div><span className="roi-label">INDUSTRY</span>
+            <input className="roi-input" value={draft.industry} placeholder="Construction" onChange={(e) => setDraft({ ...draft, industry: e.target.value })} /></div>
+          <div><span className="roi-label">EMPLOYEES</span>
+            <input className="roi-input" type="number" value={draft.ees} placeholder="25" onChange={(e) => setDraft({ ...draft, ees: e.target.value })} /></div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <span className="roi-label">STATE(S)</span>
+          <input className="roi-input" value={draft.states} placeholder="CO, WY" onChange={(e) => setDraft({ ...draft, states: e.target.value })} />
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <span className="roi-label">SIGNALS, TAP ALL THAT APPLY</span>
+          <div className="sig-pick">
+            {SIGNAL_LIBRARY.map((s) => (
+              <button key={s.id} type="button"
+                className={"sig-toggle" + (draft.signals.includes(s.id) ? " on" : "")}
+                onClick={() => toggleSig(s.id)}>
+                {s.label}<b>+{s.pts}</b>
+              </button>
+            ))}
           </div>
-        );
-      })}
-      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "12px 4px 0", lineHeight: 1.55 }}>
-        Sample data, real scoring logic. In production this runs against the live base, and the
-        signals, weights, and talk tracks are tuned every week in the win/loss loop with the team.
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+          <button className="btn primary" onClick={addAccount}>Score this account</button>
+          <button className="btn ghost" onClick={loadSamples}>Load sample accounts</button>
+          {accounts.length > 0 && <button className="btn ghost" onClick={clearAll}>Clear</button>}
+        </div>
+      </div>
+
+      {ranked.length === 0 ? (
+        <p style={{ fontSize: 13.5, color: "var(--ink-soft)", textAlign: "center", margin: "22px 4px 4px", lineHeight: 1.6 }}>
+          Enter an account above, or tap <b>Load sample accounts</b> to watch the engine rank a book instantly.
+        </p>
+      ) : (
+        <div style={{ marginTop: 22 }}>
+          <div className="src-tag" style={{ marginBottom: 10 }}>RANKED, {ranked.length} ACCOUNT{ranked.length > 1 ? "S" : ""}</div>
+          {ranked.map((a, i) => {
+            const [label, cls] = tier(a.score);
+            const isOpen = open === i;
+            const chosen = a.signals;
+            return (
+              <div className="agent-card" key={a._idx}>
+                <div className="agent-head" role="button" tabIndex={0}
+                  style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
+                  onClick={() => setOpen(isOpen ? -1 : i)}
+                  onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}>
+                  <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="row-main">
+                    <p className="row-title">{a.name}</p>
+                    <p className="row-sub">{[a.industry, a.ees ? a.ees + " EEs" : "", a.states].filter(Boolean).join(" · ")}</p>
+                  </span>
+                  <span className={"score-pill " + cls}>{a.score} · {label}</span>
+                </div>
+                {isOpen && (
+                  <div className="agent-detail">
+                    <div className="sig-wrap">
+                      {chosen.length === 0 ? <span className="sig-chip">No signals selected, base score only</span> :
+                        chosen.map((id) => {
+                          const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+                          return sig ? <span className="sig-chip" key={id}>{sig.label}<b>+{sig.pts}</b></span> : null;
+                        })}
+                    </div>
+                    {a._summary && (
+                      <p style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.55, margin: "12px 0 0" }}>
+                        <b style={{ color: "var(--ink)" }}>What we found: </b>{a._summary}
+                        {a.ees ? <span> Headcount {a.ees} (source: {a._source}{a._confidence ? `, ${a._confidence} confidence` : ""}{a._alt ? `; firmographic estimate ${a._alt}` : ""}).</span> : null}
+                      </p>
+                    )}
+                    <div className="callout" style={{ marginTop: 12, marginBottom: 4 }}>
+                      <span className="tag">OPENING TALK TRACK</span>{buildTalkTrack(a, chosen)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "14px 4px 0", lineHeight: 1.6 }}>
+        Real scoring logic, live. Base 25, plus weighted signal points, capped at 99; 80+ is HOT, 65+ WARM.
+        In production these signals arrive automatically from the payroll base instead of being typed, and
+        the weights and talk tracks get tuned every week in the win/loss loop with the team.
+      </p>
+    </div>
+  );
+}
+
+const MY_DAY_POOL = [
+  { name: "Bluebird Dental Group", industry: "Professional services", ees: 18, states: "CO", contact: "Dr. Mara Quinn, Owner", phone: "(303) 555‑0142", trigger: "Asked about group health in-app 3 days ago; renewal in 71 days", signals: ["benefits_q", "renewal", "sweet_spot"] },
+  { name: "Summit Peak Builders", industry: "Construction", ees: 34, states: "CO, WY", contact: "Dave Okafor, CFO", phone: "(307) 555‑0188", trigger: "Comp mod climbing; crossed 25 EEs last quarter", signals: ["comp_claims", "crossed_25", "hourly", "multistate"] },
+  { name: "Cedar Creek Veterinary", industry: "Healthcare services", ees: 14, states: "CO, NM", contact: "Dr. Lena Hart", phone: "(505) 555‑0164", trigger: "Opened a second clinic in NM; benefits renewal ~60 days", signals: ["new_state", "renewal", "sweet_spot", "multistate"] },
+  { name: "Pixel & Pine Studio", industry: "Software & design", ees: 12, states: "CO, NY, TX", contact: "Sam Reyes, Founder", phone: "(512) 555‑0109", trigger: "Lost a senior hire over benefits; hiring 4 roles", signals: ["lost_candidate", "multistate", "growth", "sweet_spot"] },
+  { name: "Harvest Lane Logistics", industry: "Logistics", ees: 47, states: "CO, UT, AZ", contact: "Priya Nathan, Ops Dir.", phone: "(602) 555‑0173", trigger: "Registered in AZ 3 weeks ago; hourly fleet workforce", signals: ["new_state", "hourly", "multistate", "growth"] },
+  { name: "Iron Horse Fabrication", industry: "Manufacturing", ees: 28, states: "CO", contact: "Russ Beale, Owner", phone: "(303) 555‑0196", trigger: "Comp claims frequency rising; mod renewal this fall", signals: ["comp_claims", "sweet_spot", "hourly"] },
+  { name: "Aspen Trail Hospitality", industry: "Restaurants", ees: 52, states: "CO", contact: "Nina Two Bears, GM", phone: "(970) 555‑0127", trigger: "High turnover; no group health offered today", signals: ["hourly", "no_health", "growth"] },
+  { name: "Front Range Accounting", industry: "Professional services", ees: 9, states: "CO", contact: "Tom Alvarez, Partner", phone: "(719) 555‑0151", trigger: "Gusto accountant-partner; asked about 401(k)", signals: ["partner", "benefits_q"] },
+  { name: "Granite Peak Electric", industry: "Electrical contracting", ees: 22, states: "CO, NE", contact: "Will Carver, Owner", phone: "(308) 555‑0134", trigger: "Multi-state field crews; comp renewal in 88 days", signals: ["renewal", "hourly", "multistate", "crossed_25"] },
+  { name: "Lark & Co. Marketing", industry: "Professional services", ees: 16, states: "CO", contact: "Bea Lindqvist, CEO", phone: "(303) 555‑0118", trigger: "Asked about benefits; grew from 11 to 16 this year", signals: ["benefits_q", "sweet_spot", "growth"] },
+  { name: "Trailhead Brewing", industry: "Food & beverage", ees: 38, states: "CO, WY", contact: "Marco Reyes, Founder", phone: "(307) 555‑0177", trigger: "Hourly staff; opening 2nd taproom across state line", signals: ["new_state", "hourly", "growth", "multistate"] },
+  { name: "Vista Ridge Home Health", industry: "Healthcare services", ees: 41, states: "CO", contact: "Dana Whitfield, Dir.", phone: "(303) 555‑0185", trigger: "Benefits renewal ~80 days; recruiting caregivers hard", signals: ["renewal", "hourly", "lost_candidate"] },
+];
+
+function MyDay() {
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  // deterministic daily rotation so the list feels fresh but is stable within a day
+  const dayNum = Math.floor(Date.now() / 86400000);
+  const rotated = MY_DAY_POOL.map((a, i) => ({ ...a, score: scoreAccount(a), _r: (i + dayNum) % MY_DAY_POOL.length }));
+  const list = rotated.sort((x, y) => y.score - x.score).slice(0, 10);
+  const [open, setOpen] = useState(-1);
+  const [done, setDone] = useState([]);
+  const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
+  const toggleDone = (name) => setDone((d) => d.includes(name) ? d.filter((x) => x !== name) : [...d, name]);
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+        <div className="src-tag">{today.toUpperCase()}</div>
+        <div className="src-tag">{done.length} / {list.length} WORKED</div>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        {list.map((a, i) => {
+          const [label, cls] = tier(a.score);
+          const isOpen = open === i;
+          const isDone = done.includes(a.name);
+          return (
+            <div className="agent-card" key={a.name}>
+              <div className="agent-head" role="button" tabIndex={0}
+                style={{ ...(isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}), opacity: isDone ? 0.55 : 1 }}
+                onClick={() => setOpen(isOpen ? -1 : i)}
+                onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}>
+                <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
+                <span className="row-main">
+                  <p className="row-title" style={isDone ? { textDecoration: "line-through" } : undefined}>{a.name}</p>
+                  <p className="row-sub">{a.industry} · {a.ees} EEs · {a.states}</p>
+                </span>
+                <span className={"score-pill " + cls}>{a.score} · {label}</span>
+              </div>
+              {isOpen && (
+                <div className="agent-detail">
+                  <div className="myday-meta">
+                    <div><span className="roi-label">WHO TO CALL</span>{a.contact}<br /><span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13 }}>{a.phone}</span></div>
+                    <div><span className="roi-label">WHY TODAY</span>{a.trigger}</div>
+                  </div>
+                  <div className="sig-wrap">
+                    {a.signals.map((id) => {
+                      const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+                      return sig ? <span className="sig-chip" key={id}>{sig.label}<b>+{sig.pts}</b></span> : null;
+                    })}
+                  </div>
+                  <div className="callout" style={{ marginTop: 12, marginBottom: 10 }}>
+                    <span className="tag">OPENING TALK TRACK</span>{buildTalkTrack(a, a.signals)}
+                  </div>
+                  <button className={"btn " + (isDone ? "ghost" : "primary")} onClick={() => toggleDone(a.name)}>
+                    {isDone ? "Mark as not worked" : "Mark as worked"}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "14px 4px 0", lineHeight: 1.6 }}>
+        In production this list builds itself overnight: the agent scans the payroll base for fresh
+        signals, ranks them, and hands each rep ten worked-up accounts with the contact and the reason
+        already attached. Sample data shown here; the list rotates daily so the dashboard is never stale.
       </p>
     </div>
   );
@@ -1178,13 +1432,22 @@ function AgentTab() {
   return (
     <div className="shell">
       <div className="hero">
-        <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING DEMO BELOW</div>
+        <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING TOOL BELOW</div>
         <h1>The PEO Targeting Agent<span className="hl">.</span></h1>
         <p className="lede">
           My initial thinking on letting data lead our path to market: score the payroll base for
           PEO propensity, and hand the team a ranked, reasoned list instead of an alphabetical one.
-          A working demo on sample data is below, tap any account.
+          The working tool is below. It opens to My Day, ten accounts the agent scored and worked up overnight, and you can also score your own accounts by hand to see the logic run.
         </p>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">MY DAY · TODAY'S TOP 10</div>
+        <h2>The list the rep opens to</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Ten accounts, already scored and worked up. Who to call, why today, and the opening line. Tap any to expand.</p>
+        <div style={{ marginTop: 16 }}>
+          <MyDay />
+        </div>
       </div>
 
       <div className="card" style={{ marginBottom: 14 }}>
@@ -1211,11 +1474,11 @@ function AgentTab() {
       </div>
 
       <div className="card">
-        <div className="kicker">LIVE DEMO · SAMPLE ACCOUNTS</div>
-        <h2>Today's ranked list</h2>
-        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Tap an account to see why it scored, and the opening the agent drafts.</p>
+        <div className="kicker">THE LIVE TOOL · RESEARCH ANY COMPANY</div>
+        <h2>Run the engine</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Type a company name and the agent researches it live, verifies headcount, detects signals, scores, and writes the opening. Or build an account by hand.</p>
         <div style={{ marginTop: 16 }}>
-          <AgentDemo />
+          <AgentEngine />
         </div>
       </div>
     </div>
