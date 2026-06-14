@@ -4,7 +4,7 @@ import React, { useState, createContext, useContext } from "react";
 
 /* ============================================================
    GABE × GUSTO, HEAD OF PEO SALES
-   Interview microsite: background, PEO Targeting Agent,
+   Interview microsite: background, PEO Prospecting Agent,
    certification course, landscape, SWOT, success keys, 90-day plan.
    Gusto-branded: guava (#F45D48), warm cream, DM Sans.
    ============================================================ */
@@ -46,7 +46,7 @@ const css = `
 .wordmark .x { color: var(--guava); }
 .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
 
-.tabbar { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tabbar { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-right: 24px; }
 .tabbar::-webkit-scrollbar { display: none; }
 .tab {
   border: none; background: none; cursor: pointer;
@@ -176,6 +176,7 @@ const css = `
 .roi-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
 .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
+.workstream { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); margin: 18px 0 2px; font-weight: 600; }
 .path-wrap { max-width: 720px; margin: 0 auto 22px; }
 .path-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--guava-deep); border: 1px solid var(--guava); background: var(--guava-soft); border-radius: 999px; padding: 2px 9px; margin-left: 9px; vertical-align: 2px; white-space: nowrap; }
 .sources { border-top: 1px dashed var(--rule); margin-top: 22px; padding-top: 12px; }
@@ -992,8 +993,8 @@ function ModuleView({ mod, progress, onLessonDone, onPass, onHome }) {
 
 const TABS = [
   { id: "about", label: "About Gabe" },
-  { id: "agent", label: "PEO Targeting Agent" },
-  { id: "course", label: "PEO Certification" },
+  { id: "agent", label: "PEO Prospecting Agent" },
+  { id: "course", label: "PEO Training" },
   { id: "landscape", label: "Competitors" },
   { id: "swot", label: "Market SWOT" },
   { id: "construct", label: "Gusto PEO Construct" },
@@ -1023,7 +1024,7 @@ function AboutTab() {
         <div className="stat"><div className="v">7×</div><div className="l">Summit Achiever at 150%+ of quota (2019–2025)</div></div>
         <div className="stat"><div className="v">100%</div><div className="l">Of consultants to President's Club · the only team at TriNet to do it</div></div>
         <div className="stat"><div className="v">35%+</div><div className="l">YoY growth, five consecutive years</div></div>
-        <div className="stat"><div className="v">2 products</div><div className="l">PEOLens proposal audits · PEO Targeting Agent</div></div>
+        <div className="stat"><div className="v">2 products</div><div className="l">PEOLens proposal audits · PEO Prospecting Agent</div></div>
       </div>
 
       <div className="card">
@@ -1092,7 +1093,7 @@ function AboutTab() {
         <p>
           And there's a pattern underneath it: I've launched a revenue-generating product at
           every stop, College Parent Magazine ($1MM+ in year one), PEO Consulting Partners,
-          PEOLens, and the PEO Targeting Agent built live during this process. Gusto is
+          PEOLens, and the PEO Prospecting Agent built live during this process. Gusto is
           launching a product. I launch products.
         </p>
         <div className="callout"><span className="tag">SALES PHILOSOPHY</span>
@@ -1433,7 +1434,7 @@ function AgentTab() {
     <div className="shell">
       <div className="hero">
         <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING TOOL BELOW</div>
-        <h1>The PEO Targeting Agent<span className="hl">.</span></h1>
+        <h1>The PEO Prospecting Agent<span className="hl">.</span></h1>
         <p className="lede">
           My initial thinking on letting data lead our path to market: score the payroll base for
           PEO propensity, and hand the team a ranked, reasoned list instead of an alphabetical one.
@@ -1839,7 +1840,7 @@ function GTMTab() {
           <li><b>Distribution before advertising.</b> The in-base motion is the whole short-term GTM: ICP-score the payroll base (NAPEO: nearly two-thirds of all PEO clients are 10–49 employees, exactly where Gusto's base lives), and work lifecycle triggers, new state registrations, headcount crossings, benefits-seeking signals, renewal windows.</li>
           <li><b>Internal partnership before external motion.</b> Week one belongs to peer sales leaders: written rules of engagement for install-base conversion, who owns the account, how credit and comp are shared, when a payroll AE brings PEO in, so converting the base makes allies of the payroll org, never victims. Co-selling into a shared customer base only works when the peer team wins every time we win.</li>
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
-          <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Targeting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
+          <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Prospecting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
           <li><b>Start the CPEO clock immediately.</b> Certification takes time and PEO 3 waits on it. File early, pursue ESAC in parallel, and market the pursuit itself, "certification in progress" beats silence.</li>
           <li><b>Underwriting before rep five.</b> Deal desk, credit screening, and funds-flow controls live before the sales team scales. The deals competitors decline will find the new entrant first; the controls have to be standing when they arrive.</li>
           <li><b>A small, certified founding team.</b> PEO-fluent consultants, every rep certifies through the Operator Course before touching a prospect, with compensation aligned to underwriting quality, so Gusto scales the book it wants.</li>
@@ -1899,7 +1900,7 @@ function KeysTab() {
     { n: "05", h: "Credentials: CPEO & ESAC", p: "Sole federal tax liability, no wage-base restart, bonded financial assurance, certification converts trust from a claim into a statute.", g: "For a new entrant, CPEO is the fastest answer to 'why trust the new guy with my payroll taxes?'" },
     { n: "06", h: "Service model matched to segment", p: "Dedicated HRBP vs self-serve isn't branding, it's a cost structure choice. Mismatched service models churn books.", g: "Gusto's base skews simple and software-native: lead self-serve with human escalation, and resist over-building white glove too early." },
     { n: "07", h: "The retention engine", p: "Accounts reach true profitability deep into the relationship. Implementation quality and the first payroll are the strongest retention predictors.", g: "Instrument GP/WSE and retention from client one, the metrics that tell you whether the machine works." },
-    { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Targeting Agent exists to exploit it systematically." },
+    { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Prospecting Agent exists to exploit it systematically." },
   ];
   return (
     <div className="shell">
@@ -1929,52 +1930,86 @@ function PlanTab() {
   return (
     <div className="shell">
       <div className="hero">
-        <div className="eyebrow">HEAD OF PEO SALES</div>
+        <div className="eyebrow">HEAD OF PEO SALES · FIRST 90 DAYS</div>
         <h1>The first 90 days<span className="hl">.</span></h1>
         <p className="lede">
-          Three phases: learn the machine, build the motion, prove it with a pilot cohort.
-          Every phase ends with something shipped, not something scheduled.
+          Three phases, each built on the same four workstreams: listen and learn the current
+          state, partner with the people already here, build the product and the motion, and prove
+          it with a real pilot. Every phase ends with something shipped, not something scheduled.
         </p>
       </div>
 
-      <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 1–30</span><h3>Learn & map</h3></div>
-        <p className="theme">Understand Gusto's PEO product, underwriting appetite, and the base, then define the ICP from data, not instinct.</p>
-        <ul>
-          <li>Deep-dive the product, pricing structure, underwriting appetite, and state licensing footprint with product, risk, and ops leaders. Know exactly what we can write, where, and at what price.</li>
-          <li>Mine the payroll base for PEO propensity: headcount band, multi-state, industry mix, benefits-seeking signals. Define the ICP and size the in-base opportunity.</li>
-          <li>Stand up the PEO Targeting Agent against real base data, turn the ICP into a scored, ranked target list.</li>
-          <li>Listen: ride along on sales calls, talk to early PEO customers and lost deals, interview top accountant partners about how PEO referrals would actually work in their practice.</li>
-          <li>Sit down with peer sales leaders across payroll and benefits in the first two weeks: align on shared accounts, draft the co-sell rules of engagement together, and earn cross-functional credibility before asking anyone for anything.</li>
-          <li>Draft the founding-rep hiring profile: PEO-fluent consultants who can read a census and unbundle an invoice, and open requisitions.</li>
-        </ul>
-        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>ICP definition + sized in-base opportunity, scored target list v1, co-sell rules of engagement drafted with peer sales leaders, hiring profile and open reqs, written read-back of product/underwriting reality.</div>
+      <div className="callout" style={{ marginBottom: 18 }}><span className="tag">HOW THIS PLAN IS STRUCTURED</span>
+        I don't walk in with the answers. I walk in with a method. The first month is mostly
+        listening, because a brand-new PEO inside an established company succeeds or fails on how
+        well it fits what's already working. Each phase below runs four parallel tracks: Listen &
+        Understand, Partner Internally, Build the Platform & Playbook, and Prove It. The weight
+        shifts from listening to building to proving as the quarter moves.
       </div>
 
       <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 31–60</span><h3>Build the motion</h3></div>
-        <p className="theme">Turn knowledge into a playbook, and the playbook into a live pilot.</p>
+        <div className="phase-head"><span className="phase-days">DAYS 1–30</span><h3>Listen & understand the current state</h3></div>
+        <p className="theme">Earn the right to build by understanding the machine, the people, and the data before changing anything.</p>
+
+        <p className="workstream">LISTEN & UNDERSTAND</p>
         <ul>
-          <li>Write Playbook v1: discovery artifact checklist (census, renewal dates, SUI notices, comp dec pages), the unbundling comparison toolkit, talk tracks for the five objections, and the honest year-two renewal story.</li>
-          <li>Launch the pilot: a defined cohort of high-scoring in-base accounts (sized with sales leadership), worked by me and the first reps using the playbook, every call instrumented.</li>
-          <li>Open the partner lane: pilot PEO referrals with a handful of top-tier accountant partners; define the referral motion, materials, and economics.</li>
-          <li>Build the underwriting feedback loop: weekly sales-risk review of every declined and repriced deal, so the ICP and pitch sharpen with each cycle.</li>
-          <li>Onboard the first rep class through the certification course on this site, every rep stamps all five modules before touching a prospect.</li>
+          <li><b>Map and meet every key stakeholder.</b> Product, underwriting and risk, finance and BizOps, benefits, implementation, marketing, partnerships, and the payroll and benefits sales leaders. One goal per conversation: understand their world, their constraints, and what a PEO does to their roadmap.</li>
+          <li><b>Interview customers and lost deals.</b> Sit with early PEO-curious clients, recent wins, and the deals that walked. The losses teach more than the wins; both define the real ICP better than any model.</li>
+          <li><b>Shadow the front line.</b> Ride along on payroll and benefits sales calls and listen to account managers handle renewals and escalations. The current motion is the foundation I have to build on, so I need to hear it live.</li>
+          <li><b>Learn the Gusto way.</b> Study how Gusto already sells, onboards, and supports, the tone, the self-serve philosophy, the values in practice, so the PEO motion extends the brand instead of fighting it.</li>
         </ul>
-        <div className="callout"><span className="tag">DAY-60 DELIVERABLES</span>Playbook v1 in use, pilot cohort live with full funnel instrumentation, accountant-channel pilot running, first reps certified and selling.</div>
+
+        <p className="workstream">UNDERSTAND THE NUMBERS</p>
+        <ul>
+          <li><b>Review underwriting policy and appetite.</b> What can we write, in which states, for which class codes, at what size? Where are the declines? Know the box before selling to its edges.</li>
+          <li><b>Establish the metrics and data picture.</b> What data exists on the base, what's the pricing structure, what are the key pricing levers (PEPM, comp, tax, benefits load), and what targets and goals already exist. Find the gaps in what we can measure.</li>
+          <li><b>Size the in-base opportunity.</b> Mine the payroll base for PEO propensity, headcount band, multi-state, industry mix, benefits-seeking signals, and define the ICP from data, not instinct.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, written read-back of product and underwriting reality, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
       </div>
 
       <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 61–90</span><h3>Prove & scale</h3></div>
-        <p className="theme">Close the first cohort, codify what worked, and present the scaling case with evidence.</p>
+        <div className="phase-head"><span className="phase-days">DAYS 31–60</span><h3>Partner & build</h3></div>
+        <p className="theme">Turn what I learned into alignment, a developing platform, and a playbook ready to test.</p>
+
+        <p className="workstream">PARTNER INTERNALLY</p>
         <ul>
-          <li>Close first pilot wins and run structured win/loss reviews on everything, what the data says about ICP, pricing, objections, and cycle length goes into Playbook v2.</li>
-          <li>Instrument the full funnel as the operating system: target → engaged → underwriting → proposal → closed, plus WSEs sold, effective PEPM, and early implementation quality.</li>
-          <li>Define the quota and comp model from observed cycle data, including underwriting-quality incentives, so we scale the book we want.</li>
-          <li>Hire wave two against the now-proven profile; promote pilot learnings into formal onboarding.</li>
-          <li>Day-90 executive readout: pilot results, unit economics signals, channel learnings, and the resourced plan for the next two quarters.</li>
+          <li><b>Align with the sales org.</b> Co-design the co-sell rules of engagement with the payroll and benefits sales leaders, account ownership, shared credit, comp, and the warm-handoff motion, so converting the base makes the peer team win every time we win.</li>
+          <li><b>Build the account-manager feedback loop.</b> AMs see renewal pain, churn signals, and benefits frustration first. Stand up a standing channel so what they hear becomes pipeline and product input, not lost signal.</li>
+          <li><b>Open the partner lane.</b> Pilot PEO referrals with a handful of top accountant partners; define the referral motion, materials, and economics with the partnerships team.</li>
         </ul>
-        <div className="callout"><span className="tag">DAY-90 SCORECARD</span>First in-base PEO revenue closed, repeatable playbook with evidence, instrumented funnel, certified and growing team, and a data-backed scaling plan on the table.</div>
+
+        <p className="workstream">BUILD THE PLATFORM & PLAYBOOK</p>
+        <ul>
+          <li><b>Drive platform enhancement.</b> Feed the listening-tour and underwriting findings into a structured product and pricing roadmap with product and risk, a polished, prioritized plan for what the PEO needs to be competitive at launch and what comes next.</li>
+          <li><b>Write Playbook v1.</b> Discovery checklist (census, renewal dates, SUI notices, comp dec pages), the total-cost-of-employment quoting toolkit, talk tracks for the top objections, and the honest year-two renewal story.</li>
+          <li><b>Build the underwriting feedback loop.</b> A weekly sales-and-risk review of every declined and repriced deal, so the ICP, pricing, and pitch sharpen each cycle.</li>
+          <li><b>Train the first team.</b> Onboard the founding reps through the training course on this site, every rep completes all five modules before touching a prospect.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-60 DELIVERABLES</span>Co-sell rules of engagement live with peer leaders, AM feedback loop running, accountant-channel pilot defined, prioritized platform and pricing roadmap, Playbook v1 in hand, and the first rep class trained.</div>
+      </div>
+
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">DAYS 61–90</span><h3>Prove it & plan the scale</h3></div>
+        <p className="theme">Run a real pilot, instrument everything, and bring the scaling case back with evidence.</p>
+
+        <p className="workstream">PROVE IT</p>
+        <ul>
+          <li><b>Launch the in-base pilot.</b> A defined cohort of high-scoring accounts, worked by me and the first reps using the playbook, every call instrumented from first touch to first payroll.</li>
+          <li><b>Close first wins and run win/loss on everything.</b> What the data says about ICP, pricing, objections, and cycle length goes straight into Playbook v2.</li>
+          <li><b>Stand up the funnel as the operating system.</b> Target to engaged to underwriting to proposal to closed, plus WSEs sold, effective PEPM, and early implementation quality, the metrics that run the business going forward.</li>
+        </ul>
+
+        <p className="workstream">PLAN THE SCALE</p>
+        <ul>
+          <li><b>Design quota and comp from real cycle data,</b> including underwriting-quality incentives, so we scale the book we actually want, not just the book that's easiest to write.</li>
+          <li><b>Hire wave two against the now-proven profile,</b> and promote pilot learnings into formal onboarding.</li>
+          <li><b>Deliver the Day-90 executive readout:</b> pilot results, unit-economics signals, channel learnings, the platform roadmap, and a resourced plan for the next two quarters.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-90 SCORECARD</span>First in-base PEO revenue closed, a repeatable playbook backed by evidence, an instrumented funnel, a trained and growing team, internal partnerships operating, and a data-backed scaling plan on the table.</div>
       </div>
     </div>
   );
@@ -2214,7 +2249,11 @@ export default function App() {
           </div>
           <nav className="tabbar">
             {TABS.map((t) => (
-              <button key={t.id} className={"tab" + (tab === t.id ? " active" : "")} onClick={() => setTab(t.id)}>
+              <button
+                key={t.id}
+                className={"tab" + (tab === t.id ? " active" : "")}
+                onClick={(e) => { setTab(t.id); e.currentTarget.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }}
+              >
                 {t.label}
               </button>
             ))}
