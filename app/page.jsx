@@ -177,6 +177,13 @@ const css = `
 .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
 .workstream { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); margin: 18px 0 2px; font-weight: 600; }
+.acro-row { display: flex; gap: 12px; align-items: baseline; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px dashed var(--rule); padding: 9px 2px; cursor: pointer; font: inherit; color: var(--ink); }
+.acro-row:hover { background: var(--bg); }
+.acro-row b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--guava-deep); min-width: 68px; flex-shrink: 0; }
+.acro-row span { font-size: 14px; color: var(--ink-soft); }
+.answer-key { margin: 12px 0 4px; padding-left: 20px; }
+.answer-key li { font-size: 13.5px; line-height: 1.5; margin-bottom: 7px; color: var(--ink); }
+.answer-key b { font-family: 'IBM Plex Mono', monospace; color: var(--green); margin-right: 4px; }
 .path-wrap { max-width: 720px; margin: 0 auto 22px; }
 .path-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--guava-deep); border: 1px solid var(--guava); background: var(--guava-soft); border-radius: 999px; padding: 2px 9px; margin-left: 9px; vertical-align: 2px; white-space: nowrap; }
 .sources { border-top: 1px dashed var(--rule); margin-top: 22px; padding-top: 12px; }
@@ -629,9 +636,9 @@ const COURSE = [
       {
         title: "Our pricing promise",
         blocks: [
-          { t: "p", x: "Module 3 taught the four places any PEO makes money: the admin fee, workers' comp pricing, unemployment taxes, and benefits rates. Our promise is structural transparency in all four, a published PEPM admin fee anyone can look up, itemized bills where taxes, comp, and premiums each show as their own line, and a renewal philosophy we put in writing before the first invoice." },
-          { t: "p", x: "Published pricing does in this category what it did for Gusto in payroll: it converts a traditionally opaque, quote-gated sale into one a buyer can start by themselves. In a market where most providers custom-quote everything, the published number is a trust signal before a rep ever speaks." },
-          { t: "callout", tag: "ALWAYS EXTRA: EVERYWHERE, INCLUDING HERE", x: "No PEO's admin fee, ours included, covers gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Those are pass-throughs. Saying this out loud, unprompted, is part of how we sell." },
+          { t: "p", x: "Module 3 taught the four places any PEO makes money: the admin fee, workers' comp pricing, unemployment taxes, and benefits rates. The Gusto PEO pricing model is built to be the opposite of the industry on all four. Five rules define it." },
+          { t: "list", items: ["One flat PEPM admin fee. A single per-employee-per-month number, published and lookup-able, never a percent of payroll. Raises, bonuses, and commissions never increase what the client pays us, because our fee has nothing to do with their wage bill.","Tier-priced, not deal-priced. The admin fee is set by tier (PEO 1, PEO 2, PEO 3) and headcount band, not negotiated case by case. Two similar companies get the same number. No sales-skill tax, no quote roulette.","Pass-throughs always itemized, never marked up. Wages, employer taxes, workers' comp premium, and benefit premiums each appear as their own line at cost. The admin fee is the only thing we earn, and it is the only thing that looks like a fee.","Comp and tax at true rate, spread disclosed. Where we administer workers' comp or unemployment, the client sees the real rate. We do not bury margin in a blended comp or SUTA number.","Renewal philosophy in writing before signing. The client sees how renewals work, what drives them (medical trend and the group's own claims, not a sales lever), and how increases get allocated, before the first invoice. We can't cap what medical trend does, but we can promise no surprises and no games. The renewal is where PEOs are won or lost, and we win it on honesty up front." ] },{ t: "p", x: "Published pricing does in this category what it did for Gusto in payroll: it converts a traditionally opaque, quote-gated sale into one a buyer can start by themselves. In a market where most providers custom-quote everything, the published number is a trust signal before a rep ever speaks." },
+          { t: "callout", tag: "ALWAYS EXTRA: EVERYWHERE, INCLUDING HERE", x: "No PEO's admin fee, ours included, covers gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Those are pass-throughs, billed at cost on their own lines, never marked up. Saying this out loud, unprompted, is part of how we sell." },
           { t: "callout", tag: "SAY IT THIS WAY", x: "\"Our admin fee is published, you can see it without talking to me. Your bill will show every component on its own line: wages, taxes, comp, premiums, our fee. And before you sign, I'll put our renewal philosophy in writing, because year two matters more than year one.\"" },
         ],
       },
@@ -761,6 +768,24 @@ const GLOSSARY = {
   "GTM": ["Go-To-Market", "The strategy and motion for bringing a product to customers: targeting, channels, pricing, and sales process."],
   "SLA": ["Service Level Agreement", "A committed performance standard, like time to a clean first payroll."],
   "HRBP": ["HR Business Partner", "A dedicated HR professional assigned to support a client, the premium end of the PEO service-model spectrum."],
+  "ADP": ["Automatic Data Processing", "The largest payroll company and, through ADP TotalSource, the largest PEO."],
+  "BLS": ["Bureau of Labor Statistics", "Federal source for employment, wage, and turnover data often cited in PEO ROI cases."],
+  "EPL": ["Employment Practices Liability", "The category of risk (discrimination, harassment, wrongful termination) that EPLI insures."],
+  "FLSA": ["Fair Labor Standards Act", "The federal law governing minimum wage, overtime, and exempt vs non-exempt classification, core PEO compliance territory."],
+  "FMLA": ["Family and Medical Leave Act", "Federal job-protected leave law; PEOs help clients administer eligibility and tracking."],
+  "FTE": ["Full-Time Equivalent", "A headcount measure combining part-timers into full-time units; used for ALE determination under the ACA."],
+  "HCM": ["Human Capital Management", "The broad software category (payroll, HR, benefits, talent) that PEOs and platforms compete in."],
+  "HDHP": ["High-Deductible Health Plan", "A lower-premium plan paired with an HSA, central to the gap-coverage plan-design play."],
+  "HRIS": ["Human Resource Information System", "The system of record for employee data; a PEO provides one as part of the platform."],
+  "KPI": ["Key Performance Indicator", "A headline metric used to run the sales motion (WSEs sold, gross profit per WSE, retention)."],
+  "POP": ["Premium Only Plan", "A Section 125 plan letting employees pay their insurance share pre-tax; a small but real savings PEOs administer."],
+  "ROI": ["Return on Investment", "The core PEO value claim; NAPEO research puts it around 27%, or about $1,273 returned per $1,000 spent."],
+  "SMB": ["Small and Medium-sized Business", "The core PEO market, especially employers with 10 to 99 employees."],
+  "SOC": ["System and Organization Controls", "Audit reports (SOC 1/SOC 2) on a provider's financial and security controls; trust signals in vendor diligence."],
+  "SUTADumping": ["SUTA Dumping", "The illegal practice of manipulating state unemployment accounts to lower tax rates, addressed by the 2004 federal SUTA Dumping Prevention Act."],
+  "TPA": ["Third-Party Administrator", "An outside firm that administers benefits or claims; a PEO brings much of this in-house."],
+  "TCOE": ["Total Cost of Employment", "The full per-employee cost (wages, taxes, benefits, comp, admin time) that the PEO value case is built against."],
+  "VEBA": ["Voluntary Employees' Beneficiary Association", "A tax-exempt trust some larger employers use to fund benefits; occasionally relevant in benefits structuring."],
 };
 
 const INLINE_EXCLUDE = new Set(["PEO"]);
@@ -1001,6 +1026,7 @@ const TABS = [
   { id: "gtm", label: "Go-To-Market" },
   { id: "keys", label: "What Makes a PEO Win" },
   { id: "plan", label: "90-Day Plan" },
+  { id: "resources", label: "Resources" },
 ];
 
 function AboutTab() {
@@ -1540,6 +1566,18 @@ function LandscapeTab() {
       good: ["Flexible underwriting and willingness to customize, including tougher comp risk", "Personalized mid-market service posture", "Structural flexibility: PEPM or percent-of-payroll"],
       bad: ["Smaller benefits scale and carrier leverage than the nationals", "Platform experience trails the tech-forward tier", "Limited brand awareness; custom-quote opacity"],
       win: "The platform and brand gaps are widest here, lead with product experience and national trust, and put published pricing against custom-quote opacity. Concede the tough-class-code deals their underwriting hustle wins; that's risk Gusto's early book shouldn't want anyway." },
+    { name: "Vensure", pos: "The acquisition machine: the country's fastest-growing PEO, built by buying others.",
+      good: ["Enormous scale and reach, roughly 4 million worksite employees across the platform, assembled through well over 100 acquisitions", "Broad geographic and class-code appetite, including staffing and tougher risk most nationals decline", "Deep, well-capitalized parent with continued M&A firepower"],
+      bad: ["Technology is inconsistent by design: some clients land on PrismHR, others sit on legacy systems from acquired companies that were never migrated, so the experience depends on which brand you joined through", "Pricing and service quality vary meaningfully region to region for the same reason, two similar companies can get very different deals", "Quote-driven, no published pricing; the integration seams show in reporting and self-service", "A roll-up's service model is only as good as the last shop it bought"],
+      win: "Consistency is the whole pitch. Gusto is one platform, one experience, one published price, everywhere, versus a patchwork where the product depends on which acquisition absorbed you. Ask the buyer which system they'd be on and what happens when they call support, then show the same Gusto experience a company in any state would get. Concede the tough-risk and staffing deals their appetite wins; that isn't the early Gusto book." },
+    { name: "Obsidian HR", pos: "The Denver-local PEO: regional service, Colorado focus.",
+      good: ["Genuinely local Colorado presence and service reputation, fast response and a personal touch national PEOs struggle to match", "Backed by ProService Hawaii, so real PEO infrastructure sits behind a boutique front", "Strong local relationships, references, and brand in the exact backyard Gusto's early motion will touch"],
+      bad: ["Small benefits and workers' comp scale next to the nationals, the buying-power story is limited", "Single-region footprint: a Colorado-centered PEO is a hard fit for a client growing into multiple states", "Limited technology depth and self-serve compared to a platform-first competitor", "Capacity and product breadth are bounded by size"],
+      win: "Respect the local relationship; don't attack it. Win on reach and platform: when the client adds employees in a second or third state, a Colorado-focused PEO is working at the edge of its footprint while Gusto runs the same play nationally on one system. Pair national scale and published pricing with the fact that Gusto already runs their payroll, the switching cost is lower than leaving a local incumbent they're loyal to." },
+    { name: "DecisionHR", pos: "The mid-sized Florida-based national, underwriting-led.",
+      good: ["Established full-service PEO, around 30,000 worksite employees across roughly 42 states with 25-plus years in market", "Backed by Bankers Financial Corporation, so there's insurance and underwriting muscle behind it", "Comfortable with workers' comp risk and underwriting-led deals, a real strength for comp-heavy accounts"],
+      bad: ["Quote-driven and opaque, no published pricing, with a traditional broker-channel sales motion", "Technology and self-serve trail the platform-first tier", "Brand awareness is thin outside the Southeast and the broker network", "Built around the insurance relationship more than the software experience"],
+      win: "Out-simple and out-platform them. DecisionHR's edge is comp underwriting, so concede the genuinely tough-comp accounts and compete where Gusto is stronger: a modern platform, published pricing, and an in-base motion that doesn't depend on a broker introduction. For a benefits-driven SMB that already trusts Gusto for payroll, the underwriting-led pitch matters less than the experience." },
   ];
   const matrixLesson = MATRIX_REFERENCE;
   return (
@@ -1784,7 +1822,7 @@ function ConstructTab() {
         <p className="theme">Make the financial case visible, quantified, and standard in every quote.</p>
         <ul>
           <li><b>A credits analysis in every quote.</b> WOTC screening and the R&D payroll-tax credit (worth up to hundreds of thousands per year for qualifying startups) get evaluated up front and shipped as a page of the proposal, found money, quantified before the client signs. Gusto already runs R&D credit services inside payroll, so this is native plumbing, not a new build. And CPEO certification preserves these credits at the customer level, which makes the credits page a permanent feature, not a transition casualty.</li>
-          <li><b>Published pricing wraps all of it.</b> Every play above shows up itemized on a bill anyone can read, under an admin fee anyone can look up. Transparency isn't one of the products; it's the container the products ship in.</li>
+          <li><b>One pricing model wraps all of it.</b> One flat published PEPM admin fee, set by tier and headcount band rather than negotiated deal by deal. Every pass-through, wages, taxes, comp, premiums, itemized at cost on its own line. Our renewal philosophy, how increases are driven and allocated, in writing before signing. The admin fee is the only thing we earn, and it is the only thing on the bill that looks like a fee.</li>
           <li><b>The 3-to-5 year ROI model, in every consultant's hands.</b> NAPEO's research gives us defensible economics: 27% ROI, $1,775 saved vs $1,395 spent per employee, 12% lower turnover, double the growth rate. Put a calculator on it, train every consultant to run it live in discovery, and the long-term case stops being a claim and becomes arithmetic. Working demo below.</li>
         </ul>
       </div>
@@ -1836,7 +1874,7 @@ function GTMTab() {
         <div className="phase-head"><span className="phase-days">SHORT TERM · MONTHS 0–12</span><h3>Earn the right to scale</h3></div>
         <p className="theme">Prove the motion with the in-base pilot while the operating controls come online.</p>
         <ul>
-          <li><b>Publish pricing on day one.</b> PEO 1 and PEO 2 at flat, published PEPM, no bundled rates, ever, as brand law. Justworks just raised Plus ~18% to ~$129; the "transparent, affordable PEO" mantle is being vacated in real time, and Gusto should take it at launch.</li>
+          <li><b>Publish pricing on day one.</b> One flat PEPM admin fee per tier and headcount band, looked up rather than negotiated, with pass-throughs itemized at cost and the renewal philosophy in writing. No percent-of-payroll, no bundled rates, ever, as brand law. Justworks just raised Plus ~18% to ~$129; the "transparent, affordable PEO" mantle is being vacated in real time, and Gusto should take it at launch.</li>
           <li><b>Distribution before advertising.</b> The in-base motion is the whole short-term GTM: ICP-score the payroll base (NAPEO: nearly two-thirds of all PEO clients are 10–49 employees, exactly where Gusto's base lives), and work lifecycle triggers, new state registrations, headcount crossings, benefits-seeking signals, renewal windows.</li>
           <li><b>Internal partnership before external motion.</b> Week one belongs to peer sales leaders: written rules of engagement for install-base conversion, who owns the account, how credit and comp are shared, when a payroll AE brings PEO in, so converting the base makes allies of the payroll org, never victims. Co-selling into a shared customer base only works when the peer team wins every time we win.</li>
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
@@ -1921,6 +1959,90 @@ function KeysTab() {
             <p className="gusto"><b>For Gusto:</b> {k.g}</p>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ResourcesTab({ onTerm }) {
+  const [openKey, setOpenKey] = useState(-1);
+  const letters = (n) => "ABCDEFGH"[n];
+  return (
+    <div className="shell">
+      <div className="hero">
+        <div className="eyebrow">FOR THE TEAM · TAKE THESE WITH YOU</div>
+        <h1>Resources<span className="hl">.</span></h1>
+        <p className="lede">
+          The leave-behinds: a downloadable competitive landscape, the full acronym reference, and
+          the training answer key for whoever's running the certification.
+        </p>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">DOWNLOAD</div>
+        <h2>The PEO Competitive Landscape</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>
+          Every major competitor by name, ADP, Insperity, TriNet, Paychex, Justworks, Rippling,
+          CoAdvantage, Vensure, Obsidian HR, and DecisionHR, with strengths to respect, weaknesses
+          to exploit, and the specific wedge for each. A four-page PDF, formatted to share.
+        </p>
+        <a className="btn primary" href="/competitive-landscape.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 14, display: "inline-block" }}>
+          Download the PDF
+        </a>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">REFERENCE</div>
+        <h2>The PEO acronym hub</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>
+          Every acronym in the business, {Object.keys(GLOSSARY).length} and counting. Tap any term
+          for the full definition. These are the same links that appear throughout the training.
+        </p>
+        <div style={{ marginTop: 16 }}>
+          {Object.keys(GLOSSARY).sort().map((k) => (
+            <button key={k} className="acro-row" onClick={() => onTerm(k)}>
+              <b>{k}</b><span>{GLOSSARY[k][0]}</span>
+            </button>
+          ))}
+        </div>
+        <button className="btn ghost" style={{ marginTop: 14 }} onClick={() => onTerm("__LEGEND__")}>Open the full glossary</button>
+      </div>
+
+      <div className="card">
+        <div className="kicker">FACILITATOR ONLY</div>
+        <h2>Training answer key</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>
+          For whoever administers the certification. Each module's correct answers and the one-line
+          why. Tap a module to reveal it.
+        </p>
+        <div style={{ marginTop: 16 }}>
+          {COURSE.map((m, mi) => (
+            <div className="agent-card" key={m.id}>
+              <div className="agent-head" role="button" tabIndex={0}
+                style={openKey === mi ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
+                onClick={() => setOpenKey(openKey === mi ? -1 : mi)}
+                onKeyDown={(e) => e.key === "Enter" && setOpenKey(openKey === mi ? -1 : mi)}>
+                <span className="row-num">{m.num}</span>
+                <span className="row-main">
+                  <p className="row-title">{m.title}</p>
+                  <p className="row-sub">{m.quiz.length} questions · pass at {m.pass}</p>
+                </span>
+                <span className="score-pill watch">KEY</span>
+              </div>
+              {openKey === mi && (
+                <div className="agent-detail">
+                  <ol className="answer-key">
+                    {m.quiz.map((q, qi) => (
+                      <li key={qi}>
+                        <b>{letters(q.a)}.</b> {q.opts[q.a]}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -2270,6 +2392,7 @@ export default function App() {
       {tab === "gtm" && <GTMTab />}
       {tab === "keys" && <KeysTab />}
       {tab === "plan" && <PlanTab />}
+      {tab === "resources" && <ResourcesTab onTerm={(k) => setTermKey(k)} />}
 
       <div className="footer">
         <span className="eyebrow">BUILT BY GABRIEL REVNEW · NOT AN OFFICIAL GUSTO PROPERTY · v2.0</span>
