@@ -4,7 +4,7 @@ import React, { useState, createContext, useContext } from "react";
 
 /* ============================================================
    GABE × GUSTO, HEAD OF PEO SALES
-   Interview microsite: background, PEO Targeting Agent,
+   Interview microsite: background, PEO Prospecting Agent,
    certification course, landscape, SWOT, success keys, 90-day plan.
    Gusto-branded: guava (#F45D48), warm cream, DM Sans.
    ============================================================ */
@@ -46,7 +46,7 @@ const css = `
 .wordmark .x { color: var(--guava); }
 .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
 
-.tabbar { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tabbar { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-right: 24px; }
 .tabbar::-webkit-scrollbar { display: none; }
 .tab {
   border: none; background: none; cursor: pointer;
@@ -162,11 +162,21 @@ const css = `
 .gloss-item { padding: 11px 0; border-bottom: 1px dashed var(--rule); font-size: 14px; }
 .gloss-item b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
 .gloss-item p { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 4px 0 0; }
+.myday-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding-top: 12px; font-size: 13.5px; line-height: 1.5; }
+@media (max-width: 560px) { .myday-meta { grid-template-columns: 1fr; } }
+.agent-builder { border: 1px solid var(--rule); border-radius: 14px; padding: 20px; background: var(--bg); }
+.sig-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.sig-toggle { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--rule); background: var(--surface); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; color: var(--ink); cursor: pointer; transition: all .12s; font-family: inherit; }
+.sig-toggle:hover { border-color: var(--guava); }
+.sig-toggle b { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); font-weight: 600; }
+.sig-toggle.on { background: var(--guava-soft); border-color: var(--guava); color: var(--guava-deep); }
+.sig-toggle.on b { color: var(--guava-deep); }
 .roi-input { font-family: 'IBM Plex Mono', monospace; border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; font-size: 15px; width: 100%; background: var(--surface); color: var(--ink); }
 .roi-input:focus { outline: none; border-color: var(--guava); }
 .roi-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
 .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
+.workstream { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); margin: 18px 0 2px; font-weight: 600; }
 .path-wrap { max-width: 720px; margin: 0 auto 22px; }
 .path-chip { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; color: var(--guava-deep); border: 1px solid var(--guava); background: var(--guava-soft); border-radius: 999px; padding: 2px 9px; margin-left: 9px; vertical-align: 2px; white-space: nowrap; }
 .sources { border-top: 1px dashed var(--rule); margin-top: 22px; padding-top: 12px; }
@@ -579,12 +589,12 @@ const COURSE = [
       {
         title: "The market we're entering",
         blocks: [
-          { t: "p", x: "Everything in Modules 1\u20133 is category knowledge, what a PEO is, how one runs, and what builds a bill. This module is about ours. Start with the market: a ~$414B industry that has more than quadrupled since 2012, serving 230,000+ businesses, yet only ~15% of employers with 10\u2013499 employees, and roughly 4% of all US businesses, use a PEO. We are entering a large, growing, and mostly unconverted category." },
+          { t: "p", x: "Everything in Modules 1–3 is category knowledge, what a PEO is, how one runs, and what builds a bill. This module is about ours. Start with the market: a ~$414B industry that has more than quadrupled since 2012, serving 230,000+ businesses, yet only ~15% of employers with 10–499 employees, and roughly 4% of all US businesses, use a PEO. We are entering a large, growing, and mostly unconverted category." },
           { t: "p", x: "Three broad archetypes operate in it today. Service-heavy nationals sell depth: named HR teams, consulting intensity, premium pricing. Tech-forward platforms sell product: software experience, speed, and in some cases published pricing. Regional specialists sell flexibility: underwriting creativity and local relationships. Know these shapes the way you'd know the geography of any market you sell in, because clients will ask what else is out there, and a confident, fair answer builds more trust than a rehearsed attack." },
           { t: "callout", tag: "HOW WE TALK ABOUT THE MARKET", x: "We don't run teardowns and we don't sell against anyone's invoice. We sell the Gusto PEO: what it is, what it costs, and what it does for the client, next to what they're paying to employ people today. If a client brings another quote, we answer questions honestly and normalize structures so they can see clearly. That's the whole policy." },
           { t: "sources", items: [
             { l: "Market size, growth, client counts, NAPEO Industry Research & Data", u: "https://napeo.org/intro-to-peos/industry-research-data/" },
-            { l: "Penetration (~15% of 10\u2013499 EE employers; ~4% of all US businesses), NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
+            { l: "Penetration (~15% of 10–499 EE employers; ~4% of all US businesses), NAPEO: PEO Clients white paper (Oct 2025)", u: "https://napeo.org/wp-content/uploads/2025/10/PEOClients2025_WhitePaper_Web.pdf" },
           ]},
         ],
       },
@@ -603,7 +613,7 @@ const COURSE = [
       {
         title: "Who we serve and how we reach them",
         blocks: [
-          { t: "p", x: "Our ICP comes straight from the industry's own demographics: nearly two-thirds of all PEO clients have 10\u201349 employees, and roughly half are in professional services, manufacturing, or construction. Layer on the strongest propensity signals, multi-state footprint, benefits-seeking behavior, growth, comp complexity, and that's the target." },
+          { t: "p", x: "Our ICP comes straight from the industry's own demographics: nearly two-thirds of all PEO clients have 10–49 employees, and roughly half are in professional services, manufacturing, or construction. Layer on the strongest propensity signals, multi-state footprint, benefits-seeking behavior, growth, comp complexity, and that's the target." },
           { t: "p", x: "What makes our motion different is where those targets already live: inside Gusto's payroll base of 500,000+ businesses. The in-base motion runs on lifecycle triggers, a new state registration, a headcount crossing, a benefits question asked in-app, a renewal window opening, surfaced and prioritized so the team starts each day with the accounts most likely to need us now." },
           { t: "list", items: [
             "Internal partnership is a rule, not a vibe. Payroll account owners are partners in every conversion: written rules of engagement, shared credit, and a warm handoff. The payroll team wins every time we win, or the motion dies.",
@@ -612,7 +622,7 @@ const COURSE = [
           ]},
           { t: "callout", tag: "FIELD NOTE", x: "The trigger beats the list. An account that just registered in a second state or just lost a candidate over benefits is worth ten cold names, the event creates the conversation, and we can see the event." },
           { t: "sources", items: [
-            { l: "Client profile (two-thirds at 10\u201349 EEs; ~half in professional services, manufacturing, construction), NAPEO: PEO Clients, An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
+            { l: "Client profile (two-thirds at 10–49 EEs; ~half in professional services, manufacturing, construction), NAPEO: PEO Clients, An Analysis (2022)", u: "https://napeo.org/wp-content/uploads/2025/03/analysisofpeo_whitepaper-fin.pdf" },
           ]},
         ],
       },
@@ -629,7 +639,7 @@ const COURSE = [
     quiz: [
       { q: "The only difference between PEO 1 and PEO 2 is:", opts: ["PEO 2 runs on a different platform", "PEO 2 is full co-employment without benefits enrollment, the client keeps its own benefits and broker", "PEO 2 has no compliance support", "PEO 2 is only for companies over 100 employees"], a: 1, x: "Same foundation, same platform, same co-employment, PEO 2 simply leaves benefits with the client's existing broker. It's how broker relationships become bridges instead of blockers." },
       { q: "What does CPEO certification make possible for the future PEO 3 tier?", opts: ["Exemption from state licensing", "Permission to blend rates", "Sole federal employment-tax liability and successor-employer treatment, no wage-base restart, so mid-year starts are clean", "Lower health premiums by law"], a: 2, x: "IRC \u00A73511 makes a certified PEO solely liable for federal employment taxes and grants successor treatment, eliminating the wage-base restart that makes mid-year moves expensive across most of the industry." },
-      { q: "Per NAPEO's client research, the heart of the PEO market, and our ICP, is:", opts: ["Businesses with 500+ employees", "Businesses with 10\u201349 employees", "Solo founders", "Only tech companies"], a: 1, x: "Nearly two-thirds of all PEO clients have 10\u201349 employees, with professional services, manufacturing, and construction making up about half the client base." },
+      { q: "Per NAPEO's client research, the heart of the PEO market, and our ICP, is:", opts: ["Businesses with 500+ employees", "Businesses with 10–49 employees", "Solo founders", "Only tech companies"], a: 1, x: "Nearly two-thirds of all PEO clients have 10–49 employees, with professional services, manufacturing, and construction making up about half the client base." },
       { q: "Why is selling the Gusto PEO into the existing payroll base structurally different from how most PEOs sell?", opts: ["It skips underwriting", "Trust, CAC, and cycle length: we offer an upgrade to customers who already know us, instead of cold-acquiring strangers", "It avoids the CSA", "Payroll clients are legally required to convert"], a: 1, x: "An installed, trusting base changes the economics of every deal, cheaper acquisition, shorter cycles, and a relationship that starts warm. The discipline is prioritizing it intelligently." },
       { q: "The non-negotiable rule of the internal co-sell motion:", opts: ["PEO reps work accounts secretly to move fast", "The payroll account owner wins, in credit and comp, every time we convert their account", "Payroll AEs must not be told about PEO", "Conversions only happen in January"], a: 1, x: "Written rules of engagement and shared credit make the payroll org our distribution engine. Without them, the motion creates enemies inside our own building, the one channel conflict that can kill this product." },
       { q: "PEO selling concentrates September through December because:", opts: ["State law requires fall enrollment", "Most benefits programs start January 1, so decisions cluster in the months before, pipeline builds in summer, implementation peaks in December", "PEOs close their books in August", "Buyers prefer holiday shopping"], a: 1, x: "The January 1 benefits start drives the calendar: summer pipeline, fall proposals and underwriting, December implementation. Plan capacity, marketing, risk, ops, around the season, not after it arrives." },
@@ -983,8 +993,8 @@ function ModuleView({ mod, progress, onLessonDone, onPass, onHome }) {
 
 const TABS = [
   { id: "about", label: "About Gabe" },
-  { id: "agent", label: "PEO Targeting Agent" },
-  { id: "course", label: "PEO Certification" },
+  { id: "agent", label: "PEO Prospecting Agent" },
+  { id: "course", label: "PEO Training" },
   { id: "landscape", label: "Competitors" },
   { id: "swot", label: "Market SWOT" },
   { id: "construct", label: "Gusto PEO Construct" },
@@ -1009,12 +1019,12 @@ function AboutTab() {
       </div>
 
       <div className="stat-grid">
-        <div className="stat"><div className="v">Leader of the Year</div><div className="l">Top sales leadership honor across publicly traded TriNet, 2022–23</div></div>
+        <div className="stat"><div className="v">Leader of the Year</div><div className="l">C-suite-selected top leader across all of TriNet, 2022–23</div></div>
         <div className="stat"><div className="v">5 years</div><div className="l">Running the #1-ranked team in the country · 128% of plan FY2025–26</div></div>
         <div className="stat"><div className="v">7×</div><div className="l">Summit Achiever at 150%+ of quota (2019–2025)</div></div>
         <div className="stat"><div className="v">100%</div><div className="l">Of consultants to President's Club · the only team at TriNet to do it</div></div>
         <div className="stat"><div className="v">35%+</div><div className="l">YoY growth, five consecutive years</div></div>
-        <div className="stat"><div className="v">2 products</div><div className="l">PEOLens proposal audits · PEO Targeting Agent</div></div>
+        <div className="stat"><div className="v">2 products</div><div className="l">PEOLens proposal audits · PEO Prospecting Agent</div></div>
       </div>
 
       <div className="card">
@@ -1083,7 +1093,7 @@ function AboutTab() {
         <p>
           And there's a pattern underneath it: I've launched a revenue-generating product at
           every stop, College Parent Magazine ($1MM+ in year one), PEO Consulting Partners,
-          PEOLens, and the PEO Targeting Agent built live during this process. Gusto is
+          PEOLens, and the PEO Prospecting Agent built live during this process. Gusto is
           launching a product. I launch products.
         </p>
         <div className="callout"><span className="tag">SALES PHILOSOPHY</span>
@@ -1123,52 +1133,297 @@ const AGENT_ACCOUNTS = [
     talk: "Turnover is the quiet tax in hospitality. Earned wage access plus even a basic benefits package measurably moves retention, and participation requirements are the first thing to verify before anyone quotes you, so let's check that before pricing anything." },
 ];
 
-function AgentDemo() {
-  const [open, setOpen] = useState(0);
-  const scored = AGENT_ACCOUNTS
-    .map((a) => ({ ...a, score: Math.min(99, 25 + a.signals.reduce((s, x) => s + x[1], 0)) }))
+const SIGNAL_LIBRARY = [
+  { id: "benefits_q", label: "Asked about benefits / health coverage", pts: 25, why: "active benefits intent" },
+  { id: "renewal", label: "Benefits or comp renewal in ~90 days", pts: 20, why: "a renewal window is open" },
+  { id: "new_state", label: "Just registered in a new state", pts: 18, why: "multi-state compliance just got harder" },
+  { id: "sweet_spot", label: "Headcount in the 10–49 sweet spot", pts: 15, why: "the core of the PEO market" },
+  { id: "hourly", label: "Hourly / blue-collar workforce (EWA + comp fit)", pts: 15, why: "earned wage access and comp savings land hard here" },
+  { id: "crossed_25", label: "Recently crossed 25 employees", pts: 12, why: "HR complexity outgrew the back office" },
+  { id: "lost_candidate", label: "Lost a hire over benefits", pts: 20, why: "small-group coverage just cost them talent" },
+  { id: "comp_claims", label: "Workers' comp mod climbing / claims rising", pts: 15, why: "a master program is the fix they need" },
+  { id: "multistate", label: "Already multi-state", pts: 10, why: "compliance surface is already wide" },
+  { id: "growth", label: "Hiring / growing fast", pts: 10, why: "growth multiplies HR load" },
+  { id: "partner", label: "Accountant-partner referral", pts: 18, why: "a trusted advisor is already in the room" },
+  { id: "no_health", label: "Offers no group health today", pts: 8, why: "greenfield for the benefits story" },
+];
+
+function buildTalkTrack(acct, chosen) {
+  const has = (id) => chosen.includes(id);
+  const name = acct.name || "this account";
+  if (has("lost_candidate"))
+    return "Losing a candidate over benefits usually means a small-group quote that can't compete. A master plan changes the math, same census, large-group rates. Worth twenty minutes to model it?";
+  if (has("benefits_q") && has("renewal"))
+    return "You were already asking about coverage, and your renewal is inside ninety days. That's the exact window to put your current quote next to a master-plan option, line by line. Want me to run it?";
+  if (has("new_state") || has("multistate"))
+    return "The week you run payroll in another state, your compliance surface doubles. That's the natural moment to look at consolidating payroll, benefits, and compliance into one relationship, before the next registration.";
+  if (has("comp_claims"))
+    return "When the mod moves the wrong way it compounds at every renewal. The fix is claims management and safety programs inside a master comp program. Bring the dec page and loss runs and we'll see what your codes really price at.";
+  if (has("hourly"))
+    return "For an hourly team, earned wage access plus a real benefits floor moves retention more than almost anything else, and a master comp program usually prices your class codes better. Both ride on the same platform you already run payroll on.";
+  if (has("renewal"))
+    return "Your renewal window is open, which is the one time a year a comparison actually costs you nothing. Let's put your current state next to a Gusto PEO quote and see if it's worth a move.";
+  return "Based on what we're seeing, you look like a strong fit for the Gusto PEO. It usually takes about fifteen minutes to gather the few documents I need to build a full quote, and more often than not we can show a net-positive ROI for you and your team. Want to grab those together?";
+}
+
+function scoreAccount(acct) {
+  const pts = acct.signals.reduce((s, id) => {
+    const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+    return s + (sig ? sig.pts : 0);
+  }, 0);
+  return Math.min(99, 25 + pts);
+}
+
+const SAMPLE_INPUT = [
+  { name: "Bluebird Dental Group", industry: "Professional services", ees: 18, states: "CO", signals: ["benefits_q", "renewal", "sweet_spot", "growth"] },
+  { name: "Summit Peak Builders", industry: "Construction", ees: 34, states: "CO, WY", signals: ["comp_claims", "crossed_25", "hourly", "multistate"] },
+  { name: "Pixel & Pine Studio", industry: "Software & design", ees: 12, states: "CO, NY, TX", signals: ["lost_candidate", "multistate", "growth", "sweet_spot"] },
+  { name: "Front Range Accounting", industry: "Professional services", ees: 9, states: "CO", signals: ["partner", "benefits_q"] },
+];
+
+function AgentEngine() {
+  const [accounts, setAccounts] = useState([]);
+  const [draft, setDraft] = useState({ name: "", industry: "", ees: "", states: "", signals: [] });
+  const [open, setOpen] = useState(-1);
+
+  const addAccount = () => {
+    if (!draft.name.trim()) return;
+    setAccounts([...accounts, { ...draft, ees: Number(draft.ees) || 0 }]);
+    setDraft({ name: "", industry: "", ees: "", states: "", signals: [] });
+  };
+  const loadSamples = () => { setAccounts(SAMPLE_INPUT.slice()); setOpen(-1); };
+  const clearAll = () => { setAccounts([]); setOpen(-1); };
+  const toggleSig = (id) =>
+    setDraft((d) => ({ ...d, signals: d.signals.includes(id) ? d.signals.filter((x) => x !== id) : [...d.signals, id] }));
+
+  const ranked = accounts
+    .map((a, idx) => ({ ...a, _idx: idx, score: scoreAccount(a) }))
     .sort((x, y) => y.score - x.score);
   const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
+
+  const [query, setQuery] = useState("");
+  const [domain, setDomain] = useState("");
+  const [researching, setResearching] = useState(false);
+  const [researchNote, setResearchNote] = useState(null);
+
+  const runResearch = async () => {
+    if (!query.trim() && !domain.trim()) return;
+    setResearching(true); setResearchNote(null);
+    try {
+      const r = await fetch("/api/research", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company: query.trim(), domain: domain.trim() }),
+      });
+      const data = await r.json();
+      if (!data.ok) {
+        setResearchNote(data.message || "Live research is unavailable. Enter details manually below.");
+      } else {
+        const acct = {
+          name: data.company,
+          industry: data.industry || "",
+          ees: data.employees || 0,
+          states: data.states || "",
+          signals: data.signals || [],
+          _summary: data.summary || "",
+          _source: data.employeesSource,
+          _alt: data.employeesAlt,
+          _confidence: data.employeesConfidence,
+          _apollo: data.apolloUsed,
+        };
+        setAccounts((a) => [...a, acct]);
+        setOpen(0);
+        setQuery(""); setDomain("");
+      }
+    } catch {
+      setResearchNote("Live research is unavailable right now. Enter details manually below.");
+    } finally {
+      setResearching(false);
+    }
+  };
+
   return (
     <div>
-      {scored.map((a, i) => {
-        const [label, cls] = tier(a.score);
-        const isOpen = open === i;
-        return (
-          <div className="agent-card" key={a.name}>
-            <div
-              className="agent-head"
-              role="button"
-              tabIndex={0}
-              style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
-              onClick={() => setOpen(isOpen ? -1 : i)}
-              onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}
-            >
-              <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
-              <span className="row-main">
-                <p className="row-title">{a.name}</p>
-                <p className="row-sub">{a.industry} · {a.ees} EEs · {a.states.join(", ")}</p>
-              </span>
-              <span className={"score-pill " + cls}>{a.score} · {label}</span>
-            </div>
-            {isOpen && (
-              <div className="agent-detail">
-                <div className="sig-wrap">
-                  {a.signals.map(([s, pts]) => (
-                    <span className="sig-chip" key={s}>{s}<b>+{pts}</b></span>
-                  ))}
-                </div>
-                <div className="callout" style={{ marginTop: 12, marginBottom: 4 }}>
-                  <span className="tag">OPENING TALK TRACK</span>{a.talk}
-                </div>
-              </div>
-            )}
+      <div className="agent-builder" style={{ marginBottom: 14 }}>
+        <span className="roi-label">LIVE RESEARCH, LET THE AGENT DO THE WORK</span>
+        <div className="roi-grid" style={{ gridTemplateColumns: "2fr 1.4fr auto" }}>
+          <div><input className="roi-input" value={query} placeholder="Company name, e.g. Landlocked Cards" onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && runResearch()} /></div>
+          <div><input className="roi-input" value={domain} placeholder="domain (optional)" onChange={(e) => setDomain(e.target.value)} onKeyDown={(e) => e.key === "Enter" && runResearch()} /></div>
+          <div><button className="btn primary" style={{ width: "100%" }} disabled={researching} onClick={runResearch}>{researching ? "Researching..." : "Research & score"}</button></div>
+        </div>
+        {researching && <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "10px 2px 0" }}>Searching the web, verifying headcount, detecting signals. This takes a few seconds.</p>}
+        {researchNote && <div className="callout" style={{ marginTop: 12 }}><span className="tag">MANUAL MODE</span>{researchNote}</div>}
+      </div>
+
+      <div className="agent-builder">
+        <span className="roi-label" style={{ marginBottom: 8, display: "block" }}>OR BUILD AN ACCOUNT BY HAND</span>
+        <div className="roi-grid">
+          <div><span className="roi-label">ACCOUNT NAME</span>
+            <input className="roi-input" value={draft.name} placeholder="Acme Co." onChange={(e) => setDraft({ ...draft, name: e.target.value })} /></div>
+          <div><span className="roi-label">INDUSTRY</span>
+            <input className="roi-input" value={draft.industry} placeholder="Construction" onChange={(e) => setDraft({ ...draft, industry: e.target.value })} /></div>
+          <div><span className="roi-label">EMPLOYEES</span>
+            <input className="roi-input" type="number" value={draft.ees} placeholder="25" onChange={(e) => setDraft({ ...draft, ees: e.target.value })} /></div>
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <span className="roi-label">STATE(S)</span>
+          <input className="roi-input" value={draft.states} placeholder="CO, WY" onChange={(e) => setDraft({ ...draft, states: e.target.value })} />
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <span className="roi-label">SIGNALS, TAP ALL THAT APPLY</span>
+          <div className="sig-pick">
+            {SIGNAL_LIBRARY.map((s) => (
+              <button key={s.id} type="button"
+                className={"sig-toggle" + (draft.signals.includes(s.id) ? " on" : "")}
+                onClick={() => toggleSig(s.id)}>
+                {s.label}<b>+{s.pts}</b>
+              </button>
+            ))}
           </div>
-        );
-      })}
-      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "12px 4px 0", lineHeight: 1.55 }}>
-        Sample data, real scoring logic. In production this runs against the live base, and the
-        signals, weights, and talk tracks are tuned every week in the win/loss loop with the team.
+        </div>
+        <div style={{ display: "flex", gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+          <button className="btn primary" onClick={addAccount}>Score this account</button>
+          <button className="btn ghost" onClick={loadSamples}>Load sample accounts</button>
+          {accounts.length > 0 && <button className="btn ghost" onClick={clearAll}>Clear</button>}
+        </div>
+      </div>
+
+      {ranked.length === 0 ? (
+        <p style={{ fontSize: 13.5, color: "var(--ink-soft)", textAlign: "center", margin: "22px 4px 4px", lineHeight: 1.6 }}>
+          Enter an account above, or tap <b>Load sample accounts</b> to watch the engine rank a book instantly.
+        </p>
+      ) : (
+        <div style={{ marginTop: 22 }}>
+          <div className="src-tag" style={{ marginBottom: 10 }}>RANKED, {ranked.length} ACCOUNT{ranked.length > 1 ? "S" : ""}</div>
+          {ranked.map((a, i) => {
+            const [label, cls] = tier(a.score);
+            const isOpen = open === i;
+            const chosen = a.signals;
+            return (
+              <div className="agent-card" key={a._idx}>
+                <div className="agent-head" role="button" tabIndex={0}
+                  style={isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : undefined}
+                  onClick={() => setOpen(isOpen ? -1 : i)}
+                  onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}>
+                  <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="row-main">
+                    <p className="row-title">{a.name}</p>
+                    <p className="row-sub">{[a.industry, a.ees ? a.ees + " EEs" : "", a.states].filter(Boolean).join(" · ")}</p>
+                  </span>
+                  <span className={"score-pill " + cls}>{a.score} · {label}</span>
+                </div>
+                {isOpen && (
+                  <div className="agent-detail">
+                    <div className="sig-wrap">
+                      {chosen.length === 0 ? <span className="sig-chip">No signals selected, base score only</span> :
+                        chosen.map((id) => {
+                          const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+                          return sig ? <span className="sig-chip" key={id}>{sig.label}<b>+{sig.pts}</b></span> : null;
+                        })}
+                    </div>
+                    {a._summary && (
+                      <p style={{ fontSize: 13, color: "var(--ink-soft)", lineHeight: 1.55, margin: "12px 0 0" }}>
+                        <b style={{ color: "var(--ink)" }}>What we found: </b>{a._summary}
+                        {a.ees ? <span> Headcount {a.ees} (source: {a._source}{a._confidence ? `, ${a._confidence} confidence` : ""}{a._alt ? `; firmographic estimate ${a._alt}` : ""}).</span> : null}
+                      </p>
+                    )}
+                    <div className="callout" style={{ marginTop: 12, marginBottom: 4 }}>
+                      <span className="tag">OPENING TALK TRACK</span>{buildTalkTrack(a, chosen)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "14px 4px 0", lineHeight: 1.6 }}>
+        Real scoring logic, live. Base 25, plus weighted signal points, capped at 99; 80+ is HOT, 65+ WARM.
+        In production these signals arrive automatically from the payroll base instead of being typed, and
+        the weights and talk tracks get tuned every week in the win/loss loop with the team.
+      </p>
+    </div>
+  );
+}
+
+const MY_DAY_POOL = [
+  { name: "Bluebird Dental Group", industry: "Professional services", ees: 18, states: "CO", contact: "Dr. Mara Quinn, Owner", phone: "(303) 555‑0142", trigger: "Asked about group health in-app 3 days ago; renewal in 71 days", signals: ["benefits_q", "renewal", "sweet_spot"] },
+  { name: "Summit Peak Builders", industry: "Construction", ees: 34, states: "CO, WY", contact: "Dave Okafor, CFO", phone: "(307) 555‑0188", trigger: "Comp mod climbing; crossed 25 EEs last quarter", signals: ["comp_claims", "crossed_25", "hourly", "multistate"] },
+  { name: "Cedar Creek Veterinary", industry: "Healthcare services", ees: 14, states: "CO, NM", contact: "Dr. Lena Hart", phone: "(505) 555‑0164", trigger: "Opened a second clinic in NM; benefits renewal ~60 days", signals: ["new_state", "renewal", "sweet_spot", "multistate"] },
+  { name: "Pixel & Pine Studio", industry: "Software & design", ees: 12, states: "CO, NY, TX", contact: "Sam Reyes, Founder", phone: "(512) 555‑0109", trigger: "Lost a senior hire over benefits; hiring 4 roles", signals: ["lost_candidate", "multistate", "growth", "sweet_spot"] },
+  { name: "Harvest Lane Logistics", industry: "Logistics", ees: 47, states: "CO, UT, AZ", contact: "Priya Nathan, Ops Dir.", phone: "(602) 555‑0173", trigger: "Registered in AZ 3 weeks ago; hourly fleet workforce", signals: ["new_state", "hourly", "multistate", "growth"] },
+  { name: "Iron Horse Fabrication", industry: "Manufacturing", ees: 28, states: "CO", contact: "Russ Beale, Owner", phone: "(303) 555‑0196", trigger: "Comp claims frequency rising; mod renewal this fall", signals: ["comp_claims", "sweet_spot", "hourly"] },
+  { name: "Aspen Trail Hospitality", industry: "Restaurants", ees: 52, states: "CO", contact: "Nina Two Bears, GM", phone: "(970) 555‑0127", trigger: "High turnover; no group health offered today", signals: ["hourly", "no_health", "growth"] },
+  { name: "Front Range Accounting", industry: "Professional services", ees: 9, states: "CO", contact: "Tom Alvarez, Partner", phone: "(719) 555‑0151", trigger: "Gusto accountant-partner; asked about 401(k)", signals: ["partner", "benefits_q"] },
+  { name: "Granite Peak Electric", industry: "Electrical contracting", ees: 22, states: "CO, NE", contact: "Will Carver, Owner", phone: "(308) 555‑0134", trigger: "Multi-state field crews; comp renewal in 88 days", signals: ["renewal", "hourly", "multistate", "crossed_25"] },
+  { name: "Lark & Co. Marketing", industry: "Professional services", ees: 16, states: "CO", contact: "Bea Lindqvist, CEO", phone: "(303) 555‑0118", trigger: "Asked about benefits; grew from 11 to 16 this year", signals: ["benefits_q", "sweet_spot", "growth"] },
+  { name: "Trailhead Brewing", industry: "Food & beverage", ees: 38, states: "CO, WY", contact: "Marco Reyes, Founder", phone: "(307) 555‑0177", trigger: "Hourly staff; opening 2nd taproom across state line", signals: ["new_state", "hourly", "growth", "multistate"] },
+  { name: "Vista Ridge Home Health", industry: "Healthcare services", ees: 41, states: "CO", contact: "Dana Whitfield, Dir.", phone: "(303) 555‑0185", trigger: "Benefits renewal ~80 days; recruiting caregivers hard", signals: ["renewal", "hourly", "lost_candidate"] },
+];
+
+function MyDay() {
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  // deterministic daily rotation so the list feels fresh but is stable within a day
+  const dayNum = Math.floor(Date.now() / 86400000);
+  const rotated = MY_DAY_POOL.map((a, i) => ({ ...a, score: scoreAccount(a), _r: (i + dayNum) % MY_DAY_POOL.length }));
+  const list = rotated.sort((x, y) => y.score - x.score).slice(0, 10);
+  const [open, setOpen] = useState(-1);
+  const [done, setDone] = useState([]);
+  const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
+  const toggleDone = (name) => setDone((d) => d.includes(name) ? d.filter((x) => x !== name) : [...d, name]);
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+        <div className="src-tag">{today.toUpperCase()}</div>
+        <div className="src-tag">{done.length} / {list.length} WORKED</div>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        {list.map((a, i) => {
+          const [label, cls] = tier(a.score);
+          const isOpen = open === i;
+          const isDone = done.includes(a.name);
+          return (
+            <div className="agent-card" key={a.name}>
+              <div className="agent-head" role="button" tabIndex={0}
+                style={{ ...(isOpen ? { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}), opacity: isDone ? 0.55 : 1 }}
+                onClick={() => setOpen(isOpen ? -1 : i)}
+                onKeyDown={(e) => e.key === "Enter" && setOpen(isOpen ? -1 : i)}>
+                <span className="row-num">{String(i + 1).padStart(2, "0")}</span>
+                <span className="row-main">
+                  <p className="row-title" style={isDone ? { textDecoration: "line-through" } : undefined}>{a.name}</p>
+                  <p className="row-sub">{a.industry} · {a.ees} EEs · {a.states}</p>
+                </span>
+                <span className={"score-pill " + cls}>{a.score} · {label}</span>
+              </div>
+              {isOpen && (
+                <div className="agent-detail">
+                  <div className="myday-meta">
+                    <div><span className="roi-label">WHO TO CALL</span>{a.contact}<br /><span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 13 }}>{a.phone}</span></div>
+                    <div><span className="roi-label">WHY TODAY</span>{a.trigger}</div>
+                  </div>
+                  <div className="sig-wrap">
+                    {a.signals.map((id) => {
+                      const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
+                      return sig ? <span className="sig-chip" key={id}>{sig.label}<b>+{sig.pts}</b></span> : null;
+                    })}
+                  </div>
+                  <div className="callout" style={{ marginTop: 12, marginBottom: 10 }}>
+                    <span className="tag">OPENING TALK TRACK</span>{buildTalkTrack(a, a.signals)}
+                  </div>
+                  <button className={"btn " + (isDone ? "ghost" : "primary")} onClick={() => toggleDone(a.name)}>
+                    {isDone ? "Mark as not worked" : "Mark as worked"}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", margin: "14px 4px 0", lineHeight: 1.6 }}>
+        In production this list builds itself overnight: the agent scans the payroll base for fresh
+        signals, ranks them, and hands each rep ten worked-up accounts with the contact and the reason
+        already attached. Sample data shown here; the list rotates daily so the dashboard is never stale.
       </p>
     </div>
   );
@@ -1178,13 +1433,22 @@ function AgentTab() {
   return (
     <div className="shell">
       <div className="hero">
-        <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING DEMO BELOW</div>
-        <h1>The PEO Targeting Agent<span className="hl">.</span></h1>
+        <div className="eyebrow">BUILT DURING THIS PROCESS · WORKING TOOL BELOW</div>
+        <h1>The PEO Prospecting Agent<span className="hl">.</span></h1>
         <p className="lede">
           My initial thinking on letting data lead our path to market: score the payroll base for
           PEO propensity, and hand the team a ranked, reasoned list instead of an alphabetical one.
-          A working demo on sample data is below, tap any account.
+          The working tool is below. It opens to My Day, ten accounts the agent scored and worked up overnight, and you can also score your own accounts by hand to see the logic run.
         </p>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">MY DAY · TODAY'S TOP 10</div>
+        <h2>The list the rep opens to</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Ten accounts, already scored and worked up. Who to call, why today, and the opening line. Tap any to expand.</p>
+        <div style={{ marginTop: 16 }}>
+          <MyDay />
+        </div>
       </div>
 
       <div className="card" style={{ marginBottom: 14 }}>
@@ -1211,11 +1475,11 @@ function AgentTab() {
       </div>
 
       <div className="card">
-        <div className="kicker">LIVE DEMO · SAMPLE ACCOUNTS</div>
-        <h2>Today's ranked list</h2>
-        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Tap an account to see why it scored, and the opening the agent drafts.</p>
+        <div className="kicker">THE LIVE TOOL · RESEARCH ANY COMPANY</div>
+        <h2>Run the engine</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Type a company name and the agent researches it live, verifies headcount, detects signals, scores, and writes the opening. Or build an account by hand.</p>
         <div style={{ marginTop: 16 }}>
-          <AgentDemo />
+          <AgentEngine />
         </div>
       </div>
     </div>
@@ -1576,7 +1840,7 @@ function GTMTab() {
           <li><b>Distribution before advertising.</b> The in-base motion is the whole short-term GTM: ICP-score the payroll base (NAPEO: nearly two-thirds of all PEO clients are 10–49 employees, exactly where Gusto's base lives), and work lifecycle triggers, new state registrations, headcount crossings, benefits-seeking signals, renewal windows.</li>
           <li><b>Internal partnership before external motion.</b> Week one belongs to peer sales leaders: written rules of engagement for install-base conversion, who owns the account, how credit and comp are shared, when a payroll AE brings PEO in, so converting the base makes allies of the payroll org, never victims. Co-selling into a shared customer base only works when the peer team wins every time we win.</li>
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
-          <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Targeting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
+          <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Prospecting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
           <li><b>Start the CPEO clock immediately.</b> Certification takes time and PEO 3 waits on it. File early, pursue ESAC in parallel, and market the pursuit itself, "certification in progress" beats silence.</li>
           <li><b>Underwriting before rep five.</b> Deal desk, credit screening, and funds-flow controls live before the sales team scales. The deals competitors decline will find the new entrant first; the controls have to be standing when they arrive.</li>
           <li><b>A small, certified founding team.</b> PEO-fluent consultants, every rep certifies through the Operator Course before touching a prospect, with compensation aligned to underwriting quality, so Gusto scales the book it wants.</li>
@@ -1636,7 +1900,7 @@ function KeysTab() {
     { n: "05", h: "Credentials: CPEO & ESAC", p: "Sole federal tax liability, no wage-base restart, bonded financial assurance, certification converts trust from a claim into a statute.", g: "For a new entrant, CPEO is the fastest answer to 'why trust the new guy with my payroll taxes?'" },
     { n: "06", h: "Service model matched to segment", p: "Dedicated HRBP vs self-serve isn't branding, it's a cost structure choice. Mismatched service models churn books.", g: "Gusto's base skews simple and software-native: lead self-serve with human escalation, and resist over-building white glove too early." },
     { n: "07", h: "The retention engine", p: "Accounts reach true profitability deep into the relationship. Implementation quality and the first payroll are the strongest retention predictors.", g: "Instrument GP/WSE and retention from client one, the metrics that tell you whether the machine works." },
-    { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Targeting Agent exists to exploit it systematically." },
+    { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Prospecting Agent exists to exploit it systematically." },
   ];
   return (
     <div className="shell">
@@ -1666,52 +1930,86 @@ function PlanTab() {
   return (
     <div className="shell">
       <div className="hero">
-        <div className="eyebrow">HEAD OF PEO SALES</div>
+        <div className="eyebrow">HEAD OF PEO SALES · FIRST 90 DAYS</div>
         <h1>The first 90 days<span className="hl">.</span></h1>
         <p className="lede">
-          Three phases: learn the machine, build the motion, prove it with a pilot cohort.
-          Every phase ends with something shipped, not something scheduled.
+          Three phases, each built on the same four workstreams: listen and learn the current
+          state, partner with the people already here, build the product and the motion, and prove
+          it with a real pilot. Every phase ends with something shipped, not something scheduled.
         </p>
       </div>
 
-      <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 1–30</span><h3>Learn & map</h3></div>
-        <p className="theme">Understand Gusto's PEO product, underwriting appetite, and the base, then define the ICP from data, not instinct.</p>
-        <ul>
-          <li>Deep-dive the product, pricing structure, underwriting appetite, and state licensing footprint with product, risk, and ops leaders. Know exactly what we can write, where, and at what price.</li>
-          <li>Mine the payroll base for PEO propensity: headcount band, multi-state, industry mix, benefits-seeking signals. Define the ICP and size the in-base opportunity.</li>
-          <li>Stand up the PEO Targeting Agent against real base data, turn the ICP into a scored, ranked target list.</li>
-          <li>Listen: ride along on sales calls, talk to early PEO customers and lost deals, interview top accountant partners about how PEO referrals would actually work in their practice.</li>
-          <li>Sit down with peer sales leaders across payroll and benefits in the first two weeks: align on shared accounts, draft the co-sell rules of engagement together, and earn cross-functional credibility before asking anyone for anything.</li>
-          <li>Draft the founding-rep hiring profile: PEO-fluent consultants who can read a census and unbundle an invoice, and open requisitions.</li>
-        </ul>
-        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>ICP definition + sized in-base opportunity, scored target list v1, co-sell rules of engagement drafted with peer sales leaders, hiring profile and open reqs, written read-back of product/underwriting reality.</div>
+      <div className="callout" style={{ marginBottom: 18 }}><span className="tag">HOW THIS PLAN IS STRUCTURED</span>
+        I don't walk in with the answers. I walk in with a method. The first month is mostly
+        listening, because a brand-new PEO inside an established company succeeds or fails on how
+        well it fits what's already working. Each phase below runs four parallel tracks: Listen &
+        Understand, Partner Internally, Build the Platform & Playbook, and Prove It. The weight
+        shifts from listening to building to proving as the quarter moves.
       </div>
 
       <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 31–60</span><h3>Build the motion</h3></div>
-        <p className="theme">Turn knowledge into a playbook, and the playbook into a live pilot.</p>
+        <div className="phase-head"><span className="phase-days">DAYS 1–30</span><h3>Listen & understand the current state</h3></div>
+        <p className="theme">Earn the right to build by understanding the machine, the people, and the data before changing anything.</p>
+
+        <p className="workstream">LISTEN & UNDERSTAND</p>
         <ul>
-          <li>Write Playbook v1: discovery artifact checklist (census, renewal dates, SUI notices, comp dec pages), the unbundling comparison toolkit, talk tracks for the five objections, and the honest year-two renewal story.</li>
-          <li>Launch the pilot: a defined cohort of high-scoring in-base accounts (sized with sales leadership), worked by me and the first reps using the playbook, every call instrumented.</li>
-          <li>Open the partner lane: pilot PEO referrals with a handful of top-tier accountant partners; define the referral motion, materials, and economics.</li>
-          <li>Build the underwriting feedback loop: weekly sales-risk review of every declined and repriced deal, so the ICP and pitch sharpen with each cycle.</li>
-          <li>Onboard the first rep class through the certification course on this site, every rep stamps all five modules before touching a prospect.</li>
+          <li><b>Map and meet every key stakeholder.</b> Product, underwriting and risk, finance and BizOps, benefits, implementation, marketing, partnerships, and the payroll and benefits sales leaders. One goal per conversation: understand their world, their constraints, and what a PEO does to their roadmap.</li>
+          <li><b>Interview customers and lost deals.</b> Sit with early PEO-curious clients, recent wins, and the deals that walked. The losses teach more than the wins; both define the real ICP better than any model.</li>
+          <li><b>Shadow the front line.</b> Ride along on payroll and benefits sales calls and listen to account managers handle renewals and escalations. The current motion is the foundation I have to build on, so I need to hear it live.</li>
+          <li><b>Learn the Gusto way.</b> Study how Gusto already sells, onboards, and supports, the tone, the self-serve philosophy, the values in practice, so the PEO motion extends the brand instead of fighting it.</li>
         </ul>
-        <div className="callout"><span className="tag">DAY-60 DELIVERABLES</span>Playbook v1 in use, pilot cohort live with full funnel instrumentation, accountant-channel pilot running, first reps certified and selling.</div>
+
+        <p className="workstream">UNDERSTAND THE NUMBERS</p>
+        <ul>
+          <li><b>Review underwriting policy and appetite.</b> What can we write, in which states, for which class codes, at what size? Where are the declines? Know the box before selling to its edges.</li>
+          <li><b>Establish the metrics and data picture.</b> What data exists on the base, what's the pricing structure, what are the key pricing levers (PEPM, comp, tax, benefits load), and what targets and goals already exist. Find the gaps in what we can measure.</li>
+          <li><b>Size the in-base opportunity.</b> Mine the payroll base for PEO propensity, headcount band, multi-state, industry mix, benefits-seeking signals, and define the ICP from data, not instinct.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, written read-back of product and underwriting reality, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
       </div>
 
       <div className="phase">
-        <div className="phase-head"><span className="phase-days">DAYS 61–90</span><h3>Prove & scale</h3></div>
-        <p className="theme">Close the first cohort, codify what worked, and present the scaling case with evidence.</p>
+        <div className="phase-head"><span className="phase-days">DAYS 31–60</span><h3>Partner & build</h3></div>
+        <p className="theme">Turn what I learned into alignment, a developing platform, and a playbook ready to test.</p>
+
+        <p className="workstream">PARTNER INTERNALLY</p>
         <ul>
-          <li>Close first pilot wins and run structured win/loss reviews on everything, what the data says about ICP, pricing, objections, and cycle length goes into Playbook v2.</li>
-          <li>Instrument the full funnel as the operating system: target → engaged → underwriting → proposal → closed, plus WSEs sold, effective PEPM, and early implementation quality.</li>
-          <li>Define the quota and comp model from observed cycle data, including underwriting-quality incentives, so we scale the book we want.</li>
-          <li>Hire wave two against the now-proven profile; promote pilot learnings into formal onboarding.</li>
-          <li>Day-90 executive readout: pilot results, unit economics signals, channel learnings, and the resourced plan for the next two quarters.</li>
+          <li><b>Align with the sales org.</b> Co-design the co-sell rules of engagement with the payroll and benefits sales leaders, account ownership, shared credit, comp, and the warm-handoff motion, so converting the base makes the peer team win every time we win.</li>
+          <li><b>Build the account-manager feedback loop.</b> AMs see renewal pain, churn signals, and benefits frustration first. Stand up a standing channel so what they hear becomes pipeline and product input, not lost signal.</li>
+          <li><b>Open the partner lane.</b> Pilot PEO referrals with a handful of top accountant partners; define the referral motion, materials, and economics with the partnerships team.</li>
         </ul>
-        <div className="callout"><span className="tag">DAY-90 SCORECARD</span>First in-base PEO revenue closed, repeatable playbook with evidence, instrumented funnel, certified and growing team, and a data-backed scaling plan on the table.</div>
+
+        <p className="workstream">BUILD THE PLATFORM & PLAYBOOK</p>
+        <ul>
+          <li><b>Drive platform enhancement.</b> Feed the listening-tour and underwriting findings into a structured product and pricing roadmap with product and risk, a polished, prioritized plan for what the PEO needs to be competitive at launch and what comes next.</li>
+          <li><b>Write Playbook v1.</b> Discovery checklist (census, renewal dates, SUI notices, comp dec pages), the total-cost-of-employment quoting toolkit, talk tracks for the top objections, and the honest year-two renewal story.</li>
+          <li><b>Build the underwriting feedback loop.</b> A weekly sales-and-risk review of every declined and repriced deal, so the ICP, pricing, and pitch sharpen each cycle.</li>
+          <li><b>Train the first team.</b> Onboard the founding reps through the training course on this site, every rep completes all five modules before touching a prospect.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-60 DELIVERABLES</span>Co-sell rules of engagement live with peer leaders, AM feedback loop running, accountant-channel pilot defined, prioritized platform and pricing roadmap, Playbook v1 in hand, and the first rep class trained.</div>
+      </div>
+
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">DAYS 61–90</span><h3>Prove it & plan the scale</h3></div>
+        <p className="theme">Run a real pilot, instrument everything, and bring the scaling case back with evidence.</p>
+
+        <p className="workstream">PROVE IT</p>
+        <ul>
+          <li><b>Launch the in-base pilot.</b> A defined cohort of high-scoring accounts, worked by me and the first reps using the playbook, every call instrumented from first touch to first payroll.</li>
+          <li><b>Close first wins and run win/loss on everything.</b> What the data says about ICP, pricing, objections, and cycle length goes straight into Playbook v2.</li>
+          <li><b>Stand up the funnel as the operating system.</b> Target to engaged to underwriting to proposal to closed, plus WSEs sold, effective PEPM, and early implementation quality, the metrics that run the business going forward.</li>
+        </ul>
+
+        <p className="workstream">PLAN THE SCALE</p>
+        <ul>
+          <li><b>Design quota and comp from real cycle data,</b> including underwriting-quality incentives, so we scale the book we actually want, not just the book that's easiest to write.</li>
+          <li><b>Hire wave two against the now-proven profile,</b> and promote pilot learnings into formal onboarding.</li>
+          <li><b>Deliver the Day-90 executive readout:</b> pilot results, unit-economics signals, channel learnings, the platform roadmap, and a resourced plan for the next two quarters.</li>
+        </ul>
+
+        <div className="callout"><span className="tag">DAY-90 SCORECARD</span>First in-base PEO revenue closed, a repeatable playbook backed by evidence, an instrumented funnel, a trained and growing team, internal partnerships operating, and a data-backed scaling plan on the table.</div>
       </div>
     </div>
   );
@@ -1777,7 +2075,7 @@ function WelcomeLetter({ onClose }) {
           Gusto has one shot at entering PEO the right way, and my record is why I believe I
           can help build it. Five years running the number one team in the country at TriNet.
           The only team to put 100% of its consultants in President's Club. Leader of the Year
-          at a publicly traded company. Every page of this site comes from that experience.
+          chosen by the C-suite as the top leader across all of TriNet. Every page of this site comes from that experience.
           And I know none of it works alone, so treat everything here as a starting point for
           what we'd build together.
         </p>
@@ -1951,7 +2249,11 @@ export default function App() {
           </div>
           <nav className="tabbar">
             {TABS.map((t) => (
-              <button key={t.id} className={"tab" + (tab === t.id ? " active" : "")} onClick={() => setTab(t.id)}>
+              <button
+                key={t.id}
+                className={"tab" + (tab === t.id ? " active" : "")}
+                onClick={(e) => { setTab(t.id); e.currentTarget.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }); }}
+              >
                 {t.label}
               </button>
             ))}
