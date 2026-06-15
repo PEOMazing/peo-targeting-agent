@@ -3578,6 +3578,42 @@ export default function App() {
   const [termKey, setTermKey] = useState(null);
   const [selectedPath, setSelectedPath] = useState(null);
   const [tab, setTab] = useState("about");
+  // ---- per-person view tracking (reads ?v=name, times each tab, emails a summary) ----
+  const trackRef = React.useRef({ visitor: "", current: "about", since: 0, totals: {}, opened: false, sent: false });
+  useEffect(() => {
+    if (!unlocked) return;
+    let v = "";
+    try { v = new URLSearchParams(window.location.search).get("v") || ""; } catch {}
+    const tr = trackRef.current;
+    tr.visitor = (v || "anonymous").slice(0, 60);
+    tr.current = tab; tr.since = Date.now();
+    const post = (event) => {
+      try {
+        const tabsArr = Object.keys(tr.totals).map((id) => {
+          const meta = TABS.find((t) => t.id === id);
+          return { label: meta ? meta.label : id, sec: Math.round(tr.totals[id] / 1000) };
+        }).filter((x) => x.sec > 0).sort((a, b) => b.sec - a.sec);
+        const totalSec = tabsArr.reduce((s, x) => s + x.sec, 0);
+        const payload = JSON.stringify({ visitor: tr.visitor, event, tabs: tabsArr, totalSec, ua: navigator.userAgent, ref: document.referrer });
+        if (navigator.sendBeacon) navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+        else fetch("/api/track", { method: "POST", headers: { "Content-Type": "application/json" }, body: payload, keepalive: true });
+      } catch {}
+    };
+    if (!tr.opened) { tr.opened = true; post("open"); }
+    const flush = () => { const now = Date.now(); tr.totals[tr.current] = (tr.totals[tr.current] || 0) + (now - tr.since); tr.since = now; };
+    const onHide = () => { if (document.visibilityState === "hidden") { flush(); if (!tr.sent) { tr.sent = true; post("session"); setTimeout(() => { tr.sent = false; }, 30000); } } };
+    document.addEventListener("visibilitychange", onHide);
+    window.addEventListener("pagehide", () => { flush(); post("session"); });
+    return () => { document.removeEventListener("visibilitychange", onHide); };
+  }, [unlocked]);
+  // accumulate time when switching tabs
+  useEffect(() => {
+    const tr = trackRef.current;
+    if (!tr.visitor) return;
+    const now = Date.now();
+    tr.totals[tr.current] = (tr.totals[tr.current] || 0) + (now - tr.since);
+    tr.current = tab; tr.since = now;
+  }, [tab]);
   const [courseView, setCourseView] = useState("home");
   const [progress, setProgress] = useState(() => {
     const p = {};
