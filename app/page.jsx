@@ -2901,7 +2901,7 @@ function Bar({ label, value, max, count, color }) {
     <div style={{ height: 9, background: OFF, borderRadius: 5, overflow: "hidden" }}><div style={{ width: w + "%", height: "100%", background: color, borderRadius: 5 }} /></div>
   </div>;
 }
-function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onPrintDeal }) {
+function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onPrintDeal, deepJobs }) {
   const [q, setQ] = useState("");
   const [stageFilter, setStageFilter] = useState("All");
   const [view, setView] = useState("myday"); // forecast | deals
@@ -2937,6 +2937,7 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
       <span style={{ display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
       <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "3px 10px" }}>{c.stage}</span>
       {(() => { const sc = dealScore(c); const [lab, col] = scoreTier(sc); return <span style={{ fontSize: 11, fontWeight: 800, color: col, border: `1px solid ${col}`, borderRadius: 20, padding: "2px 9px" }} title="PEO Targeting Agent score">{sc} · {lab}</span>; })()}
+      {deepJobs && deepJobs[c.id] && <span style={{ fontSize: 10, fontWeight: 800, color: "#fff", background: KALE, borderRadius: 20, padding: "2px 8px", display: "inline-flex", alignItems: "center", gap: 4 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: "#fff", animation: "vpulse 1s infinite" }} />RESEARCHING</span>}
       </span>
       <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>{onPrintDeal && <FileText size={16} style={{ color: INK60, cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); onPrintDeal(c.id); }} />}<Trash2 size={16} style={{ color: INK60, cursor: "pointer" }} onClick={() => { if (confirm("Delete this deal? This can't be undone.")) onDelete(c.id); }} /></span>
     </div>
@@ -3192,11 +3193,11 @@ function ActivityTab({ d, set }) {
       </div>}
   </div>;
 }
-async function researchAccount(company, domain) {
+async function researchAccount(company, domain, deep) {
   const prompt = `You are a B2B sales research assistant for a PEO (Professional Employer Organization) sales rep at Gusto, selling into SMBs. Research the company "${company}"${domain ? " (" + domain + ")" : ""}. Use the Apollo connector for authoritative firmographics, technographics, and key decision-maker contacts; use web search for recent "why now" signals (hiring surges, funding, expansion, leadership changes, benefits/compliance pain, M&A). For field-staff-heavy industries (construction, restaurants, logistics, healthcare, hospitality), cross-check and do not undercount headcount. Classify the sales motion as one of: "Upsell" (already a Gusto payroll customer), "Displacement" (on a competing PEO like ADP TotalSource, Insperity, TriNet, Justworks, Paychex Oasis), or "Likely Multi-vendor" (payroll + separate benefits broker). Return ONLY minified JSON (no prose, no markdown) of this exact shape: {"employees":<number|null>,"industry":"","hq":"","revenue":"","incumbent":"<current payroll/PEO/HR provider or ''>","motion":"Upsell|Displacement|Likely Multi-vendor","signals":["short why-now signal ...up to 4"],"valueProp":["specific value-prop talking point for this account ...up to 4"],"objections":[{"o":"likely objection","a":"crisp response"} ...up to 3],"benefitsPlay":["benefits/medical angle tailored to them ...up to 4"],"techStack":["detected tool name" ...up to 12],"outreach":{"email":"2-3 sentence cold email, natural human voice, no em-dashes","linkedin":"1-2 sentence connection note","call":"one-line phone opener"},"contacts":[{"name":"","title":"","email":"","phone":""}]}`;
   const res = await fetch("/api/crm-research", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ company, domain, prompt }),
+    body: JSON.stringify({ company, domain, prompt, deep: !!deep }),
   });
   if (!res.ok) throw new Error("Research unavailable (" + res.status + "). Confirm ANTHROPIC_API_KEY is set in Vercel.");
   const data = await res.json();
@@ -3229,17 +3230,18 @@ function CopyBox({ label, text }) {
     <div style={{ ...card, padding: "10px 12px", fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{text}</div>
   </div>;
 }
-function BriefTab({ d, set }) {
+function BriefTab({ d, set, onDeepResearch, deepRunning }) {
   const [loading, setLoading] = useState(false);
+  const [deepLoading, setDeepLoading] = useState(false);
   const [err, setErr] = useState("");
   const [sub, setSub] = useState("value");
   const b = d.brief;
-  const run = async () => {
+  const run = async (deep) => {
     if (!d.clientName) { setErr("Add a company name first (Manage account)."); return; }
-    setErr(""); setLoading(true);
+    setErr(""); if (deep) setDeepLoading(true); else setLoading(true);
     try {
-      const r = await researchAccount(d.clientName, domainFor(d));
-      const brief = { employees: r.employees, industry: r.industry, hq: r.hq, revenue: r.revenue, incumbent: r.incumbent, motion: r.motion, signals: r.signals || [], valueProp: r.valueProp || [], objections: r.objections || [], benefitsPlay: r.benefitsPlay || [], techStack: r.techStack || [], outreach: r.outreach || {}, updatedAt: Date.now() };
+      const r = await researchAccount(d.clientName, domainFor(d), deep);
+      const brief = { employees: r.employees, industry: r.industry, hq: r.hq, revenue: r.revenue, incumbent: r.incumbent, motion: r.motion, signals: r.signals || [], valueProp: r.valueProp || [], objections: r.objections || [], benefitsPlay: r.benefitsPlay || [], techStack: r.techStack || [], outreach: r.outreach || {}, deep: !!deep, updatedAt: Date.now() };
       const patch = { ...d, brief };
       if (r.employees) patch.employees = r.employees;
       if (r.industry && !d.industry) patch.industry = r.industry;
@@ -3253,7 +3255,7 @@ function BriefTab({ d, set }) {
       }
       set(patch);
     } catch (e) { setErr((e && e.message) || "Research failed"); }
-    setLoading(false);
+    setLoading(false); setDeepLoading(false);
   };
   const SUBS = [["value", "Value Prop"], ["objections", "Objection Handling"], ["benefits", "Benefits Play"], ["tech", "Tech Stack"], ["outreach", "Outreach"]];
   return <div>
@@ -3265,18 +3267,22 @@ function BriefTab({ d, set }) {
           <div style={{ fontSize: 12, color: INK60 }}>{domainFor(d) || "no website yet"}{b && b.updatedAt ? " · researched " + new Date(b.updatedAt).toLocaleDateString() : ""}</div>
         </div>
       </div>
-      <Btn onClick={run} disabled={loading}><Sparkles size={15} /> {loading ? "Researching…" : b ? "Refresh research" : "Run Apollo + AI research"}</Btn>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+        <Btn onClick={() => run(false)} disabled={loading || deepRunning}><Sparkles size={15} /> {loading ? "Researching…" : b ? "Refresh" : "Run research"}</Btn>
+        {b && <Btn kind="kale" onClick={() => onDeepResearch && onDeepResearch(d.id)} disabled={loading || deepRunning}><Search size={15} /> {deepRunning ? "Deep research running…" : "Conduct deeper research"}</Btn>}
+      </div>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Firmographics &amp; contacts powered by Apollo · signals via live web search</div>
+    {deepRunning && <div style={{ ...card, padding: "11px 13px", borderColor: KALE20, background: KALE20, color: INK, fontSize: 12.5, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={14} style={{ color: KALE }} /> Deep research is running in the background. Keep working — you'll get a ping when it's ready, and this brief will update automatically.</div>}
     {err && <div style={{ ...card, padding: 12, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 13, marginBottom: 12 }}>{err}</div>}
     {!b && !loading && <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}>
       <Sparkles size={30} style={{ color: KALE, marginBottom: 8 }} />
       <div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>Build the account brief</div>
       <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Pull firmographics, the tech stack, and decision-maker contacts from Apollo, plus recent "why now" signals from the web. It classifies the motion (Upsell / Displacement / Likely Multi-vendor) and drafts your value prop, objection handling, benefits play, and outreach — then auto-fills the deal.</div>
-      <Btn onClick={run}><Sparkles size={15} /> Run Apollo + AI research</Btn>
+      <Btn onClick={() => run(false)} disabled={loading}><Sparkles size={15} /> {loading ? "Researching…" : "Run research (fast)"}</Btn>
       <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Powered by Apollo</div>
     </div>}
-    {loading && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>Pulling Apollo firmographics, tech stack, contacts, and live signals…</div>}
+    {(loading || deepLoading) && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>{deepLoading ? "Deep research running — searching the web for specific, verifiable signals. This can take up to a minute…" : "Researching the account from category knowledge… (a few seconds)"}</div>}
     {b && <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
         <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "—"} />
@@ -3341,7 +3347,7 @@ function ManagePanel({ d, set, c, onClose }) {
     </div>
   </div>;
 }
-function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
+function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch, deepRunning }) {
   const [primary, setPrimary] = useState("Brief");
   const [qtab, setQtab] = useState("Assumptions");
   const [manage, setManage] = useState(false);
@@ -3363,7 +3369,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
     <div style={{ display: "flex", gap: 4, marginBottom: 18, borderBottom: `1px solid ${LINE}` }}>
       {PRIMARY.map(([v, l]) => <button key={v} onClick={() => setPrimary(v)} style={{ padding: "10px 16px", border: "none", borderBottom: `3px solid ${primary === v ? GUAVA : "transparent"}`, background: "transparent", color: primary === v ? INK : INK60, fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", marginBottom: -1 }}>{l}</button>)}
     </div>
-    {primary === "Brief" && <BriefTab d={d} set={set} />}
+    {primary === "Brief" && <BriefTab d={d} set={set} onDeepResearch={onDeepResearch} deepRunning={deepRunning} />}
     {primary === "Contacts" && <ContactTab d={d} set={set} />}
     {primary === "Analysis" && <div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
@@ -3455,6 +3461,8 @@ function VantageApp() {
   const [saved, setSaved] = useState(true);
   const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
+  const [deepJobs, setDeepJobs] = useState({}); // { [dealId]: "running" }
+  const [toast, setToast] = useState(null); // { dealId, clientName }
 
   useEffect(() => { (async () => {
     let idx = await readIndex();
@@ -3527,6 +3535,38 @@ function VantageApp() {
   const openClient = async (id) => { const c = await readClient(id); if (c) { setData(c); setSaved(true); setView("editor"); } };
   const [pendingPrint, setPendingPrint] = useState(false);
   const openAndPrint = async (id) => { const c = await readClient(id); if (c) { setData(c); setSaved(true); setView("editor"); setPendingPrint(true); } };
+  // Background deep research: runs while the rep works elsewhere, writes the brief to the deal, then pings.
+  const runDeepResearch = useCallback(async (dealId) => {
+    const rec = await readClient(dealId);
+    if (!rec || !rec.clientName) return;
+    setDeepJobs((j) => ({ ...j, [dealId]: "running" }));
+    try {
+      const r = await researchAccount(rec.clientName, domainFor(rec), true);
+      const fresh = await readClient(dealId) || rec; // re-read in case it changed while running
+      const brief = { employees: r.employees, industry: r.industry, hq: r.hq, revenue: r.revenue, incumbent: r.incumbent, motion: r.motion, signals: r.signals || [], valueProp: r.valueProp || [], objections: r.objections || [], benefitsPlay: r.benefitsPlay || [], techStack: r.techStack || [], outreach: r.outreach || {}, deep: true, updatedAt: Date.now() };
+      const up = { ...fresh, brief };
+      if (r.employees) up.employees = r.employees;
+      if (r.industry && !fresh.industry) up.industry = r.industry;
+      if (r.incumbent && !fresh.incumbent) up.incumbent = r.incumbent;
+      if (Array.isArray(r.contacts) && r.contacts.length) {
+        const have = new Set((fresh.contacts || []).filter((x) => x.name).map((x) => x.name.toLowerCase()));
+        const add = r.contacts.filter((x) => x.name && !have.has(x.name.toLowerCase()));
+        const existing = (fresh.contacts || []).filter((x) => x.name);
+        const merged = [...existing, ...add].slice(0, 8);
+        up.contacts = merged.length ? merged : fresh.contacts;
+      }
+      await writeClient(up);
+      const idx = [...index.filter((x) => x.id !== dealId), indexEntry(up)];
+      setIndex(idx); await writeIndex(idx);
+      if (data && data.id === dealId) setData(up); // live-update if they're still on it
+      setToast({ dealId, clientName: rec.clientName });
+    } catch (e) {
+      setToast({ dealId, clientName: rec.clientName, error: true });
+    } finally {
+      setDeepJobs((j) => { const n = { ...j }; delete n[dealId]; return n; });
+    }
+  }, [index, data]);
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(null), 8000); return () => clearTimeout(t); } }, [toast]);
   useEffect(() => {
     if (pendingPrint && data) {
       const t = setTimeout(() => { doPrint(); setPendingPrint(false); }, 300);
@@ -3572,8 +3612,17 @@ function VantageApp() {
   const calc = data ? compute(data) : null;
 
   return <div style={{ fontFamily: "Arial, Helvetica, sans-serif", color: INK, background: OFF, minHeight: "100vh" }}>
+    {toast && <div onClick={() => { if (!toast.error) { openClient(toast.dealId); } setToast(null); }} style={{ position: "fixed", top: 16, right: 16, zIndex: 9999, background: toast.error ? "#b4392b" : KALE, color: "#fff", padding: "12px 16px", borderRadius: 12, boxShadow: "0 8px 30px rgba(0,0,0,.25)", cursor: "pointer", maxWidth: 340, display: "flex", alignItems: "center", gap: 10, fontFamily: "Arial, sans-serif" }}>
+      <Sparkles size={18} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 800, fontSize: 13 }}>{toast.error ? "Deep research didn't finish" : "Deep research ready"}</div>
+        <div style={{ fontSize: 12, opacity: .9 }}>{toast.clientName}{toast.error ? " — try again" : " · tap to view"}</div>
+      </div>
+      <X size={16} onClick={(e) => { e.stopPropagation(); setToast(null); }} />
+    </div>}
     <style>{`
       * { box-sizing: border-box; }
+      @keyframes vpulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
       input:focus, select:focus { border-color: ${KALE} !important; }
       .packet { display: none; }
       @media print {
@@ -3598,8 +3647,8 @@ function VantageApp() {
         </div>
       </div>
       {loading ? <div style={{ textAlign: "center", padding: 60, color: INK60 }}>Loading your client files…</div>
-        : view === "dashboard" ? <Dashboard index={index} onOpen={openClient} onNew={newClientFile} onDelete={removeClient} onQuick={quickUpdate} onAddProspect={addProspect} onPrintDeal={openAndPrint} />
-          : <Editor data={data} setData={setData} onBack={() => setView("dashboard")} onSave={save} saved={saved} onPrint={doPrint} />}
+        : view === "dashboard" ? <Dashboard index={index} onOpen={openClient} onNew={newClientFile} onDelete={removeClient} onQuick={quickUpdate} onAddProspect={addProspect} onPrintDeal={openAndPrint} deepJobs={deepJobs} />
+          : <Editor data={data} setData={setData} onBack={() => setView("dashboard")} onSave={save} saved={saved} onPrint={doPrint} onDeepResearch={runDeepResearch} deepRunning={data && !!deepJobs[data.id]} />}
     </div>
 
     {data && calc && <Packet d={data} c={calc} />}

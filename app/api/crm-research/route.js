@@ -16,13 +16,16 @@ export async function GET() {
   }, { status: 200 });
 }
 
-async function callClaude(key, prompt, useApollo, maxTokens) {
+async function callClaude(key, prompt, useApollo, maxTokens, useWebSearch) {
   const body = {
     model: "claude-sonnet-4-6",
     max_tokens: maxTokens,
     messages: [{ role: "user", content: prompt }],
-    tools: [{ type: "web_search_20250305", name: "web_search" }],
   };
+  // Fast path sends no tools at all (pure model knowledge, ~3-6s).
+  if (useWebSearch) {
+    body.tools = [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }];
+  }
   const headers = {
     "Content-Type": "application/json",
     "x-api-key": key,
@@ -32,7 +35,14 @@ async function callClaude(key, prompt, useApollo, maxTokens) {
     body.mcp_servers = [{ type: "url", url: "https://mcp.apollo.io/mcp", name: "apollo" }];
     headers["anthropic-beta"] = "mcp-client-2025-04-04";
   }
-  return fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers, body: JSON.stringify(body) });
+  // Abort before Vercel's wall so we return a clean message instead of a hung timeout.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), useWebSearch ? 55000 : 20000);
+  try {
+    return await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers, body: JSON.stringify(body), signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function POST(req) {
@@ -43,12 +53,12 @@ export async function POST(req) {
   try { input = await req.json(); } catch { return Response.json({ ok: false, message: "Bad request" }, { status: 400 }); }
   const prompt = (input && input.prompt || "").trim();
   if (!prompt) return Response.json({ ok: false, message: "Empty request" }, { status: 400 });
+  const deep = !!(input && input.deep); // deep = use web search (slower, more specific)
 
   try {
-    // Fast path: web-search-only (Apollo skipped unless explicitly enabled). Trimmed token budget.
-    let r = await callClaude(key, prompt, USE_APOLLO, 1100);
-    // Only fall back if Apollo was on AND failed.
-    if (!r.ok && USE_APOLLO) r = await callClaude(key, prompt, false, 1100);
+    // Fast path (default): no web search, pure model knowledge, ~3-6s.
+    // Deep path: web search enabled (capped), up to ~1 min.
+    let r = await callClaude(key, prompt, deep, deep ? 1400 : 1100, deep);
     if (!r.ok) {
       const t = await r.text();
       return Response.json({ ok: false, message: "Research call failed (" + r.status + ").", detail: t.slice(0, 400) }, { status: 200 });
@@ -78,6 +88,9 @@ export async function POST(req) {
     if (!parsed) return Response.json({ ok: false, message: "No data returned — try again." }, { status: 200 });
     return Response.json({ ok: true, result: parsed }, { status: 200 });
   } catch (e) {
-    return Response.json({ ok: false, message: "Research is unavailable right now.", detail: String(e).slice(0, 200) }, { status: 200 });
+    const msg = (e && e.name === "AbortError")
+      ? "Research took too long and timed out. Try again — it usually works on the second attempt."
+      : "Research is unavailable right now.";
+    return Response.json({ ok: false, message: msg, detail: String(e).slice(0, 200) }, { status: 200 });
   }
 }
