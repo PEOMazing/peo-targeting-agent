@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, useEffect, useMemo, useCallback, createContext, useContext } from "react";
+import { Folder, Plus, Trash2, ChevronLeft, FileText, Search, Save, Check, Users, DollarSign, Clock, TrendingUp, Calendar, Phone, Mail, Building2, MessageSquare, Sparkles, X, Info } from "lucide-react";
 
 /* ============================================================
    GABE × GUSTO, HEAD OF PEO SALES
@@ -177,6 +178,22 @@ const css = `
 .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 @media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
 .workstream { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); margin: 18px 0 2px; font-weight: 600; }
+.cmp-table { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+.cmp-head, .cmp-row { display: grid; grid-template-columns: 2fr 1.1fr 1.1fr 1fr; align-items: center; gap: 8px; padding: 9px 12px; }
+.cmp-head { background: var(--ink); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .08em; }
+.cmp-head span:not(:first-child), .cmp-row span:not(:first-child) { text-align: right; }
+.cmp-row { border-top: 1px solid var(--rule); font-size: 13.5px; }
+.cmp-row:nth-child(even) { background: var(--bg); }
+.cmp-row b { display: block; }
+.cmp-row i { font-style: normal; font-size: 11px; color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; }
+.cmp-input { text-align: right; padding: 6px 8px !important; font-size: 13px !important; }
+.cmp-delta { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; font-weight: 600; }
+.cmp-delta.pos { color: var(--green); }
+.cmp-delta.neg { color: var(--guava-deep); }
+.cmp-row.total { background: var(--guava-soft); font-weight: 700; border-top: 2px solid var(--guava); }
+.cmp-row.total span { font-size: 14px; }
+@media (max-width: 560px) { .cmp-head, .cmp-row { grid-template-columns: 1.5fr 1fr 1fr 0.9fr; gap: 5px; padding: 8px 8px; font-size: 12px; } .cmp-input { font-size: 12px !important; } }
+.vantage-breakout { width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; }
 .acro-row { display: flex; gap: 12px; align-items: baseline; width: 100%; text-align: left; background: none; border: none; border-bottom: 1px dashed var(--rule); padding: 9px 2px; cursor: pointer; font: inherit; color: var(--ink); }
 .acro-row:hover { background: var(--bg); }
 .acro-row b { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--guava-deep); min-width: 68px; flex-shrink: 0; }
@@ -1027,6 +1044,7 @@ const TABS = [
   { id: "keys", label: "What Makes a PEO Win" },
   { id: "plan", label: "90-Day Plan" },
   { id: "resources", label: "Resources" },
+  { id: "crm", label: "CRM & Tools" },
 ];
 
 function AboutTab() {
@@ -1964,6 +1982,14 @@ function KeysTab() {
   );
 }
 
+function CrmTab() {
+  return (
+    <div className="vantage-breakout">
+      <VantageApp />
+    </div>
+  );
+}
+
 function ResourcesTab({ onTerm }) {
   const [openKey, setOpenKey] = useState(-1);
   const letters = (n) => "ABCDEFGH"[n];
@@ -2231,6 +2257,1270 @@ const PATHS = [
     blurb: "The construct and the financial engine: what co-employment is, how a PEO makes money and where the risk lives, and what the Gusto PEO is building. Three modules, quizzes optional, though stamps look good on anyone." },
 ];
 
+
+
+/* ===================== VANTAGE CRM (mounted in CRM & Tools tab) ===================== */
+
+/* ============================ Gusto theme ============================ */
+const GUAVA = "#F45D48", GUAVA20 = "#FDDFDA", KALE = "#0A8080", KALE20 = "#CEE6E6",
+  CREAM = "#FFF2DF", PEACH = "#FEEFE8", OFF = "#F8F5F2", INK = "#222525", INK60 = "#7A7C7C", LINE = "#E4E0DB";
+
+const money = (n) => (n < 0 ? "-$" : "$") + Math.round(Math.abs(n || 0)).toLocaleString();
+const money2 = (n) => "$" + (n || 0).toFixed(2);
+const pct = (n) => (n * 100).toFixed(1) + "%";
+const APP_NAME = "Vantage";
+const APP_TAGLINE = "your north star";
+
+/* ---- company logo / avatar ---- */
+const FREE_MAIL = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "aol.com", "icloud.com", "live.com", "me.com", "proton.me", "protonmail.com"];
+const emailDomain = (e) => { if (!e || !e.includes("@")) return ""; const d = e.split("@")[1].trim().toLowerCase().replace(/\/$/, ""); return FREE_MAIL.includes(d) ? "" : d; };
+const cleanDomain = (s) => { if (!s) return ""; let h = String(s).trim(); if (!h) return ""; try { if (!/^https?:\/\//i.test(h)) h = "https://" + h; h = new URL(h).hostname; } catch { h = String(s).trim().toLowerCase().replace(/^https?:\/\//, "").split("/")[0]; } return h.toLowerCase().replace(/^www\./, ""); };
+const domainFor = (rec) => cleanDomain(rec.domain) || emailDomain(rec.contacts && rec.contacts[0] && rec.contacts[0].email) || "";
+const AV_COLORS = ["#0A8080", "#3B82B8", "#2E9E6B", "#C2544A", "#7A5AF8", "#D98B2B", "#178585", "#B4456E"];
+const colorFor = (s) => AV_COLORS[Math.abs([...(s || "?")].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7)) % AV_COLORS.length];
+function LogoAvatar({ name, domain, size = 40, radius = 10 }) {
+  const sources = useMemo(() => domain ? [
+    "https://logo.clearbit.com/" + domain + "?size=128",
+    "https://icons.duckduckgo.com/ip3/" + domain + ".ico",
+    "https://www.google.com/s2/favicons?sz=128&domain=" + domain,
+  ] : [], [domain]);
+  const [okSrc, setOkSrc] = useState("");
+  useEffect(() => {
+    setOkSrc("");
+    if (!sources.length) return;
+    let cancelled = false, i = 0;
+    const tryNext = () => {
+      if (cancelled || i >= sources.length) return;
+      const url = sources[i++];
+      const img = new Image();
+      img.referrerPolicy = "no-referrer";
+      img.onload = () => { if (!cancelled) { (img.naturalWidth > 1 ? setOkSrc(url) : tryNext()); } };
+      img.onerror = () => { if (!cancelled) tryNext(); };
+      img.src = url;
+    };
+    tryNext();
+    return () => { cancelled = true; };
+  }, [sources]);
+  const initials = (((name || "").trim().split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("")) || "?").toUpperCase();
+  const box = { width: size, height: size, borderRadius: radius, flexShrink: 0 };
+  if (okSrc) return <img src={okSrc} alt="" referrerPolicy="no-referrer" style={{ ...box, objectFit: "contain", background: "#fff", border: `1px solid ${LINE}` }} />;
+  return <div style={{ ...box, background: colorFor(name), color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: Math.round(size * 0.4) }}>{initials}</div>;
+}
+
+/* ============================ Plan libraries ============================ */
+const MED_PLANS = [
+  { name: "Anthem PPO 1500", carrier: "Anthem", type: "PPO", hsa: "No", r: { eeOnly: 650, eeSpouse: 1365, eeChild: 1170, family: 1950 },
+    d: { dedII: "$1,500", dedFI: "$3,000", dedIO: "$3,000", dedFO: "$6,000", oopII: "$6,000", oopFI: "$12,000", coinsI: "20%", coinsO: "40%", pcp: "$30", spec: "$60", prev: "$0 (covered)", tele: "$10", urgent: "$75", er: "$350 copay", inpat: "20% after ded.", outpat: "20% after ded.", lab: "$40", img: "$150", rxDed: "$150", rxT1: "$15", rxT2: "$40", rxT3: "$70", rxT4: "25% to $250" } },
+  { name: "Anthem HSA 3000", carrier: "Anthem", type: "HDHP", hsa: "Yes", r: { eeOnly: 520, eeSpouse: 1092, eeChild: 936, family: 1560 },
+    d: { dedII: "$3,000", dedFI: "$6,000", dedIO: "$6,000", dedFO: "$12,000", oopII: "$5,000", oopFI: "$10,000", coinsI: "20%", coinsO: "40%", pcp: "Ded then 20%", spec: "Ded then 20%", prev: "$0 (covered)", tele: "Ded then 20%", urgent: "Ded then 20%", er: "Ded then 20%", inpat: "20% after ded.", outpat: "20% after ded.", lab: "Ded then 20%", img: "Ded then 20%", rxDed: "$0", rxT1: "Ded+$10", rxT2: "Ded+$40", rxT3: "Ded+$70", rxT4: "Ded then 25%" } },
+  { name: "UHC Choice Plus", carrier: "UnitedHealthcare", type: "PPO", hsa: "No", r: { eeOnly: 610, eeSpouse: 1281, eeChild: 1098, family: 1830 },
+    d: { dedII: "$1,000", dedFI: "$2,000", dedIO: "$2,500", dedFO: "$5,000", oopII: "$5,000", oopFI: "$10,000", coinsI: "20%", coinsO: "40%", pcp: "$25", spec: "$50", prev: "$0 (covered)", tele: "$0", urgent: "$60", er: "$300 copay", inpat: "20% after ded.", outpat: "20% after ded.", lab: "$30", img: "$100", rxDed: "$100", rxT1: "$10", rxT2: "$35", rxT3: "$60", rxT4: "20% to $200" } },
+  { name: "Kaiser HMO 1500", carrier: "Kaiser Permanente", type: "HMO", hsa: "No", r: { eeOnly: 560, eeSpouse: 1176, eeChild: 1008, family: 1680 },
+    d: { dedII: "$1,500", dedFI: "$3,000", dedIO: "Not covered", dedFO: "Not covered", oopII: "$6,500", oopFI: "$13,000", coinsI: "20%", coinsO: "N/A", pcp: "$20", spec: "$40", prev: "$0 (covered)", tele: "$0", urgent: "$50", er: "$250 copay", inpat: "20% after ded.", outpat: "20% after ded.", lab: "$25", img: "$100", rxDed: "$150", rxT1: "$15", rxT2: "$30", rxT3: "$50", rxT4: "20% to $250" } },
+];
+const MED_ROWS = [["Plan Overview"], ["Carrier", "carrier"], ["Plan Type", "type"], ["HSA-Eligible", "hsa"],
+  ["Annual Deductible"], ["Individual — In-Net", "dedII"], ["Family — In-Net", "dedFI"], ["Individual — Out", "dedIO"], ["Family — Out", "dedFO"],
+  ["Out-of-Pocket Max"], ["Individual — In-Net", "oopII"], ["Family — In-Net", "oopFI"],
+  ["Coinsurance"], ["In-Network", "coinsI"], ["Out-of-Network", "coinsO"],
+  ["Office & Urgent"], ["PCP Copay", "pcp"], ["Specialist Copay", "spec"], ["Preventive", "prev"], ["Telehealth", "tele"], ["Urgent Care", "urgent"], ["Emergency Room", "er"],
+  ["Hospital & Outpatient"], ["Inpatient", "inpat"], ["Outpatient Surgery", "outpat"], ["Lab / X-ray", "lab"], ["Advanced Imaging", "img"],
+  ["Prescription Drugs"], ["Rx Deductible", "rxDed"], ["Tier 1 Generic", "rxT1"], ["Tier 2 Preferred", "rxT2"], ["Tier 3 Non-Pref", "rxT3"], ["Tier 4 Specialty", "rxT4"]];
+
+const DEN_PLANS = [
+  { name: "MetLife Dental PPO", carrier: "MetLife", type: "PPO", r: { eeOnly: 35, eeSpouse: 70, eeChild: 75, family: 110 }, d: { dedI: "$50", dedF: "$150", max: "$1,500", prev: "100%", basic: "80%", major: "50%", ortho: "50% to $1,500", orthoMax: "$1,500", waitB: "None", waitM: "None", oon: "U&C 90th" } },
+  { name: "Guardian DPPO", carrier: "Guardian", type: "PPO", r: { eeOnly: 28, eeSpouse: 56, eeChild: 60, family: 90 }, d: { dedI: "$50", dedF: "$150", max: "$1,500", prev: "100%", basic: "80%", major: "50%", ortho: "50% to $1,500", orthoMax: "$1,500", waitB: "None", waitM: "None", oon: "U&C 90th" } },
+  { name: "Cigna Dental DHMO", carrier: "Cigna", type: "DHMO", r: { eeOnly: 22, eeSpouse: 44, eeChild: 48, family: 70 }, d: { dedI: "$0", dedF: "$0", max: "None", prev: "100%", basic: "Copay sched.", major: "Copay sched.", ortho: "Copay sched.", orthoMax: "N/A", waitB: "None", waitM: "None", oon: "In-network only" } },
+];
+const DEN_ROWS = [["Plan Overview"], ["Carrier", "carrier"], ["Plan Type", "type"],
+  ["Deductible & Maximum"], ["Deductible — Ind", "dedI"], ["Deductible — Fam", "dedF"], ["Annual Maximum", "max"],
+  ["Coverage (plan pays)"], ["Preventive", "prev"], ["Basic Services", "basic"], ["Major Services", "major"],
+  ["Orthodontia"], ["Ortho Coverage", "ortho"], ["Ortho Lifetime Max", "orthoMax"],
+  ["Waiting & Network"], ["Wait — Basic", "waitB"], ["Wait — Major", "waitM"], ["Out-of-Network", "oon"]];
+
+const VIS_PLANS = [
+  { name: "VSP Vision", carrier: "VSP", type: "PPO", r: { eeOnly: 8, eeSpouse: 14, eeChild: 15, family: 22 }, d: { exam: "$10", examFreq: "12 months", materials: "$25", lenses: "Covered in full", frame: "$150", frameFreq: "24 months", contacts: "$150 allowance", oon: "Schedule" } },
+  { name: "VSP Choice", carrier: "VSP", type: "PPO", r: { eeOnly: 6.5, eeSpouse: 12, eeChild: 13, family: 18 }, d: { exam: "$10", examFreq: "12 months", materials: "$25", lenses: "Covered in full", frame: "$150", frameFreq: "12 months", contacts: "$150 allowance", oon: "Schedule" } },
+  { name: "EyeMed", carrier: "EyeMed", type: "PPO", r: { eeOnly: 7, eeSpouse: 13, eeChild: 14, family: 20 }, d: { exam: "$10", examFreq: "12 months", materials: "$20", lenses: "Covered in full", frame: "$130", frameFreq: "24 months", contacts: "$130 allowance", oon: "Schedule" } },
+];
+const VIS_ROWS = [["Plan Overview"], ["Carrier", "carrier"], ["Plan Type", "type"],
+  ["Frequency"], ["Exam Frequency", "examFreq"], ["Frame / Lens Freq", "frameFreq"],
+  ["Copays"], ["Exam Copay", "exam"], ["Materials Copay", "materials"],
+  ["Allowances"], ["Lenses", "lenses"], ["Frame Allowance", "frame"], ["Contact Allowance", "contacts"], ["Out-of-Network", "oon"]];
+
+const TIERS = [["EE Only", "eeOnly"], ["EE + Spouse", "eeSpouse"], ["EE + Child(ren)", "eeChild"], ["Family", "family"]];
+
+/* ============================ Gusto invoice template ============================ */
+const GUSTO_TEMPLATE = [
+  { g: "Subscription", n: "Plus Base Subscription", basis: "Base / mo", rate: 80, qty: 1 },
+  { g: "Subscription", n: "Per-Employee Fee", basis: "Per EE / mo", rate: 12, perEE: true },
+  { g: "Subscription", n: "Per-Contractor Fee", basis: "Per contractor / mo", rate: 6, qty: 0 },
+  { g: "Payroll & Support", n: "Faster / Next-Day Direct Deposit", basis: "$15/mo + $3/EE", rate: 0, qty: 0 },
+  { g: "Payroll & Support", n: "Time Tracking & Scheduling", basis: "Per EE / mo (Simple)", rate: 6, qty: 0 },
+  { g: "Payroll & Support", n: "Performance Reviews", basis: "Per EE / mo", rate: 3, qty: 0 },
+  { g: "Payroll & Support", n: "Priority Support & HR — Base", basis: "Flat / mo", rate: 30, qty: 0 },
+  { g: "Payroll & Support", n: "Priority Support & HR — Per EE", basis: "Per EE / mo", rate: 3, qty: 0 },
+  { g: "Benefits Admin", n: "Broker Integration (BYO broker)", basis: "Per elig. EE / mo", rate: 6, perEE: true },
+  { g: "Benefits Admin", n: "Tax-Advantaged Accounts Fee", basis: "$200 / yr flat", rate: 16.67, qty: 1 },
+  { g: "Benefits Admin", n: "HSA Administration", basis: "Per participant / mo", rate: 2.5, qty: 0 },
+  { g: "Benefits Admin", n: "FSA / DCFSA Admin", basis: "Per participant / mo", rate: 4, qty: 0 },
+  { g: "Benefits Admin", n: "Commuter Benefits Admin", basis: "Per participant / mo", rate: 4, qty: 0 },
+  { g: "Benefits Admin", n: "ACA Compliance Filing", basis: "$1,250 / yr", rate: 104.17, qty: 0 },
+  { g: "Benefits Admin", n: "COBRA Administration", basis: "Per company / mo", rate: 30, qty: 0 },
+  { g: "Retirement & Insurance", n: "401(k) Admin (Guideline)", basis: "Base + per part. / mo", rate: 149, qty: 1 },
+  { g: "Retirement & Insurance", n: "Workers' Comp Admin (pay-go)", basis: "Flat / mo", rate: 0, qty: 0 },
+  { g: "Global & Other", n: "International EOR (Gusto Global)", basis: "Per EE / mo", rate: 699, qty: 0 },
+  { g: "Global & Other", n: "R&D Tax Credit Service", basis: "% of credit", rate: 0, qty: 0 },
+  { g: "One-Time / Setup", n: "New-State Registration", basis: "~$150 one-time / state", rate: 150, qty: 0, oneTime: true },
+  { g: "One-Time / Setup", n: "Historical Payroll Migration", basis: "One-time", rate: 0, qty: 0, oneTime: true },
+];
+
+/* ============================ default client ============================ */
+function newClient() {
+  return {
+    id: "c_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    createdAt: Date.now(), updatedAt: Date.now(),
+    clientName: "", preparedBy: "", proposalDate: new Date().toISOString().slice(0, 10), provider: "Gusto",
+    stage: "Meeting Scheduled", forecast: "Pipeline", lostReason: "", expectedClose: new Date().toISOString().slice(0, 7), nextStep: "",
+    industry: "", incumbent: "", leadSource: "", domain: "",
+    contacts: [{ name: "", title: "", email: "", phone: "" }],
+    activities: [],
+    employees: 13, payroll: 1200000,
+    medER: 0.7, denER: 0.5, visER: 0, curTrend: 0.1, propTrend: 0.05, proposedPEPM: 171, implFee: 0,
+    lifeCur: 0, lifeProp: 144,
+    med: { cur: "Anthem PPO 1500", prop: "UHC Choice Plus", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 },
+      rateType: "tier",
+      members: [
+        { name: "Employee 1", tier: "Employee Only", curRate: 540, propRate: 510 },
+        { name: "Employee 2", tier: "EE + Spouse", curRate: 1130, propRate: 1065 },
+        { name: "Employee 3", tier: "Family", curRate: 1820, propRate: 1720 },
+      ],
+      renewal: { enabled: false, renewalMonth: 1, effectiveMonth: 10, increase: 0.11 } },
+    den: { cur: "MetLife Dental PPO", prop: "Guardian DPPO", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 } },
+    vis: { cur: "VSP Vision", prop: "VSP Choice", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 } },
+    wc: { payroll: 1200000, curRate: 0.45, curMod: 1, propRate: 0.38, propMod: 1 },
+    invoice: GUSTO_TEMPLATE.map((l) => ({ ...l })),
+    soft: { hours: 15, rate: 55, weeks: 52, reduction: 0.5 },
+    winPlan: "", brief: null,
+  };
+}
+
+/* ============================ sample deals (first-run seed) ============================ */
+function dOffset(days) { const n = new Date(); n.setDate(n.getDate() + days); return new Date(n.getTime() - n.getTimezoneOffset() * 60000).toISOString().slice(0, 10); }
+function mOffset(months) { const n = new Date(); n.setMonth(n.getMonth() + months); return n.toISOString().slice(0, 7); }
+const STARTER_BOOK = [
+  { clientName: "Merton Way B2B Marketing", domain: "mertonway.com", industry: "B2B Marketing agency", employees: 10, city: "Arvada, CO" },
+  { clientName: "A-Train Marketing", domain: "atrainmarketing.com", industry: "Marketing agency", employees: 12, city: "Fort Collins, CO" },
+  { clientName: "Webolutions", domain: "webolutions.com", industry: "Digital / web agency", employees: 14, city: "Centennial, CO", note: "Tech-adjacent, ~14 EEs." },
+  { clientName: "Lanphier LLP", domain: "lanphiercpa.com", industry: "Accounting / CPA", employees: 12, city: "Denver, CO" },
+  { clientName: "Fraser, Waldrop & Company CPAs", domain: "coprotax.com", industry: "Accounting / CPA", employees: 10, city: "Denver, CO" },
+  { clientName: "SBA CPA", domain: "thesbacpa.com", industry: "Accounting / CPA", employees: 12, city: "Denver, CO", note: "Already runs payroll for clients — value prop lands fast." },
+  { clientName: "O'Connor CPA Firm", domain: "oconnorcpafirm.com", industry: "Accounting / CPA", employees: 8, city: "Denver, CO" },
+  { clientName: "John P. Morse, CPA", domain: "cpamorse.com", industry: "Accounting / CPA", employees: 6, city: "Denver, CO" },
+  { clientName: "Aspen Dental – Private Practice of Cherry Creek", domain: "cherry-creekdentist.com", industry: "Dental practice", employees: 18, city: "Denver, CO", note: "3-dentist practice, solid 5–25 fit." },
+  { clientName: "The Dental Team", domain: "thedentalteam.com", industry: "Dental, multi-location", employees: 30, city: "Denver metro, CO", note: "Female-owned, multi-location." },
+];
+function buildStarterBook() {
+  return STARTER_BOOK.map((s) => { const c = newClient(); return { ...c, clientName: s.clientName, domain: s.domain, industry: s.industry, employees: s.employees, stage: "Assigned", forecast: "Pipeline", leadSource: "Assigned territory", preparedBy: "Gabe", winPlan: [s.city ? "Location: " + s.city : "", s.note || ""].filter(Boolean).join("\n"), contacts: [{ name: "", title: "", email: "", phone: "" }] }; });
+}
+function buildSamples() {
+  const base = (o) => { const c = newClient(); return { ...c, ...o, employees: o.employees, payroll: o.payroll, med: { ...c.med, census: o.census || c.med.census }, den: { ...c.den, census: o.census || c.den.census }, vis: { ...c.vis, census: o.census || c.vis.census } }; };
+  return [
+    base({
+      clientName: "Summit Robotics", domain: "summitrobotics.com", industry: "Advanced Manufacturing", incumbent: "Insperity", leadSource: "Accountant referral",
+      employees: 45, payroll: 4600000, proposedPEPM: 165, stage: "Deep Dive Discovery Meeting", forecast: "Commit",
+      expectedClose: mOffset(1), nextStep: dOffset(4), preparedBy: "Gabe",
+      contacts: [{ name: "Dana Whitfield", title: "VP Operations", email: "dana@summitrobotics.com", phone: "303-555-0142" }, { name: "Mark Reyes", title: "CFO", email: "mreyes@summitrobotics.com", phone: "303-555-0177" }],
+      winPlan: "Champion: Dana (VP Ops). Economic buyer: Mark (CFO) — get him into the deep-dive.\nPain: Anthem renewal projected +11% on 1/1; they transition 10/1, so pitch the skipped-renewal savings hard.\nLevers: R&D tax credit service + WC pay-go. Competing vs Insperity — differentiate on dedicated HR + master medical.\nNext: send age-banded census template, confirm renewal date, schedule CFO deep-dive.",
+      activities: [
+        { id: 1, type: "Meeting", date: dOffset(-6), text: "Intro call with Dana. Strong fit — frustrated with Insperity service levels." },
+        { id: 2, type: "Email", date: dOffset(-2), text: "Sent follow-up + requested current Anthem renewal and census." },
+      ],
+    }),
+    base({
+      clientName: "Harbor Pediatrics", domain: "harborpeds.com", industry: "Healthcare", incumbent: "BambooHR + broker", leadSource: "Inbound web",
+      employees: 18, payroll: 1500000, proposedPEPM: 175, stage: "Proposal", forecast: "Best Case",
+      expectedClose: mOffset(0), nextStep: dOffset(0), preparedBy: "Gabe",
+      contacts: [{ name: "Dr. Priya Nair", title: "Owner / Managing Partner", email: "priya@harborpeds.com", phone: "206-555-0190" }],
+      winPlan: "Owner-led decision. Pain: broker is unresponsive at renewal, wants better medical + real HR support.\nLevers: master medical plan, dedicated benefits admin, COBRA/ACA off their plate.\nNext: walk through the proposal live; send dental side-by-side; lock age-banded rates from invoice.",
+      activities: [
+        { id: 1, type: "Call", date: dOffset(-9), text: "Discovery — 18 EEs, current medical with Regence, dental separate. Renewal in Q1." },
+        { id: 2, type: "Note", date: dOffset(-3), text: "Built comparison; UHC proposed plan richer for less. Strong dental story." },
+      ],
+    }),
+    base({
+      clientName: "Crestline Logistics", domain: "crestlinelog.com", industry: "Transportation & Warehousing", incumbent: "ADP TotalSource", leadSource: "Outbound",
+      employees: 62, payroll: 5200000, proposedPEPM: 155, stage: "Closed Won", forecast: "Commit",
+      expectedClose: mOffset(-1), nextStep: "", preparedBy: "Gabe",
+      contacts: [{ name: "Tom Alvarez", title: "Controller", email: "talvarez@crestlinelog.com", phone: "404-555-0123" }],
+      winPlan: "WON. Decision driven by WC pay-go + payroll consolidation across 3 states. Implementation kickoff scheduled.",
+      activities: [
+        { id: 1, type: "Meeting", date: dOffset(-30), text: "Final proposal review with Tom + ownership." },
+        { id: 2, type: "Note", date: dOffset(-12), text: "Verbal yes. Sent service agreement." },
+        { id: 3, type: "Task", date: dOffset(-2), text: "Signed! Kick off implementation, collect prior-payroll + WC class codes." },
+      ],
+    }),
+    base({
+      clientName: "Maple & Vine Hospitality", domain: "mapleandvine.com", industry: "Restaurants & Hospitality", incumbent: "TriNet", leadSource: "Referral",
+      employees: 26, payroll: 1300000, proposedPEPM: 170, stage: "Closed Lost", forecast: "Pipeline", lostReason: "Price / cost",
+      expectedClose: mOffset(-1), nextStep: "", preparedBy: "Gabe",
+      contacts: [{ name: "Rosa Belmonte", title: "Owner", email: "rosa@mapleandvine.com", phone: "512-555-0166" }],
+      winPlan: "LOST on price — our PEPM came in above their incumbent TriNet renewal. Relationship intact.\nRe-engage 60 days before their next renewal (Q3) with a sharper number and the soft-cost story.",
+      activities: [
+        { id: 1, type: "Call", date: dOffset(-40), text: "Good discovery, high-turnover hourly workforce." },
+        { id: 2, type: "Email", date: dOffset(-15), text: "Sent proposal." },
+        { id: 3, type: "Note", date: dOffset(-8), text: "Lost — incumbent matched on price. Set reminder to revisit at renewal." },
+      ],
+    }),
+    base({
+      clientName: "Apex Dental Group", domain: "apexdental.com", industry: "Dental / Healthcare", incumbent: "Paychex", leadSource: "LinkedIn",
+      employees: 12, payroll: 950000, proposedPEPM: 185, stage: "Meeting Scheduled", forecast: "Pipeline",
+      expectedClose: mOffset(2), nextStep: dOffset(-5), preparedBy: "Gabe",
+      contacts: [{ name: "Kevin Osei", title: "Practice Manager", email: "kevin@apexdental.com", phone: "480-555-0118" }],
+      winPlan: "Early stage. Confirm eligible headcount and current carrier + renewal date.\nFollow-up is OVERDUE — re-book the discovery call. Likely pain: payroll tax across multi-location, benefits admin burden.",
+      activities: [
+        { id: 1, type: "Note", date: dOffset(-10), text: "Connected on LinkedIn; booked intro. 2 locations, ~12 EEs." },
+      ],
+    }),
+  ];
+}
+
+/* ============================ computation ============================ */
+function planBy(list, name) { return list.find((p) => p.name === name) || list[0]; }
+function tierTotal(plan, census) { return TIERS.reduce((s, [, k]) => s + (census[k] || 0) * (plan.r[k] || 0) * 12, 0); }
+
+function compute(d) {
+  const medC = planBy(MED_PLANS, d.med.cur), medP = planBy(MED_PLANS, d.med.prop);
+  const denC = planBy(DEN_PLANS, d.den.cur), denP = planBy(DEN_PLANS, d.den.prop);
+  const visC = planBy(VIS_PLANS, d.vis.cur), visP = planBy(VIS_PLANS, d.vis.prop);
+  const medBanded = d.med.rateType === "banded";
+  const memCur = (d.med.members || []).reduce((s, m) => s + (+m.curRate || 0), 0);
+  const memProp = (d.med.members || []).reduce((s, m) => s + (+m.propRate || 0), 0);
+  const medTC = medBanded ? memCur * 12 : tierTotal(medC, d.med.census);
+  const medTP = medBanded ? memProp * 12 : tierTotal(medP, d.med.census);
+  const denTC = tierTotal(denC, d.den.census), denTP = tierTotal(denP, d.den.census);
+  const visTC = tierTotal(visC, d.vis.census), visTP = tierTotal(visP, d.vis.census);
+  const medEC = medTC * d.medER, medEP = medTP * d.medER;
+  const denEC = denTC * d.denER, denEP = denTP * d.denER;
+  const visEC = visTC * d.visER, visEP = visTP * d.visER;
+  const wcC = (d.wc.payroll / 100) * d.wc.curRate * d.wc.curMod;
+  const wcP = (d.wc.payroll / 100) * d.wc.propRate * d.wc.propMod;
+  const adminC = d.invoice.reduce((s, l) => {
+    const q = l.perEE ? d.employees : (l.qty || 0);
+    return s + (l.oneTime ? q * l.rate : q * l.rate * 12);
+  }, 0);
+  const adminP = d.proposedPEPM * d.employees * 12;
+  const curTotal = wcC + medEC + denEC + visEC + d.lifeCur + adminC;
+  const propTotal = wcP + medEP + denEP + visEP + d.lifeProp + adminP;
+  const hard = curTotal - propTotal;
+  const soft = d.soft.hours * d.soft.rate * d.soft.weeks * d.soft.reduction;
+  // skipped-renewal savings (Year 1, hard dollars)
+  let avoidedRenewal = 0, renewalMonths = 0;
+  const rn = d.med.renewal;
+  if (rn && rn.enabled) {
+    let m = (rn.renewalMonth || 1) - (rn.effectiveMonth || 1); if (m <= 0) m += 12;
+    renewalMonths = m;
+    avoidedRenewal = medEC * (rn.increase || 0) * ((12 - m) / 12);
+  }
+  const totalValue = hard + avoidedRenewal + soft;
+  // 4-year (medical ER trended)
+  let cum = 0; const years = [];
+  for (let y = 0; y < 4; y++) {
+    const mC = medEC * Math.pow(1 + d.curTrend, y), mP = medEP * Math.pow(1 + d.propTrend, y);
+    const ct = wcC + adminC + mC + denEC + visEC + d.lifeCur;
+    const pt = wcP + adminP + mP + denEP + visEP + d.lifeProp;
+    const sv = ct - pt; cum += sv; years.push({ y: y + 1, ct, pt, sv });
+  }
+  const total4 = cum + avoidedRenewal + soft * 4;
+  const acv = d.proposedPEPM * d.employees * 12;
+  return { medC, medP, denC, denP, visC, visP, medTC, medTP, denTC, denTP, visTC, visTP, medEC, medEP, denEC, denEP, visEC, visEP, wcC, wcP, adminC, adminP, curTotal, propTotal, hard, soft, avoidedRenewal, renewalMonths, totalValue, acv, years, cum, total4 };
+}
+
+/* ============================ pipeline model ============================ */
+const STAGES = [
+  { name: "Assigned", p: 0, c: "#9AA0A0" },
+  { name: "Meeting Scheduled", p: 0.10, c: "#8FB8B8" },
+  { name: "First Meeting Completed", p: 0.20, c: "#5FA3A3" },
+  { name: "Obtaining Quote Information", p: 0.30, c: "#3B9999" },
+  { name: "Deep Dive Discovery Meeting", p: 0.45, c: "#178585" },
+  { name: "Proposal", p: 0.60, c: "#0A8080" },
+  { name: "Closed Won", p: 1.0, c: "#2E9E6B" },
+  { name: "Implementation", p: 1.0, c: "#1F7E54" },
+  { name: "Closed Lost", p: 0, c: "#C2544A" },
+];
+const FORECAST_CATS = ["Commit", "Best Case", "Pipeline", "Omit"];
+const FORECAST_DEFS = { Commit: "Gave us a verbal", "Best Case": "Likely to move forward", Pipeline: "Unsure it'll move forward", Omit: "Zero chance — excluded from forecast" };
+const LOSS_REASONS = ["Price / cost", "Stayed with current PEO", "Chose a competitor", "No decision / status quo", "Timing — not ready", "Lost to their broker", "Unresponsive / ghosted", "Other"];
+const stageInfo = (n) => STAGES.find((s) => s.name === n) || STAGES[0];
+const isWon = (n) => n === "Closed Won" || n === "Implementation";
+const isLost = (n) => n === "Closed Lost";
+const isNotStarted = (n) => n === "Assigned";
+const isOpen = (n) => !isWon(n) && !isLost(n);
+const isActive = (n) => isOpen(n) && !isNotStarted(n);
+const localToday = () => { const n = new Date(); return new Date(n.getTime() - n.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+const prettyDate = (s) => s ? new Date(s + "T00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "";
+function fuStatus(s) { if (!s) return null; const t = localToday(); if (s < t) return { label: "Overdue", color: "#C2544A" }; if (s === t) return { label: "Today", color: GUAVA }; return { label: "Follow-up", color: KALE }; }
+
+/* ============================ storage (localStorage) ============================ */
+const IDX = "peo:index";
+const LS = {
+  get: (k) => { try { const v = (typeof window !== "undefined") ? window.localStorage.getItem(k) : null; return v == null ? null : { value: v }; } catch { return null; } },
+  set: (k, v) => { try { if (typeof window !== "undefined") window.localStorage.setItem(k, v); } catch {} },
+  del: (k) => { try { if (typeof window !== "undefined") window.localStorage.removeItem(k); } catch {} },
+};
+async function readIndex() { try { const r = LS.get(IDX); return r && r.value ? JSON.parse(r.value) : []; } catch { return []; } }
+async function writeIndex(idx) { try { LS.set(IDX, JSON.stringify(idx)); } catch {} }
+async function readClient(id) { try { const r = LS.get("peo:client:" + id); return r && r.value ? JSON.parse(r.value) : null; } catch { return null; } }
+async function writeClient(d) { try { LS.set("peo:client:" + d.id, JSON.stringify(d)); } catch {} }
+async function deleteClientStore(id) { try { LS.del("peo:client:" + id); } catch {} }
+
+/* ============================ UI atoms ============================ */
+const card = { background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14 };
+function Btn({ children, onClick, kind = "primary", style, ...p }) {
+  const base = { display: "inline-flex", alignItems: "center", gap: 7, fontWeight: 600, fontSize: 14, borderRadius: 10, padding: "9px 15px", cursor: "pointer", border: "1px solid transparent", fontFamily: "inherit", transition: "filter .15s" };
+  const kinds = {
+    primary: { background: GUAVA, color: "#fff" },
+    kale: { background: KALE, color: "#fff" },
+    ghost: { background: "#fff", color: INK, border: `1px solid ${LINE}` },
+    danger: { background: "#fff", color: "#b4392b", border: "1px solid #f0cfca" },
+  };
+  return <button onClick={onClick} onMouseEnter={(e) => (e.currentTarget.style.filter = "brightness(.95)")} onMouseLeave={(e) => (e.currentTarget.style.filter = "none")} style={{ ...base, ...kinds[kind], ...style }} {...p}>{children}</button>;
+}
+function Field({ label, children, hint }) {
+  return <label style={{ display: "block", marginBottom: 12 }}>
+    <div style={{ fontSize: 12, fontWeight: 600, color: INK60, marginBottom: 4 }}>{label}</div>
+    {children}
+    {hint && <div style={{ fontSize: 11, color: INK60, marginTop: 3 }}>{hint}</div>}
+  </label>;
+}
+const inputStyle = { width: "100%", boxSizing: "border-box", padding: "9px 11px", borderRadius: 9, border: `1px solid ${LINE}`, background: CREAM, fontSize: 14, color: INK, fontFamily: "inherit", outline: "none" };
+function Num({ v, on, step = 1, pct: isPct }) {
+  return <input type="number" step={step} value={isPct ? Math.round(v * 1000) / 10 : v} onChange={(e) => { const x = parseFloat(e.target.value); on(isPct ? (isNaN(x) ? 0 : x / 100) : (isNaN(x) ? 0 : x)); }} style={inputStyle} />;
+}
+function Txt({ v, on }) { return <input value={v} onChange={(e) => on(e.target.value)} style={inputStyle} />; }
+function Sel({ v, on, opts }) {
+  return <select value={v} onChange={(e) => on(e.target.value)} style={{ ...inputStyle, appearance: "auto" }}>
+    {opts.map((o) => <option key={o} value={o}>{o}</option>)}
+  </select>;
+}
+function SectionTitle({ children }) { return <div style={{ background: KALE, color: "#fff", fontWeight: 700, fontSize: 13, padding: "7px 12px", borderRadius: 8, margin: "18px 0 12px" }}>{children}</div>; }
+
+/* ============================ design grid (current vs proposed) ============================ */
+function DesignGrid({ rows, cur, prop }) {
+  return <div style={{ ...card, overflow: "hidden", marginTop: 12 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr 1fr" }}>
+      <div style={hdCell(INK)}>Benefit Element</div>
+      <div style={hdCell(INK)}>{cur.name}</div>
+      <div style={hdCell(GUAVA)}>{prop.name}</div>
+      {rows.map((row, i) => row.length === 1
+        ? <div key={i} style={{ gridColumn: "1 / -1", background: OFF, fontWeight: 700, fontSize: 12, padding: "6px 12px", color: INK }}>{row[0]}</div>
+        : <React.Fragment key={i}>
+          <div style={cellL}>{row[0]}</div>
+          <div style={cellC}>{cur.d[row[1]]}</div>
+          <div style={cellC}>{prop.d[row[1]]}</div>
+        </React.Fragment>)}
+    </div>
+  </div>;
+}
+const hdCell = (bg) => ({ background: bg, color: "#fff", fontWeight: 700, fontSize: 12, padding: "8px 12px", textAlign: "center" });
+const cellL = { padding: "7px 12px", fontSize: 13, borderTop: `1px solid ${LINE}` };
+const cellC = { padding: "7px 12px", fontSize: 13, textAlign: "center", borderTop: `1px solid ${LINE}`, borderLeft: `1px solid ${LINE}` };
+
+/* ============================ benefit editor ============================ */
+const MEM_TIERS = ["Employee Only", "EE + Spouse", "EE + Child(ren)", "Family"];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const cellHd = { padding: "8px 12px" };
+
+function RenewalSection({ d, set, medEC }) {
+  const r = d.med.renewal || {};
+  const setR = (patch) => set({ ...d, med: { ...d.med, renewal: { ...r, ...patch } } });
+  let m = (r.renewalMonth || 1) - (r.effectiveMonth || 1); if (m <= 0) m += 12;
+  const avoided = r.enabled ? medEC * (r.increase || 0) * ((12 - m) / 12) : 0;
+  return <div style={{ ...card, marginTop: 18, padding: 16, background: r.enabled ? PEACH : "#fff", borderColor: r.enabled ? GUAVA20 : LINE }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ fontWeight: 700, fontSize: 14 }}>Skipped-renewal savings (Year 1)</div>
+      <button onClick={() => setR({ enabled: !r.enabled })} style={{ padding: "5px 14px", borderRadius: 16, border: "none", background: r.enabled ? KALE : INK60, color: "#fff", fontWeight: 700, fontSize: 12, cursor: "pointer", fontFamily: "inherit" }}>{r.enabled ? "On" : "Off"}</button>
+    </div>
+    <div style={{ fontSize: 12, color: INK60, margin: "4px 0 12px" }}>If they move to {d.provider} before their current plan's renewal, they skip that year's increase. The avoided increase on the employer's medical share is true Year-1 hard-dollar savings.</div>
+    {r.enabled && <>
+      <div style={grid3}>
+        <Field label="Current plan renewal month"><select value={r.renewalMonth} onChange={(e) => setR({ renewalMonth: +e.target.value })} style={{ ...inputStyle, appearance: "auto" }}>{MONTHS.map((mo, i) => <option key={mo} value={i + 1}>{mo}</option>)}</select></Field>
+        <Field label={"Transition to " + d.provider}><select value={r.effectiveMonth} onChange={(e) => setR({ effectiveMonth: +e.target.value })} style={{ ...inputStyle, appearance: "auto" }}>{MONTHS.map((mo, i) => <option key={mo} value={i + 1}>{mo}</option>)}</select></Field>
+        <Field label="Projected annual increase %"><Num v={r.increase} on={(v) => setR({ increase: v })} pct step={0.5} /></Field>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", background: "#fff", border: `1px solid ${GUAVA20}`, borderRadius: 8, padding: "10px 14px" }}>
+        <span style={{ fontSize: 12, color: INK60 }}>{m} months to renewal at transition → {12 - m} months of the increase avoided in Year 1</span>
+        <span style={{ fontSize: 20, fontWeight: 800, color: GUAVA }}>{money(avoided)}</span>
+      </div>
+    </>}
+  </div>;
+}
+
+function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
+  const b = d[kind];
+  const opts = plans.map((p) => p.name);
+  const cur = planBy(plans, b.cur), prop = planBy(plans, b.prop);
+  const setB = (patch) => set({ ...d, [kind]: { ...b, ...patch } });
+  const setCensus = (k, v) => setB({ census: { ...b.census, [k]: v } });
+  const banded = advanced && b.rateType === "banded";
+  const members = b.members || [];
+  const setMembers = (mm) => setB({ members: mm });
+  const updMem = (i, patch) => setMembers(members.map((x, j) => (j === i ? { ...x, ...patch } : x)));
+  const memCur = members.reduce((s, m) => s + (+m.curRate || 0), 0);
+  const memProp = members.reduce((s, m) => s + (+m.propRate || 0), 0);
+  return <div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <Field label={advanced ? "Current plan (for design)" : "Current plan"}><Sel v={b.cur} on={(x) => setB({ cur: x })} opts={opts} /></Field>
+      <Field label={advanced ? "Proposed plan (for design)" : "Proposed plan"}><Sel v={b.prop} on={(x) => setB({ prop: x })} opts={opts} /></Field>
+    </div>
+
+    {advanced && <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "2px 0" }}>
+      <span style={{ fontSize: 13, fontWeight: 600, color: INK60 }}>Rate basis:</span>
+      {[["tier", "Tier (composite)"], ["banded", "Age-banded"]].map(([val, lbl]) =>
+        <button key={val} onClick={() => setB({ rateType: val })} style={{ padding: "6px 13px", borderRadius: 18, border: `1px solid ${b.rateType === val ? KALE : LINE}`, background: b.rateType === val ? KALE : "#fff", color: b.rateType === val ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{lbl}</button>)}
+    </div>}
+
+    {!banded && <>
+      <SectionTitle>Enrollment by tier (census)</SectionTitle>
+      <div style={{ ...card, overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", background: OFF, fontWeight: 700, fontSize: 12 }}>
+          <div style={cellHd}>Tier</div><div style={{ ...cellHd, textAlign: "center" }}>Enrolled</div>
+          <div style={{ ...cellHd, textAlign: "center" }}>Current /yr</div><div style={{ ...cellHd, textAlign: "center" }}>Proposed /yr</div>
+        </div>
+        {TIERS.map(([lbl, k]) => <div key={k} style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", borderTop: `1px solid ${LINE}`, alignItems: "center" }}>
+          <div style={{ padding: "6px 12px", fontSize: 13 }}>{lbl}</div>
+          <div style={{ padding: "5px 8px" }}><Num v={b.census[k]} on={(v) => setCensus(k, v)} /></div>
+          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * cur.r[k] * 12)}</div>
+          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * prop.r[k] * 12)}</div>
+        </div>)}
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", background: KALE, color: "#fff", fontWeight: 700 }}>
+          <div style={cellHd}>Employer share ({pct(d[erKey])})</div><div></div>
+          <div style={{ ...cellHd, textAlign: "center" }}>{money(totals.tc * d[erKey])}</div>
+          <div style={{ ...cellHd, textAlign: "center" }}>{money(totals.tp * d[erKey])}</div>
+        </div>
+      </div>
+    </>}
+
+    {banded && <>
+      <SectionTitle>Age-banded rates — one row per enrolled employee (from current invoice)</SectionTitle>
+      <div style={{ ...card, overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1.2fr 1fr 1fr 30px", background: OFF, fontWeight: 700, fontSize: 12 }}>
+          <div style={cellHd}>Employee</div><div style={cellHd}>Enrollment tier</div><div style={{ ...cellHd, textAlign: "center" }}>Current $/mo</div><div style={{ ...cellHd, textAlign: "center" }}>Proposed $/mo</div><div></div>
+        </div>
+        {members.map((m, i) => <div key={i} style={{ display: "grid", gridTemplateColumns: "1.6fr 1.2fr 1fr 1fr 30px", borderTop: `1px solid ${LINE}`, alignItems: "center" }}>
+          <div style={{ padding: "4px 6px" }}><input value={m.name} placeholder="Name" onChange={(e) => updMem(i, { name: e.target.value })} style={inputStyle} /></div>
+          <div style={{ padding: "4px 6px" }}><select value={m.tier} onChange={(e) => updMem(i, { tier: e.target.value })} style={{ ...inputStyle, appearance: "auto" }}>{MEM_TIERS.map((o) => <option key={o}>{o}</option>)}</select></div>
+          <div style={{ padding: "4px 6px" }}><Num v={m.curRate} on={(v) => updMem(i, { curRate: v })} step={0.01} /></div>
+          <div style={{ padding: "4px 6px" }}><Num v={m.propRate} on={(v) => updMem(i, { propRate: v })} step={0.01} /></div>
+          <div style={{ padding: "4px", textAlign: "center", cursor: "pointer" }} onClick={() => setMembers(members.filter((_, j) => j !== i))}><Trash2 size={15} style={{ color: INK60 }} /></div>
+        </div>)}
+        <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1.2fr 1fr 1fr 30px", background: KALE, color: "#fff", fontWeight: 700 }}>
+          <div style={cellHd}>Total premium ({members.length} EEs)</div><div></div>
+          <div style={{ ...cellHd, textAlign: "center" }}>{money(memCur * 12)}/yr</div>
+          <div style={{ ...cellHd, textAlign: "center" }}>{money(memProp * 12)}/yr</div><div></div>
+        </div>
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+        <Btn kind="ghost" onClick={() => setMembers([...members, { name: "Employee " + (members.length + 1), tier: "Employee Only", curRate: 0, propRate: 0 }])}><Plus size={15} /> Add employee</Btn>
+        <span style={{ fontSize: 11, color: INK60 }}>Employer share ({pct(d[erKey])}): {money(memCur * 12 * d[erKey])} current / {money(memProp * 12 * d[erKey])} proposed</span>
+      </div>
+    </>}
+
+    {advanced && <RenewalSection d={d} set={set} medEC={totals.tc * d[erKey]} />}
+
+    <SectionTitle>Plan design — side by side</SectionTitle>
+    <DesignGrid rows={rows} cur={cur} prop={prop} />
+  </div>;
+}
+
+/* ============================ results panel ============================ */
+function Stat({ label, value, accent, icon }) {
+  return <div style={{ ...card, padding: "14px 16px", background: accent ? PEACH : "#fff", borderColor: accent ? GUAVA20 : LINE }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: INK60, fontWeight: 600 }}>{icon}{label}</div>
+    <div style={{ fontSize: 24, fontWeight: 800, color: accent ? GUAVA : INK, marginTop: 4 }}>{value}</div>
+  </div>;
+}
+function Results({ c, d }) {
+  const Line = ({ l, cur, prop, bold }) => <tr style={{ fontWeight: bold ? 700 : 400 }}>
+    <td style={tdL}>{l}</td><td style={tdR}>{money(cur)}</td><td style={tdR}>{money(prop)}</td><td style={{ ...tdR, color: cur - prop >= 0 ? KALE : GUAVA }}>{money(cur - prop)}</td>
+  </tr>;
+  return <div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+      <Stat label="Current annual" value={money(c.curTotal)} icon={<DollarSign size={14} />} />
+      <Stat label="Proposed annual" value={money(c.propTotal)} icon={<DollarSign size={14} />} />
+      <Stat label="Hard-dollar savings" value={money(c.hard)} icon={<TrendingUp size={14} />} />
+      <Stat label="Soft-cost (NAPEO)" value={money(c.soft)} icon={<Clock size={14} />} />
+      {c.avoidedRenewal > 0 && <Stat label="Avoided renewal (Yr 1)" value={money(c.avoidedRenewal)} icon={<TrendingUp size={14} />} />}
+      <div style={{ gridColumn: "1 / -1" }}><Stat label="Total annual economic value" value={money(c.totalValue)} accent icon={<TrendingUp size={16} />} /></div>
+    </div>
+    <table style={{ width: "100%", borderCollapse: "collapse", ...card, overflow: "hidden" }}>
+      <thead><tr style={{ background: INK, color: "#fff" }}><th style={th}>Cost component</th><th style={thR}>Current</th><th style={thR}>{d.provider}</th><th style={thR}>Savings</th></tr></thead>
+      <tbody>
+        <Line l="Workers' Comp" cur={c.wcC} prop={c.wcP} />
+        <Line l="Medical (ER share)" cur={c.medEC} prop={c.medEP} />
+        <Line l="Dental (ER share)" cur={c.denEC} prop={c.denEP} />
+        <Line l="Vision (ER share)" cur={c.visEC} prop={c.visEP} />
+        <Line l="Life / STD / LTD" cur={d.lifeCur} prop={d.lifeProp} />
+        <Line l="Payroll/HR Admin (Gusto → PEO)" cur={c.adminC} prop={c.adminP} />
+        <Line l="Total annualized cost" cur={c.curTotal} prop={c.propTotal} bold />
+      </tbody>
+    </table>
+    <div style={{ ...card, marginTop: 14, padding: 14, background: OFF }}>
+      <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 8 }}>4-Year projection (medical trended {pct(d.curTrend)} vs {pct(d.propTrend)})</div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+        {c.years.map((y) => <div key={y.y} style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: "8px 10px" }}>
+          <div style={{ fontSize: 11, color: INK60 }}>Year {y.y} savings</div><div style={{ fontWeight: 700, color: y.sv >= 0 ? KALE : GUAVA }}>{money(y.sv)}</div>
+        </div>)}
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 10, fontSize: 13 }}>
+        <span>4-yr cumulative hard-dollar: <b>{money(c.cum)}</b></span>
+        <span style={{ color: GUAVA }}>4-yr total economic value: <b>{money(c.total4)}</b></span>
+      </div>
+      {c.avoidedRenewal > 0 && <div style={{ marginTop: 8, fontSize: 12, color: INK60 }}>Includes a one-time avoided renewal increase of <b style={{ color: INK }}>{money(c.avoidedRenewal)}</b> ({c.renewalMonths} months to renewal at transition).</div>}
+    </div>
+  </div>;
+}
+const th = { padding: "9px 12px", textAlign: "left", fontSize: 12 }, thR = { ...th, textAlign: "right" };
+const tdL = { padding: "7px 12px", fontSize: 13, borderTop: `1px solid ${LINE}` };
+const tdR = { ...tdL, textAlign: "right" };
+
+/* ============================ print packet ============================ */
+function Packet({ d, c }) {
+  const Row = ({ l, cur, prop, bold }) => <tr style={{ fontWeight: bold ? 700 : 400 }}><td style={ptdL}>{l}</td><td style={ptdR}>{money(cur)}</td><td style={ptdR}>{money(prop)}</td><td style={ptdR}>{money(cur - prop)}</td></tr>;
+  const pGrid = (rows, cur, prop) => <table style={pTable}><thead><tr><th style={pthL}>Benefit</th><th style={pth}>{cur.name}</th><th style={{ ...pth, background: GUAVA }}>{prop.name}</th></tr></thead>
+    <tbody>{rows.map((r, i) => r.length === 1 ? <tr key={i}><td colSpan={3} style={{ background: OFF, fontWeight: 700, padding: "3px 8px", fontSize: 10 }}>{r[0]}</td></tr>
+      : <tr key={i}><td style={ptdL}>{r[0]}</td><td style={ptdC}>{cur.d[r[1]]}</td><td style={ptdC}>{prop.d[r[1]]}</td></tr>)}</tbody></table>;
+  return <div className="packet">
+    <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: `3px solid ${KALE}`, paddingBottom: 8, marginBottom: 4 }}>
+      <div style={{ fontFamily: "Arial", fontWeight: 800, fontSize: 30, color: GUAVA }}>gusto</div>
+      <div style={{ textAlign: "right", fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700 }}>FOR ILLUSTRATIVE PURPOSES ONLY — NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</div>
+    </header>
+    <div style={{ background: KALE, color: "#fff", padding: "8px 12px", fontSize: 17, fontWeight: 700, borderRadius: 4 }}>PEO Cost Comparison & ROI Analysis</div>
+    <div style={{ fontSize: 11, color: INK60, margin: "6px 2px 12px" }}>Prepared for {domainFor(d) ? <img src={"https://www.google.com/s2/favicons?sz=64&domain=" + domainFor(d)} alt="" style={{ width: 14, height: 14, verticalAlign: "middle", marginRight: 5, borderRadius: 3 }} /> : null}<b style={{ color: INK }}>{d.clientName || "—"}</b>{d.contacts && d.contacts[0] && d.contacts[0].name ? <> · Attn: {d.contacts[0].name}{d.contacts[0].title ? ", " + d.contacts[0].title : ""}</> : ""} · {d.employees} employees · by {d.preparedBy || "—"} · {d.proposalDate} · Provider: {d.provider}</div>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 14 }}>
+      {[["Current annual", money(c.curTotal), false], ["Proposed annual", money(c.propTotal), false], ["Total economic value", money(c.totalValue), true], ["4-yr total value", money(c.total4), true]].map(([l, v, a]) =>
+        <div key={l} style={{ background: a ? PEACH : OFF, border: `1px solid ${a ? GUAVA20 : LINE}`, borderRadius: 6, padding: "8px 10px" }}>
+          <div style={{ fontSize: 9, color: INK60, fontWeight: 700 }}>{l}</div><div style={{ fontSize: 18, fontWeight: 800, color: a ? GUAVA : INK }}>{v}</div></div>)}
+    </div>
+    <h3 style={ph}>Return on Investment Summary</h3>
+    <table style={pTable}><thead><tr><th style={pthL}>Cost component</th><th style={pth}>Current</th><th style={{ ...pth, background: GUAVA }}>{d.provider}</th><th style={pth}>Savings</th></tr></thead>
+      <tbody>
+        <Row l="Workers' Compensation" cur={c.wcC} prop={c.wcP} />
+        <Row l="Medical (employer share)" cur={c.medEC} prop={c.medEP} />
+        <Row l="Dental (employer share)" cur={c.denEC} prop={c.denEP} />
+        <Row l="Vision (employer share)" cur={c.visEC} prop={c.visEP} />
+        <Row l="Life / STD / LTD" cur={d.lifeCur} prop={d.lifeProp} />
+        <Row l="Payroll / HR Admin (Gusto → PEO)" cur={c.adminC} prop={c.adminP} />
+        <Row l="Total annualized cost" cur={c.curTotal} prop={c.propTotal} bold />
+      </tbody></table>
+    <div style={{ display: "flex", gap: 10, margin: "8px 0 14px" }}>
+      <div style={{ flex: 1, background: PEACH, border: `1px solid ${GUAVA20}`, borderRadius: 6, padding: 10 }}><div style={{ fontSize: 10, color: INK60 }}>Hard-dollar annual savings</div><div style={{ fontWeight: 800, color: c.hard >= 0 ? KALE : GUAVA, fontSize: 16 }}>{money(c.hard)}</div></div>
+      <div style={{ flex: 1, background: PEACH, border: `1px solid ${GUAVA20}`, borderRadius: 6, padding: 10 }}><div style={{ fontSize: 10, color: INK60 }}>Soft-cost / productivity (NAPEO)</div><div style={{ fontWeight: 800, fontSize: 16 }}>{money(c.soft)}</div></div>
+      {c.avoidedRenewal > 0 && <div style={{ flex: 1, background: PEACH, border: `1px solid ${GUAVA20}`, borderRadius: 6, padding: 10 }}><div style={{ fontSize: 10, color: INK60 }}>Avoided renewal (Year 1)</div><div style={{ fontWeight: 800, fontSize: 16, color: KALE }}>{money(c.avoidedRenewal)}</div></div>}
+      <div style={{ flex: 1, background: GUAVA, color: "#fff", borderRadius: 6, padding: 10 }}><div style={{ fontSize: 10, opacity: .9 }}>Total annual economic value</div><div style={{ fontWeight: 800, fontSize: 16 }}>{money(c.totalValue)}</div></div>
+    </div>
+    <div className="pbreak" />
+    <h3 style={ph}>Major Medical</h3>{pGrid(MED_ROWS, c.medC, c.medP)}
+    <h3 style={ph}>Dental</h3>{pGrid(DEN_ROWS, c.denC, c.denP)}
+    <div className="pbreak" />
+    <h3 style={ph}>Vision</h3>{pGrid(VIS_ROWS, c.visC, c.visP)}
+    <h3 style={ph}>Soft-Cost Savings (NAPEO / McBassi 2019)</h3>
+    <table style={pTable}><tbody>
+      <tr><td style={ptdL}>HR/payroll admin time</td><td style={ptdR}>{d.soft.hours} hrs/wk × {money2(d.soft.rate)} × {d.soft.weeks} wks</td></tr>
+      <tr><td style={ptdL}>Estimated reduction with PEO</td><td style={ptdR}>{pct(d.soft.reduction)}</td></tr>
+      <tr style={{ fontWeight: 700 }}><td style={ptdL}>Annual reclaimed-time value</td><td style={ptdR}>{money(c.soft)}</td></tr>
+      <tr><td style={ptdL}>NAPEO benchmark ($1,775/EE/yr · 27.2% ROI)</td><td style={ptdR}>{money(1775 * d.employees)}</td></tr>
+    </tbody></table>
+    <p style={{ fontSize: 8, color: INK60, marginTop: 14, fontStyle: "italic" }}>Confidential. Estimates based on data and assumptions entered. Soft-cost figures reference NAPEO/McBassi (2019). Rates and plan benefits are illustrative — replace with the prospect's actual quotes and SBCs. A binding agreement exists only upon execution of the required service agreement.</p>
+  </div>;
+}
+const ph = { fontSize: 13, color: KALE, margin: "12px 0 5px", borderBottom: `2px solid ${KALE20}`, paddingBottom: 2 };
+const pTable = { width: "100%", borderCollapse: "collapse", marginBottom: 6, fontSize: 10 };
+const pth = { background: INK, color: "#fff", padding: "4px 8px", fontSize: 10, textAlign: "right" };
+const pthL = { ...pth, textAlign: "left" };
+const ptdL = { padding: "3px 8px", borderTop: `1px solid ${LINE}`, textAlign: "left" };
+const ptdR = { padding: "3px 8px", borderTop: `1px solid ${LINE}`, textAlign: "right" };
+const ptdC = { padding: "3px 8px", borderTop: `1px solid ${LINE}`, textAlign: "center" };
+
+/* ============================ pipeline dashboard ============================ */
+function InfoTip({ text }) {
+  const [open, setOpen] = useState(false);
+  return <span style={{ position: "relative", display: "inline-flex", alignItems: "center" }} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}>
+    <Info size={13} style={{ color: INK60, cursor: "help" }} />
+    {open && <span style={{ position: "absolute", bottom: "calc(100% + 9px)", left: "50%", transform: "translateX(-50%)", width: 250, background: INK, color: "#fff", fontSize: 12, lineHeight: 1.55, fontWeight: 500, padding: "10px 12px", borderRadius: 10, zIndex: 40, boxShadow: "0 8px 24px rgba(0,0,0,.24)", textAlign: "left", pointerEvents: "none" }}>{text}<span style={{ position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: `6px solid ${INK}` }} /></span>}
+  </span>;
+}
+function PipeStat({ label, value, sub, accent, info }) {
+  return <div style={{ ...card, padding: "13px 15px", background: accent ? PEACH : "#fff", borderColor: accent ? GUAVA20 : LINE }}>
+    <div style={{ fontSize: 11.5, color: INK60, fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>{label}{info ? <InfoTip text={info} /> : null}</div>
+    <div style={{ fontSize: 23, fontWeight: 800, color: accent ? GUAVA : INK, marginTop: 3 }}>{value}</div>
+    {sub && <div style={{ fontSize: 11, color: INK60, marginTop: 2 }}>{sub}</div>}
+  </div>;
+}
+function Bar({ label, value, max, count, color }) {
+  const w = max > 0 ? Math.max(2, (value / max) * 100) : 0;
+  return <div style={{ marginBottom: 9 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 3 }}>
+      <span style={{ fontWeight: 600 }}>{label} <span style={{ color: INK60, fontWeight: 400 }}>· {count}</span></span>
+      <span style={{ fontWeight: 700 }}>{money(value)}</span>
+    </div>
+    <div style={{ height: 9, background: OFF, borderRadius: 5, overflow: "hidden" }}><div style={{ width: w + "%", height: "100%", background: color, borderRadius: 5 }} /></div>
+  </div>;
+}
+function Dashboard({ index, onOpen, onNew, onDelete, onQuick }) {
+  const [q, setQ] = useState("");
+  const [view, setView] = useState("forecast"); // forecast | deals
+  const list = index.filter((c) => (c.clientName || "Untitled").toLowerCase().includes(q.toLowerCase())).sort((a, b) => b.updatedAt - a.updatedAt);
+
+  const allOpen = index.filter((c) => isOpen(c.stage)), won = index.filter((c) => isWon(c.stage)), lost = index.filter((c) => isLost(c.stage));
+  const omit = allOpen.filter((c) => c.forecast === "Omit");
+  const notStarted = allOpen.filter((c) => isNotStarted(c.stage));
+  const open = allOpen.filter((c) => c.forecast !== "Omit" && !isNotStarted(c.stage)); // active (forecasted, started) open deals
+  const sum = (a) => a.reduce((s, c) => s + (c.acv || 0), 0);
+  const openACV = sum(open), wonACV = sum(won), omitACV = sum(omit);
+  const weighted = open.reduce((s, c) => s + (c.acv || 0) * stageInfo(c.stage).p, 0);
+  const commitOpen = sum(open.filter((c) => c.forecast === "Commit"));
+  const bestOpen = sum(open.filter((c) => c.forecast === "Best Case"));
+  const pipeOpen = sum(open.filter((c) => c.forecast === "Pipeline"));
+  const commit = wonACV + commitOpen, bestCase = wonACV + commitOpen + bestOpen;
+  const decided = won.length + lost.length;
+  const winRate = decided ? won.length / decided : 0;
+  const today = localToday();
+  const dueCount = open.filter((c) => c.nextStep && c.nextStep <= today).length;
+  const noNext = open.filter((c) => !c.nextStep).length;
+  const reasonCounts = LOSS_REASONS.map((r) => ({ r, n: lost.filter((c) => c.lostReason === r).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
+  const topReason = reasonCounts[0];
+  const funnel = STAGES.filter((s) => s.name !== "Assigned").map((s) => ({ ...s, items: index.filter((c) => c.stage === s.name && c.forecast !== "Omit") }));
+  const maxStageACV = Math.max(1, ...funnel.map((s) => sum(s.items)));
+  const matchQ = (c) => (c.clientName || "Untitled").toLowerCase().includes(q.toLowerCase());
+  const assignedList = index.filter(matchQ).sort((a, b) => (b.acv || 0) - (a.acv || 0));
+  const activeList = open.filter(matchQ).sort((a, b) => (b.acv || 0) - (a.acv || 0));
+  const tam = sum(index);
+  const renderCard = (c) => { const si = stageInfo(c.stage); return <div key={c.id} style={{ ...card, padding: 16, position: "relative" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "3px 10px" }}>{c.stage}</span>
+      <Trash2 size={16} style={{ color: INK60, cursor: "pointer" }} onClick={() => { if (confirm("Delete this deal? This can't be undone.")) onDelete(c.id); }} />
+    </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 11, marginTop: 12 }}>
+      <LogoAvatar name={c.clientName} domain={c.domain} size={42} radius={11} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontWeight: 700, fontSize: 16, cursor: "pointer", lineHeight: 1.2 }} onClick={() => onOpen(c.id)}>{c.clientName || "Untitled deal"}</div>
+        <div style={{ fontSize: 12, color: INK60, marginTop: 2 }}>{c.contact ? c.contact + " · " : ""}{isNotStarted(c.stage) ? "Assigned · not started" : isOpen(c.stage) ? c.forecast : isWon(c.stage) ? "Won" : (c.lostReason || "Lost")}</div>
+      </div>
+    </div>
+    {c.nextStep && isOpen(c.stage) && (() => { const f = fuStatus(c.nextStep); return <div style={{ fontSize: 12, marginTop: 6, display: "flex", alignItems: "center", gap: 5, fontWeight: 600, color: f.color }}><Calendar size={13} /> {f.label}: {prettyDate(c.nextStep)}</div>; })()}
+    <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${LINE}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+      <span style={{ fontSize: 11, color: INK60 }}>Annual contract value</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: GUAVA }}>{money(c.acv || 0)}</span>
+    </div>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginTop: 10 }}>
+      <select value={c.stage} onChange={(e) => onQuick(c.id, { stage: e.target.value })} style={{ ...inputStyle, background: "#fff", fontSize: 12, padding: "6px 8px" }}>{STAGES.map((s) => <option key={s.name}>{s.name}</option>)}</select>
+      {isLost(c.stage) ? <select value={c.lostReason || ""} onChange={(e) => onQuick(c.id, { lostReason: e.target.value })} style={{ ...inputStyle, background: "#fff", fontSize: 12, padding: "6px 8px" }}><option value="">Reason…</option>{LOSS_REASONS.map((r) => <option key={r}>{r}</option>)}</select>
+        : <select value={c.forecast} disabled={!isActive(c.stage)} onChange={(e) => onQuick(c.id, { forecast: e.target.value })} style={{ ...inputStyle, background: isActive(c.stage) ? "#fff" : OFF, fontSize: 12, padding: "6px 8px" }}>{FORECAST_CATS.map((f) => <option key={f}>{f}</option>)}</select>}
+    </div>
+  </div>; };
+
+  return <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 20px 60px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "10px 0 20px", flexWrap: "wrap", gap: 12 }}>
+      <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: INK60, fontWeight: 600 }}><TrendingUp size={15} /> Pipeline &amp; forecast</div>
+        <h1 style={{ fontSize: 27, fontWeight: 800, margin: "2px 0 0" }}>Sales forecast</h1>
+      </div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, overflow: "hidden" }}>
+          {[["forecast", "Forecast"], ["assigned", "Assigned"], ["active", "Active"], ["today", "Today"]].map(([v, l]) => <button key={v} onClick={() => setView(v)} style={{ padding: "8px 14px", border: "none", background: view === v ? KALE : "#fff", color: view === v ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{l}{v === "active" ? " (" + open.length + ")" : ""}{v === "today" && dueCount > 0 ? " (" + dueCount + ")" : ""}</button>)}
+        </div>
+        <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
+      </div>
+    </div>
+
+    {index.length === 0 ? <div style={{ ...card, padding: "48px 20px", textAlign: "center", color: INK60 }}>
+      <Folder size={34} style={{ color: KALE, marginBottom: 8 }} /><div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>No deals yet</div>
+      <div style={{ fontSize: 14, marginBottom: 16 }}>Create a deal to start building pipeline. Each one saves automatically and rolls into your forecast.</div>
+      <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
+    </div> : view === "forecast" ? <>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(165px,1fr))", gap: 12, marginBottom: 20 }}>
+        <PipeStat label="Open pipeline" value={money(openACV)} sub={open.length + " active" + (omit.length ? " · " + omit.length + " omitted" : "")} info="Total ACV of your active open deals — started and not omitted. Your live opportunity volume before any probability is applied." />
+        <PipeStat label="Weighted forecast" value={money(weighted)} sub="Σ ACV × stage probability" info="Each active deal's ACV multiplied by the win-probability of its stage, then summed. It's the conservative, expected-value view of your pipeline — what you'd realistically book if every deal converted at its stage's odds (Meeting 10% → First Meeting 20% → Quote Info 30% → Deep Dive 45% → Proposal 60%). Not-started and omitted deals are excluded. Stage drives this number, not your Commit/Best-Case tags." />
+        <PipeStat label="Commit" value={money(commit)} sub="Won + committed" accent info="What you're confident you'll book: Closed-Won ACV plus open deals you've tagged Commit (the prospect gave a verbal). Your floor." />
+        <PipeStat label="Best case" value={money(bestCase)} sub="Won + commit + best case" info="The upside scenario: Won + Commit + Best Case deals. What you book if the deals you think are likely actually land. Your ceiling for the period." />
+        <PipeStat label="Closed Won (ACV)" value={money(wonACV)} sub={won.length + " won"} info="Annual contract value already won (Closed Won + Implementation) in this view." />
+        <PipeStat label="Win rate" value={decided ? Math.round(winRate * 100) + "%" : "—"} sub={won.length + " won · " + lost.length + " lost"} info="Won ÷ (Won + Lost). Your close rate on decided deals only — open and not-started accounts don't count yet." />
+        <PipeStat label="Follow-ups due" value={String(dueCount)} sub={noNext ? noNext + " open w/o a next step" : "overdue or today"} accent={dueCount > 0} info="Active deals whose follow-up date is today or overdue. Not-started and omitted accounts are excluded so this stays a real worklist." />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "start" }}>
+        <div style={{ ...card, padding: 18 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 14 }}>Pipeline by stage</div>
+          {funnel.filter((s) => s.items.length).map((s) => <Bar key={s.name} label={s.name} value={sum(s.items)} count={s.items.length} max={maxStageACV} color={s.c} />)}
+          {funnel.every((s) => !s.items.length) && <div style={{ color: INK60, fontSize: 13 }}>No deals to chart yet.</div>}
+          <div style={{ borderTop: `1px solid ${LINE}`, marginTop: 12, paddingTop: 12, display: "flex", gap: 16, fontSize: 12, flexWrap: "wrap" }}>
+            <span>Commit <b>{money(commitOpen)}</b></span><span>Best case <b>{money(bestOpen)}</b></span><span>Pipeline <b>{money(pipeOpen)}</b></span><span style={{ color: INK60 }}>Omitted <b>{money(omitACV)}</b></span>
+          </div>
+          <div style={{ marginTop: 10, fontSize: 11, color: INK60, lineHeight: 1.6 }}>
+            <b style={{ color: INK }}>Commit</b> = gave a verbal · <b style={{ color: INK }}>Best Case</b> = likely to move · <b style={{ color: INK }}>Pipeline</b> = unsure · <b style={{ color: INK }}>Omit</b> = no chance (excluded)
+          </div>
+        </div>
+        <div style={{ ...card, padding: 18 }}>
+          <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6 }}>Win / loss</div>
+          <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+            <div style={{ flex: 1, background: "#EAF6F0", borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Won</div><div style={{ fontWeight: 800, fontSize: 18, color: "#1F7E54" }}>{won.length}</div></div>
+            <div style={{ flex: 1, background: "#FBEEEC", borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Lost</div><div style={{ fontWeight: 800, fontSize: 18, color: "#C2544A" }}>{lost.length}</div></div>
+            <div style={{ flex: 1, background: OFF, borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Close %</div><div style={{ fontWeight: 800, fontSize: 18 }}>{decided ? Math.round(winRate * 100) + "%" : "—"}</div></div>
+          </div>
+          <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Why we're losing</div>
+          {reasonCounts.length ? <>
+            {topReason && <div style={{ background: PEACH, border: `1px solid ${GUAVA20}`, borderRadius: 8, padding: "8px 11px", marginBottom: 8 }}>
+              <div style={{ fontSize: 11, color: INK60 }}>#1 reason</div><div style={{ fontWeight: 700, color: GUAVA }}>{topReason.r} <span style={{ color: INK60, fontWeight: 400 }}>({topReason.n})</span></div></div>}
+            {reasonCounts.map((x) => <div key={x.r} style={{ display: "flex", justifyContent: "space-between", fontSize: 12.5, padding: "3px 0" }}><span>{x.r}</span><b>{x.n}</b></div>)}
+          </> : <div style={{ color: INK60, fontSize: 13 }}>No closed-lost deals yet.</div>}
+        </div>
+      </div>
+    </> : view === "assigned" ? <>
+      <div style={{ ...card, padding: "20px 22px", marginBottom: 18, background: `linear-gradient(135deg, ${KALE} 0%, #0c6f6f 100%)`, border: "none" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,.8)", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5 }}>Total account value · your TAM</div>
+            <div style={{ fontSize: 38, fontWeight: 800, color: "#fff", lineHeight: 1.1, marginTop: 2 }}>{money(tam)}</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,.85)", marginTop: 2 }}>{index.length} account{index.length === 1 ? "" : "s"} assigned to you · est. annual contract value across the book</div>
+          </div>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            <div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>Not started</div><div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{money(sum(notStarted))}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>{notStarted.length} assigned</div></div>
+            <div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>Active eval</div><div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{money(openACV)}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>{open.length} deals</div></div>
+            <div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>Won</div><div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{money(wonACV)}</div><div style={{ fontSize: 11, color: "rgba(255,255,255,.75)" }}>{won.length} deals</div></div>
+          </div>
+        </div>
+      </div>
+      <div style={{ position: "relative", marginBottom: 16, maxWidth: 360 }}>
+        <Search size={15} style={{ position: "absolute", left: 11, top: 11, color: INK60 }} />
+        <input placeholder="Search assigned accounts" value={q} onChange={(e) => setQ(e.target.value)} style={{ ...inputStyle, background: "#fff", paddingLeft: 33 }} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 16 }}>{assignedList.map(renderCard)}</div>
+    </> : view === "active" ? <>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
+        <div><div style={{ fontWeight: 800, fontSize: 16 }}>Active evaluations</div><div style={{ fontSize: 13, color: INK60 }}>{open.length} live · {money(openACV)} open · {money(weighted)} weighted</div></div>
+        <div style={{ position: "relative", maxWidth: 320, flex: 1, minWidth: 200 }}>
+          <Search size={15} style={{ position: "absolute", left: 11, top: 11, color: INK60 }} />
+          <input placeholder="Search active deals" value={q} onChange={(e) => setQ(e.target.value)} style={{ ...inputStyle, background: "#fff", paddingLeft: 33 }} />
+        </div>
+      </div>
+      {activeList.length === 0 ? <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}><div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>No active evaluations</div><div style={{ fontSize: 14 }}>Move an assigned account into a stage to start working it.</div></div>
+        : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 16 }}>{activeList.map(renderCard)}</div>}
+    </> : <>
+      {(() => {
+        const t = localToday();
+        const withDate = open.filter((c) => c.nextStep).sort((a, b) => (a.nextStep < b.nextStep ? -1 : 1));
+        const overdue = withDate.filter((c) => c.nextStep < t);
+        const todayD = withDate.filter((c) => c.nextStep === t);
+        const upcoming = withDate.filter((c) => c.nextStep > t);
+        const noStep = open.filter((c) => !c.nextStep);
+        const Group = ({ title, items, color, empty }) => <div style={{ marginBottom: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}><span style={{ width: 9, height: 9, borderRadius: 9, background: color }} /><span style={{ fontWeight: 700, fontSize: 14 }}>{title}</span><span style={{ fontSize: 12, color: INK60 }}>· {items.length}</span></div>
+          {items.length === 0 ? <div style={{ fontSize: 13, color: INK60, paddingLeft: 17 }}>{empty}</div>
+            : <div style={{ ...card, overflow: "hidden" }}>{items.map((c, i) => { const si = stageInfo(c.stage); return <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderTop: i ? `1px solid ${LINE}` : "none", cursor: "pointer" }} onClick={() => onOpen(c.id)}>
+              <LogoAvatar name={c.clientName} domain={c.domain} size={30} radius={8} />
+              <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 700, fontSize: 14 }}>{c.clientName || "Untitled deal"}</div><div style={{ fontSize: 12, color: INK60 }}>{c.contact ? c.contact + " · " : ""}{prettyDate(c.nextStep) || "no date"}</div></div>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "3px 9px", flexShrink: 0 }}>{c.stage}</span>
+              <span style={{ fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{money(c.acv || 0)}</span>
+            </div>; })}</div>}
+        </div>;
+        return <>
+          <Group title="Overdue" items={overdue} color="#C2544A" empty="Nothing overdue — nice." />
+          <Group title="Today" items={todayD} color={GUAVA} empty="Nothing scheduled for today." />
+          <Group title="Upcoming" items={upcoming} color={KALE} empty="No upcoming follow-ups scheduled." />
+          <Group title="Needs a next step" items={noStep} color={INK60} empty="Every open deal has a next step. 👏" />
+        </>;
+      })()}
+    </>}
+  </div>;
+}
+
+/* ============================ editor ============================ */
+const V_TABS = ["Setup", "Contact", "Activity", "Medical", "Dental", "Vision", "Workers' Comp", "Gusto Invoice", "Soft-Cost", "Summary"];
+
+const ACT_TYPES = [
+  { t: "Note", c: KALE, i: MessageSquare }, { t: "Call", c: "#2E9E6B", i: Phone },
+  { t: "Email", c: "#3B82B8", i: Mail }, { t: "Meeting", c: GUAVA, i: Calendar }, { t: "Task", c: INK60, i: Check },
+];
+const actInfo = (t) => ACT_TYPES.find((x) => x.t === t) || ACT_TYPES[0];
+
+function ContactTab({ d, set }) {
+  const contacts = d.contacts && d.contacts.length ? d.contacts : [{ name: "", title: "", email: "", phone: "" }];
+  const upd = (i, patch) => set({ ...d, contacts: contacts.map((x, j) => (j === i ? { ...x, ...patch } : x)) });
+  const fld = (k, label) => <Field label={label}><Txt v={d[k] || ""} on={(v) => set({ ...d, [k]: v })} /></Field>;
+  const [pulling, setPulling] = useState(false);
+  const [perr, setPerr] = useState("");
+  const pullApollo = async () => {
+    if (!d.clientName) { setPerr("Add a company name first."); return; }
+    setPerr(""); setPulling(true);
+    try {
+      const r = await researchAccount(d.clientName, domainFor(d));
+      if (Array.isArray(r.contacts) && r.contacts.length) {
+        const have = new Set(contacts.filter((x) => x.name).map((x) => x.name.toLowerCase()));
+        const add = r.contacts.filter((x) => x.name && !have.has(x.name.toLowerCase()));
+        const existing = contacts.filter((x) => x.name);
+        set({ ...d, contacts: [...existing, ...add].slice(0, 10) });
+      } else setPerr("No contacts found in Apollo for this company.");
+    } catch (e) { setPerr((e && e.message) || "Apollo pull failed"); }
+    setPulling(false);
+  };
+  return <div>
+    <SectionTitle>Account</SectionTitle>
+    <div style={{ display: "flex", alignItems: "center", gap: 14, ...card, padding: 14, marginBottom: 12 }}>
+      <LogoAvatar name={d.clientName} domain={domainFor(d)} size={52} radius={12} />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 800, fontSize: 17 }}>{d.clientName || "Company name"}</div>
+        <div style={{ fontSize: 12, color: INK60 }}>{domainFor(d) ? domainFor(d) + " · logo auto-pulled from the company domain" : "Add a website or a work email to auto-pull the logo"}</div>
+      </div>
+    </div>
+    <div style={grid2}>
+      <Field label="Company name"><Txt v={d.clientName} on={(v) => set({ ...d, clientName: v })} /></Field>
+      <Field label="Company website" hint="Powers the logo — e.g. acme.com"><Txt v={d.domain || ""} on={(v) => set({ ...d, domain: v })} /></Field>
+      {fld("industry", "Industry")}
+      {fld("incumbent", "Current PEO / payroll provider")}
+      {fld("leadSource", "Lead source")}
+    </div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 18, marginBottom: 4 }}>
+      <SectionTitle>Contacts</SectionTitle>
+      <Btn kind="ghost" onClick={pullApollo} disabled={pulling}><Sparkles size={14} /> {pulling ? "Pulling…" : "Pull contacts from Apollo"}</Btn>
+    </div>
+    {perr && <div style={{ ...card, padding: 10, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 12.5, marginBottom: 10 }}>{perr}</div>}
+    {contacts.map((p, i) => <div key={i} style={{ ...card, padding: 14, marginBottom: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+        <span style={{ fontSize: 11, fontWeight: 700, color: i === 0 ? GUAVA : INK60 }}>{i === 0 ? "PRIMARY CONTACT" : "CONTACT " + (i + 1)}</span>
+        {contacts.length > 1 && <Trash2 size={15} style={{ color: INK60, cursor: "pointer" }} onClick={() => set({ ...d, contacts: contacts.filter((_, j) => j !== i) })} />}
+      </div>
+      <div style={grid2}>
+        <Field label="Name"><Txt v={p.name} on={(v) => upd(i, { name: v })} /></Field>
+        <Field label="Title"><Txt v={p.title} on={(v) => upd(i, { title: v })} /></Field>
+        <Field label="Email"><div style={{ display: "flex", gap: 6, alignItems: "center" }}><Txt v={p.email} on={(v) => upd(i, { email: v })} />{p.email && <a href={"mailto:" + p.email} style={{ color: KALE }}><Mail size={16} /></a>}</div></Field>
+        <Field label="Phone"><div style={{ display: "flex", gap: 6, alignItems: "center" }}><Txt v={p.phone} on={(v) => upd(i, { phone: v })} />{p.phone && <a href={"tel:" + p.phone} style={{ color: KALE }}><Phone size={16} /></a>}</div></Field>
+      </div>
+    </div>)}
+    <Btn kind="ghost" onClick={() => set({ ...d, contacts: [...contacts, { name: "", title: "", email: "", phone: "" }] })}><Plus size={15} /> Add contact</Btn>
+  </div>;
+}
+
+function ActivityTab({ d, set }) {
+  const [type, setType] = useState("Note");
+  const [date, setDate] = useState(localToday());
+  const [text, setText] = useState("");
+  const acts = (d.activities || []).slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id));
+  const log = () => {
+    if (!text.trim()) return;
+    set({ ...d, activities: [...(d.activities || []), { id: Date.now(), type, date, text: text.trim() }] });
+    setText("");
+  };
+  return <div>
+    <SectionTitle>Log activity</SectionTitle>
+    <div style={{ ...card, padding: 14 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+        {ACT_TYPES.map((a) => { const I = a.i; return <button key={a.t} onClick={() => setType(a.t)} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 18, border: `1px solid ${type === a.t ? a.c : LINE}`, background: type === a.t ? a.c : "#fff", color: type === a.t ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}><I size={14} /> {a.t}</button>; })}
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{ ...inputStyle, width: "auto", background: "#fff" }} />
+      </div>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="What happened? (e.g. Left voicemail, sent renewal request, demoed PEOLens…)" rows={3} style={{ ...inputStyle, background: "#fff", resize: "vertical" }} />
+      <div style={{ marginTop: 8 }}><Btn kind="kale" onClick={log}><Plus size={15} /> Log {type.toLowerCase()}</Btn></div>
+    </div>
+    <SectionTitle>Timeline</SectionTitle>
+    {acts.length === 0 ? <div style={{ ...card, padding: 24, textAlign: "center", color: INK60, fontSize: 14 }}>No activity logged yet. Every call, email, and meeting you log shows up here.</div>
+      : <div style={{ ...card, overflow: "hidden" }}>
+        {acts.map((a, i) => { const info = actInfo(a.type); const I = info.i; return <div key={a.id} style={{ display: "flex", gap: 12, padding: "12px 14px", borderTop: i ? `1px solid ${LINE}` : "none" }}>
+          <div style={{ width: 30, height: 30, borderRadius: 8, background: info.c, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><I size={15} /></div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+              <span style={{ fontWeight: 700, fontSize: 13 }}>{a.type}</span>
+              <span style={{ fontSize: 11, color: INK60 }}>{new Date(a.date + "T00:00").toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
+            </div>
+            <div style={{ fontSize: 13, color: INK, marginTop: 2, whiteSpace: "pre-wrap" }}>{a.text}</div>
+          </div>
+          <Trash2 size={14} style={{ color: INK60, cursor: "pointer", flexShrink: 0 }} onClick={() => set({ ...d, activities: (d.activities || []).filter((x) => x.id !== a.id) })} />
+        </div>; })}
+      </div>}
+  </div>;
+}
+async function researchAccount(company, domain) {
+  const prompt = `You are a B2B sales research assistant for a PEO (Professional Employer Organization) sales rep at Gusto, selling into SMBs. Research the company "${company}"${domain ? " (" + domain + ")" : ""}. Use the Apollo connector for authoritative firmographics, technographics, and key decision-maker contacts; use web search for recent "why now" signals (hiring surges, funding, expansion, leadership changes, benefits/compliance pain, M&A). For field-staff-heavy industries (construction, restaurants, logistics, healthcare, hospitality), cross-check and do not undercount headcount. Classify the sales motion as one of: "Upsell" (already a Gusto payroll customer), "Displacement" (on a competing PEO like ADP TotalSource, Insperity, TriNet, Justworks, Paychex Oasis), or "Likely Multi-vendor" (payroll + separate benefits broker). Return ONLY minified JSON (no prose, no markdown) of this exact shape: {"employees":<number|null>,"industry":"","hq":"","revenue":"","incumbent":"<current payroll/PEO/HR provider or ''>","motion":"Upsell|Displacement|Likely Multi-vendor","signals":["short why-now signal ...up to 4"],"valueProp":["specific value-prop talking point for this account ...up to 4"],"objections":[{"o":"likely objection","a":"crisp response"} ...up to 3],"benefitsPlay":["benefits/medical angle tailored to them ...up to 4"],"techStack":["detected tool name" ...up to 12],"outreach":{"email":"2-3 sentence cold email, natural human voice, no em-dashes","linkedin":"1-2 sentence connection note","call":"one-line phone opener"},"contacts":[{"name":"","title":"","email":"","phone":""}]}`;
+  const res = await fetch("/api/crm-research", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ company, domain, prompt }),
+  });
+  if (!res.ok) throw new Error("Research unavailable (" + res.status + "). Confirm ANTHROPIC_API_KEY is set in Vercel.");
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.message || "Research failed");
+  return data.result;
+}
+const MOTION_COLOR = { "Upsell": "#0A8080", "Displacement": "#F45D48", "Likely Multi-vendor": "#D98B2B" };
+const HR_TECH = ["gusto", "adp", "paychex", "oasis", "trinet", "insperity", "justworks", "rippling", "bamboohr", "namely", "paylocity", "paycor", "workday", "successfactors", "ukg", "dayforce", "zenefits", "sequoia", "vensure", "deel", "remote", "sap", "quickbooks", "bambee", "trnet"];
+const isHRTech = (t) => HR_TECH.some((h) => (t || "").toLowerCase().includes(h));
+function InfoCard({ label, value }) {
+  return <div style={{ ...card, padding: "11px 13px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value || "\u2014"}</div></div>;
+}
+function ListBlock({ title, items, color }) {
+  if (!items || !items.length) return null;
+  return <div style={{ marginTop: 14 }}>
+    <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>{title}</div>
+    <div style={{ ...card, overflow: "hidden" }}>
+      {items.map((t, i) => <div key={i} style={{ display: "flex", gap: 9, padding: "9px 13px", borderTop: i ? `1px solid ${LINE}` : "none", fontSize: 13 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: color, marginTop: 6, flexShrink: 0 }} /><span>{t}</span></div>)}
+    </div>
+  </div>;
+}
+function CopyBox({ label, text }) {
+  const [copied, setCopied] = useState(false);
+  if (!text) return null;
+  return <div style={{ marginBottom: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+      <div style={{ fontSize: 12, fontWeight: 700, color: INK60 }}>{label}</div>
+      <button onClick={() => { try { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch {} }} style={{ border: `1px solid ${LINE}`, background: "#fff", borderRadius: 7, padding: "3px 9px", fontSize: 11, fontWeight: 600, cursor: "pointer", color: copied ? KALE : INK, fontFamily: "inherit" }}>{copied ? "Copied" : "Copy"}</button>
+    </div>
+    <div style={{ ...card, padding: "10px 12px", fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{text}</div>
+  </div>;
+}
+function BriefTab({ d, set }) {
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+  const [sub, setSub] = useState("value");
+  const b = d.brief;
+  const run = async () => {
+    if (!d.clientName) { setErr("Add a company name first (Manage account)."); return; }
+    setErr(""); setLoading(true);
+    try {
+      const r = await researchAccount(d.clientName, domainFor(d));
+      const brief = { employees: r.employees, industry: r.industry, hq: r.hq, revenue: r.revenue, incumbent: r.incumbent, motion: r.motion, signals: r.signals || [], valueProp: r.valueProp || [], objections: r.objections || [], benefitsPlay: r.benefitsPlay || [], techStack: r.techStack || [], outreach: r.outreach || {}, updatedAt: Date.now() };
+      const patch = { ...d, brief };
+      if (r.employees) patch.employees = r.employees;
+      if (r.industry && !d.industry) patch.industry = r.industry;
+      if (r.incumbent && !d.incumbent) patch.incumbent = r.incumbent;
+      if (Array.isArray(r.contacts) && r.contacts.length) {
+        const have = new Set((d.contacts || []).filter((x) => x.name).map((x) => x.name.toLowerCase()));
+        const add = r.contacts.filter((x) => x.name && !have.has(x.name.toLowerCase()));
+        const existing = (d.contacts || []).filter((x) => x.name);
+        const merged = [...existing, ...add].slice(0, 8);
+        patch.contacts = merged.length ? merged : d.contacts;
+      }
+      set(patch);
+    } catch (e) { setErr((e && e.message) || "Research failed"); }
+    setLoading(false);
+  };
+  const SUBS = [["value", "Value Prop"], ["objections", "Objection Handling"], ["benefits", "Benefits Play"], ["tech", "Tech Stack"], ["outreach", "Outreach"]];
+  return <div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+        <LogoAvatar name={d.clientName} domain={domainFor(d)} size={46} radius={12} />
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontWeight: 800, fontSize: 18 }}>{d.clientName || "Untitled account"}</span>{b && b.motion ? <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: MOTION_COLOR[b.motion] || INK60, borderRadius: 20, padding: "3px 10px" }}>{b.motion}</span> : null}</div>
+          <div style={{ fontSize: 12, color: INK60 }}>{domainFor(d) || "no website yet"}{b && b.updatedAt ? " \u00b7 researched " + new Date(b.updatedAt).toLocaleDateString() : ""}</div>
+        </div>
+      </div>
+      <Btn onClick={run} disabled={loading}><Sparkles size={15} /> {loading ? "Researching\u2026" : b ? "Refresh research" : "Run Apollo + AI research"}</Btn>
+    </div>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Firmographics &amp; contacts powered by Apollo \u00b7 signals via live web search</div>
+    {err && <div style={{ ...card, padding: 12, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 13, marginBottom: 12 }}>{err}</div>}
+    {!b && !loading && <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}>
+      <Sparkles size={30} style={{ color: KALE, marginBottom: 8 }} />
+      <div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>Build the account brief</div>
+      <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Pull firmographics, the tech stack, and decision-maker contacts from Apollo, plus recent "why now" signals from the web. It classifies the motion (Upsell / Displacement / Likely Multi-vendor) and drafts your value prop, objection handling, benefits play, and outreach \u2014 then auto-fills the deal.</div>
+      <Btn onClick={run}><Sparkles size={15} /> Run Apollo + AI research</Btn>
+      <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Powered by Apollo</div>
+    </div>}
+    {loading && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>Pulling Apollo firmographics, tech stack, contacts, and live signals\u2026</div>}
+    {b && <div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
+        <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "\u2014"} />
+        <InfoCard label="Industry" value={b.industry} />
+        <InfoCard label="HQ" value={b.hq} />
+        <InfoCard label="Revenue" value={b.revenue} />
+        <InfoCard label="Incumbent" value={b.incumbent} />
+      </div>
+      <ListBlock title={"Why now \u2014 signals"} items={b.signals} color={GUAVA} />
+      <div style={{ display: "flex", gap: 5, flexWrap: "wrap", margin: "18px 0 14px" }}>
+        {SUBS.map(([id, label]) => <button key={id} onClick={() => setSub(id)} style={{ padding: "6px 12px", borderRadius: 20, border: `1px solid ${sub === id ? KALE : LINE}`, background: sub === id ? KALE : "#fff", color: sub === id ? "#fff" : INK, fontWeight: 600, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>{label}</button>)}
+      </div>
+      {sub === "value" && (b.valueProp && b.valueProp.length ? <ListBlock title="Value prop for this account" items={b.valueProp} color={KALE} /> : <div style={{ color: INK60, fontSize: 13 }}>No value-prop points yet.</div>)}
+      {sub === "objections" && (b.objections && b.objections.length ? <div style={{ ...card, overflow: "hidden" }}>{b.objections.map((o, i) => <div key={i} style={{ padding: "11px 13px", borderTop: i ? `1px solid ${LINE}` : "none" }}><div style={{ fontWeight: 700, fontSize: 13 }}>{o.o || o.objection}</div><div style={{ fontSize: 13, color: INK60, marginTop: 3 }}>{o.a || o.response}</div></div>)}</div> : <div style={{ color: INK60, fontSize: 13 }}>No objections drafted yet.</div>)}
+      {sub === "benefits" && (b.benefitsPlay && b.benefitsPlay.length ? <ListBlock title="Benefits play" items={b.benefitsPlay} color={GUAVA} /> : <div style={{ color: INK60, fontSize: 13 }}>No benefits play yet.</div>)}
+      {sub === "tech" && (() => {
+        const tech = b.techStack || [];
+        const hr = tech.filter(isHRTech), rest = tech.filter((t) => !isHRTech(t));
+        if (!tech.length) return <div style={{ color: INK60, fontSize: 13 }}>No technologies detected in Apollo for this company.</div>;
+        const chip = (t, hot) => <span key={t} style={{ fontSize: 12.5, fontWeight: 600, padding: "4px 10px", borderRadius: 20, background: hot ? KALE20 : "#fff", color: hot ? KALE : INK, border: `1px solid ${hot ? KALE20 : LINE}` }}>{t}</span>;
+        return <div>
+          {hr.length ? <div style={{ marginBottom: 12 }}><div style={{ fontWeight: 700, fontSize: 13, marginBottom: 7 }}>HR / payroll / benefits stack</div><div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{hr.map((t) => chip(t, true))}</div></div> : null}
+          {rest.length ? <div><div style={{ fontWeight: 700, fontSize: 13, marginBottom: 7 }}>Rest of the stack</div><div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{rest.map((t) => chip(t, false))}</div></div> : null}
+        </div>;
+      })()}
+      {sub === "outreach" && <div style={{ marginTop: 2 }}>
+        <CopyBox label="Cold email" text={b.outreach && b.outreach.email} />
+        <CopyBox label="LinkedIn connection note" text={b.outreach && b.outreach.linkedin} />
+        <CopyBox label="Phone opener" text={b.outreach && b.outreach.call} />
+        {(!b.outreach || (!b.outreach.email && !b.outreach.linkedin && !b.outreach.call)) && <div style={{ color: INK60, fontSize: 13 }}>No outreach drafted yet.</div>}
+      </div>}
+      <div style={{ fontSize: 11, color: INK60, marginTop: 14, fontStyle: "italic" }}>Apollo + AI research is a starting point \u2014 verify headcount and contacts before outreach.</div>
+    </div>}
+  </div>;
+}
+function ManagePanel({ d, set, c, onClose }) {
+  const fld = (k, label, opts = {}) => <Field label={label} hint={opts.hint}>{opts.text ? <Txt v={d[k] || ""} on={(v) => set({ ...d, [k]: v })} /> : <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} step={opts.step || 1} />}</Field>;
+  return <div style={{ position: "fixed", inset: 0, background: "rgba(34,37,37,.35)", zIndex: 60, display: "flex", justifyContent: "flex-end" }} onClick={onClose}>
+    <div onClick={(e) => e.stopPropagation()} style={{ width: "min(580px,96vw)", height: "100%", background: OFF, overflowY: "auto", padding: "16px 18px 70px", boxShadow: "-8px 0 30px rgba(0,0,0,.14)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "sticky", top: 0, background: OFF, padding: "4px 0 12px", zIndex: 1 }}>
+        <div style={{ fontWeight: 800, fontSize: 18 }}>Manage account</div>
+        <Btn kind="ghost" onClick={onClose}><X size={16} /> Close</Btn>
+      </div>
+      <div style={{ ...card, padding: 14, background: PEACH, borderColor: GUAVA20, marginBottom: 6, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div><div style={{ fontSize: 12, color: INK60 }}>Annual Contract Value</div><div style={{ fontSize: 22, fontWeight: 800, color: GUAVA }}>{money(c.acv)}</div></div>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: stageInfo(d.stage).c, borderRadius: 20, padding: "4px 12px" }}>{d.stage}</span>
+      </div>
+      <div style={grid2}>
+        <Field label="Stage"><Sel v={d.stage} on={(x) => set({ ...d, stage: x })} opts={STAGES.map((s) => s.name)} /></Field>
+        {isOpen(d.stage) ? <Field label="Forecast category" hint={FORECAST_DEFS[d.forecast]}><Sel v={d.forecast} on={(x) => set({ ...d, forecast: x })} opts={FORECAST_CATS} /></Field>
+          : isLost(d.stage) ? <Field label="Closed-lost reason"><Sel v={d.lostReason || LOSS_REASONS[0]} on={(x) => set({ ...d, lostReason: x })} opts={LOSS_REASONS} /></Field>
+            : <Field label="Status"><div style={{ ...inputStyle, background: OFF }}>Won</div></Field>}
+        <Field label="Expected close (month)"><input type="month" value={d.expectedClose || ""} onChange={(e) => set({ ...d, expectedClose: e.target.value })} style={inputStyle} /></Field>
+        <Field label="Follow-up / next meeting"><input type="date" value={d.nextStep || ""} onChange={(e) => set({ ...d, nextStep: e.target.value })} style={inputStyle} /></Field>
+      </div>
+      <SectionTitle>Next steps to win</SectionTitle>
+      <Field label="Champions, pain, and what it'll take to close"><textarea value={d.winPlan || ""} onChange={(e) => set({ ...d, winPlan: e.target.value })} rows={4} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5 }} /></Field>
+      <SectionTitle>Account</SectionTitle>
+      <div style={grid2}>{fld("clientName", "Company name", { text: true })}{fld("employees", "Employee count")}{fld("industry", "Industry", { text: true })}{fld("incumbent", "Current PEO / payroll", { text: true })}{fld("leadSource", "Lead source", { text: true })}{fld("preparedBy", "Owner / rep", { text: true })}</div>
+      <SectionTitle>Activity</SectionTitle>
+      <ActivityTab d={d} set={set} />
+    </div>
+  </div>;
+}
+function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
+  const [primary, setPrimary] = useState("Brief");
+  const [qtab, setQtab] = useState("Assumptions");
+  const [manage, setManage] = useState(false);
+  const d = data, set = setData;
+  const c = useMemo(() => compute(d), [d]);
+  const field = (k, label, opts = {}) => <Field label={label} hint={opts.hint}>{opts.pct ? <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} pct step={0.1} /> : opts.text ? <Txt v={d[k]} on={(v) => set({ ...d, [k]: v })} /> : <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} step={opts.step || 1} />}</Field>;
+  const PRIMARY = [["Brief", "Account Brief"], ["Contacts", "Contacts"], ["Analysis", "Return on Analysis"]];
+  const QTABS = ["Assumptions", "Medical", "Dental", "Vision", "Workers' Comp", "Gusto Invoice", "Soft-Cost", "Summary"];
+  return <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 20px 60px" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "8px 0 14px", flexWrap: "wrap", gap: 10 }}>
+      <Btn kind="ghost" onClick={onBack}><ChevronLeft size={16} /> Pipeline</Btn>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flex: 1, minWidth: 160 }}><LogoAvatar name={d.clientName} domain={domainFor(d)} size={30} radius={8} /><span style={{ fontWeight: 800, fontSize: 18 }}>{d.clientName || "Untitled account"}</span><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: stageInfo(d.stage).c, borderRadius: 20, padding: "3px 10px" }}>{d.stage}</span></div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <Btn kind="kale" onClick={() => setManage(true)}><Users size={16} /> Manage account</Btn>
+        <Btn kind={saved ? "ghost" : "primary"} onClick={onSave}>{saved ? <><Check size={16} /> Saved</> : <><Save size={16} /> Save</>}</Btn>
+        <Btn kind="ghost" onClick={onPrint}><FileText size={16} /> PDF</Btn>
+      </div>
+    </div>
+    <div style={{ display: "flex", gap: 4, marginBottom: 18, borderBottom: `1px solid ${LINE}` }}>
+      {PRIMARY.map(([v, l]) => <button key={v} onClick={() => setPrimary(v)} style={{ padding: "10px 16px", border: "none", borderBottom: `3px solid ${primary === v ? GUAVA : "transparent"}`, background: "transparent", color: primary === v ? INK : INK60, fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", marginBottom: -1 }}>{l}</button>)}
+    </div>
+    {primary === "Brief" && <BriefTab d={d} set={set} />}
+    {primary === "Contacts" && <ContactTab d={d} set={set} />}
+    {primary === "Analysis" && <div>
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+        {QTABS.map((t) => <button key={t} onClick={() => setQtab(t)} style={{ padding: "6px 12px", borderRadius: 20, border: `1px solid ${qtab === t ? KALE : LINE}`, background: qtab === t ? KALE : "#fff", color: qtab === t ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{t}</button>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: qtab === "Summary" ? "1fr" : "1.55fr 1fr", gap: 22, alignItems: "start" }}>
+        <div>
+          {qtab === "Assumptions" && <div>
+            <SectionTitle>Engagement</SectionTitle>
+            <div style={grid2}>{field("clientName", "Client / prospect name", { text: true })}{field("preparedBy", "Prepared by", { text: true })}{field("proposalDate", "Proposal date", { text: true })}{field("provider", "Proposed provider", { text: true })}</div>
+            <SectionTitle>Census & payroll</SectionTitle>
+            <div style={grid2}>{field("employees", "Eligible employees (WSEs)")}{field("payroll", "Annual gross payroll")}</div>
+            <SectionTitle>Contribution & trend assumptions</SectionTitle>
+            <div style={grid3}>{field("medER", "Medical ER %", { pct: true })}{field("denER", "Dental ER %", { pct: true })}{field("visER", "Vision ER %", { pct: true })}{field("curTrend", "Current med trend", { pct: true })}{field("propTrend", "Proposed med trend", { pct: true })}</div>
+            <SectionTitle>Admin & other</SectionTitle>
+            <div style={grid3}>{field("proposedPEPM", "Proposed PEO fee (PEPM)")}{field("implFee", "One-time implementation fee")}{field("lifeCur", "Life/STD/LTD \u2014 current")}{field("lifeProp", "Life/STD/LTD \u2014 proposed")}</div>
+          </div>}
+          {qtab === "Medical" && <BenefitEditor d={d} set={set} kind="med" plans={MED_PLANS} rows={MED_ROWS} erKey="medER" totals={{ tc: c.medTC, tp: c.medTP }} advanced />}
+          {qtab === "Dental" && <BenefitEditor d={d} set={set} kind="den" plans={DEN_PLANS} rows={DEN_ROWS} erKey="denER" totals={{ tc: c.denTC, tp: c.denTP }} />}
+          {qtab === "Vision" && <BenefitEditor d={d} set={set} kind="vis" plans={VIS_PLANS} rows={VIS_ROWS} erKey="visER" totals={{ tc: c.visTC, tp: c.visTP }} />}
+          {qtab === "Workers' Comp" && <div>
+            <SectionTitle>Workers' compensation (8810 Clerical class shown)</SectionTitle>
+            <div style={grid2}>
+              <Field label="Annual payroll"><Num v={d.wc.payroll} on={(v) => set({ ...d, wc: { ...d.wc, payroll: v } })} /></Field><div />
+              <Field label="Current rate / $100"><Num v={d.wc.curRate} on={(v) => set({ ...d, wc: { ...d.wc, curRate: v } })} step={0.01} /></Field>
+              <Field label="Current experience mod"><Num v={d.wc.curMod} on={(v) => set({ ...d, wc: { ...d.wc, curMod: v } })} step={0.01} /></Field>
+              <Field label="Proposed rate / $100"><Num v={d.wc.propRate} on={(v) => set({ ...d, wc: { ...d.wc, propRate: v } })} step={0.01} /></Field>
+              <Field label="Proposed experience mod"><Num v={d.wc.propMod} on={(v) => set({ ...d, wc: { ...d.wc, propMod: v } })} step={0.01} /></Field>
+            </div>
+            <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
+              <div style={{ ...card, flex: 1, padding: 14 }}><div style={{ fontSize: 12, color: INK60 }}>Current premium</div><div style={{ fontWeight: 800, fontSize: 20 }}>{money(c.wcC)}</div></div>
+              <div style={{ ...card, flex: 1, padding: 14 }}><div style={{ fontSize: 12, color: INK60 }}>Proposed premium</div><div style={{ fontWeight: 800, fontSize: 20, color: KALE }}>{money(c.wcP)}</div></div>
+            </div>
+          </div>}
+          {qtab === "Gusto Invoice" && <InvoiceEditor d={d} set={set} adminC={c.adminC} />}
+          {qtab === "Soft-Cost" && <div>
+            <SectionTitle>Administrative time \u2014 current state</SectionTitle>
+            <div style={grid3}>
+              <Field label="Hours / week on HR & payroll" hint="Owner + admin staff"><Num v={d.soft.hours} on={(v) => set({ ...d, soft: { ...d.soft, hours: v } })} step={0.5} /></Field>
+              <Field label="Blended loaded hourly cost"><Num v={d.soft.rate} on={(v) => set({ ...d, soft: { ...d.soft, rate: v } })} /></Field>
+              <Field label="Weeks per year"><Num v={d.soft.weeks} on={(v) => set({ ...d, soft: { ...d.soft, weeks: v } })} /></Field>
+            </div>
+            <SectionTitle>Projected reduction with a PEO</SectionTitle>
+            <Field label="Estimated admin-time reduction" hint="NAPEO/Paychex: PEOs cut payroll admin time up to ~50%"><Num v={d.soft.reduction} on={(v) => set({ ...d, soft: { ...d.soft, reduction: v } })} pct step={1} /></Field>
+            <div style={{ ...card, padding: 16, background: PEACH, borderColor: GUAVA20, marginTop: 6 }}>
+              <div style={{ fontSize: 12, color: INK60 }}>Annual reclaimed-time value (soft-cost savings)</div>
+              <div style={{ fontWeight: 800, fontSize: 26, color: GUAVA }}>{money(c.soft)}</div>
+              <div style={{ fontSize: 11, color: INK60, marginTop: 6 }}>NAPEO/McBassi 2019: avg $1,775/EE/yr = {money(1775 * d.employees)} \u00b7 27.2% ROI. Shown separately from hard-dollar savings.</div>
+            </div>
+          </div>}
+          {qtab === "Summary" && <Results c={c} d={d} />}
+        </div>
+        {qtab !== "Summary" && <div style={{ position: "sticky", top: 16 }}><div style={{ fontSize: 12, fontWeight: 700, color: INK60, marginBottom: 8, textTransform: "uppercase", letterSpacing: .4 }}>Live results</div><Results c={c} d={d} /></div>}
+      </div>
+    </div>}
+    {manage && <ManagePanel d={d} set={set} c={c} onClose={() => setManage(false)} />}
+  </div>;
+}
+const grid2 = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 };
+const grid3 = { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 };
+
+function InvoiceEditor({ d, set, adminC }) {
+  const groups = [...new Set(d.invoice.map((l) => l.g))];
+  const upd = (idx, field, v) => { const inv = d.invoice.map((l, i) => i === idx ? { ...l, [field]: v } : l); set({ ...d, invoice: inv }); };
+  return <div>
+    <SectionTitle>Current Gusto invoice — every billable line is absorbed by the PEO</SectionTitle>
+    {groups.map((g) => <div key={g} style={{ marginBottom: 14 }}>
+      <div style={{ fontWeight: 700, fontSize: 13, color: KALE, margin: "6px 0" }}>{g}</div>
+      <div style={{ ...card, overflow: "hidden" }}>
+        {d.invoice.map((l, i) => l.g === g && <div key={i} style={{ display: "grid", gridTemplateColumns: "2.2fr .8fr .9fr 1fr", alignItems: "center", borderTop: i && d.invoice[i - 1] && d.invoice[i - 1].g === g ? `1px solid ${LINE}` : "none" }}>
+          <div style={{ padding: "6px 12px", fontSize: 13 }}>{l.n}<div style={{ fontSize: 10, color: INK60 }}>{l.basis}</div></div>
+          <div style={{ padding: "4px 6px" }}>{l.perEE ? <div style={{ textAlign: "center", fontSize: 13, color: INK60 }}>{d.employees}</div> : <Num v={l.qty} on={(v) => upd(i, "qty", v)} />}</div>
+          <div style={{ padding: "4px 6px" }}><Num v={l.rate} on={(v) => upd(i, "rate", v)} step={0.01} /></div>
+          <div style={{ padding: "6px 12px", textAlign: "right", fontSize: 13 }}>{money((l.perEE ? d.employees : l.qty) * l.rate * (l.oneTime ? 1 : 12))}</div>
+        </div>)}
+      </div>
+    </div>)}
+    <div style={{ ...card, padding: 14, background: KALE, color: "#fff", display: "flex", justifyContent: "space-between" }}>
+      <span style={{ fontWeight: 700 }}>Total current Gusto spend (→ Included under PEO)</span><span style={{ fontWeight: 800 }}>{money(adminC)}</span>
+    </div>
+  </div>;
+}
+
+/* ============================ app ============================ */
+function VantageApp() {
+  const [view, setView] = useState("dashboard");
+  const [index, setIndex] = useState([]);
+  const [data, setData] = useState(null);
+  const [saved, setSaved] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [printing, setPrinting] = useState(false);
+
+  useEffect(() => { (async () => {
+    let idx = await readIndex();
+    let dirty = false;
+    const mkEntry = (rec) => { const cc = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: cc.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
+    // first-run: seed sample deals (once; respects later deletes via the flag)
+    let seeded = false;
+    try { const f = LS.get("peo:seeded"); seeded = !!(f && f.value); } catch { seeded = false; }
+    if (idx.length === 0 && !seeded) {
+      const samples = buildSamples();
+      idx = [];
+      for (const s of samples) { await writeClient(s); idx.push(mkEntry(s)); }
+      try { LS.set("peo:seeded", "1"); } catch {}
+      dirty = true;
+    } else {
+      // migrate older entries to include deal + ACV fields
+      let changed = false;
+      idx = await Promise.all(idx.map(async (e) => {
+        if (e.acv !== undefined && e.stage && e.contact !== undefined) return e;
+        changed = true;
+        const full = await readClient(e.id);
+        if (!full) return { ...e, acv: 0, stage: "Meeting Scheduled", forecast: "Pipeline", lostReason: "" };
+        const up = { ...full, stage: full.stage || "Meeting Scheduled", forecast: full.forecast || "Pipeline", lostReason: full.lostReason || "", expectedClose: full.expectedClose || new Date().toISOString().slice(0, 7), nextStep: full.nextStep || "", industry: full.industry || "", incumbent: full.incumbent || "", leadSource: full.leadSource || "", domain: full.domain || "", contacts: full.contacts || [{ name: "", title: "", email: "", phone: "" }], activities: full.activities || [], winPlan: full.winPlan || "", brief: full.brief || null };
+        await writeClient(up);
+        return mkEntry(up);
+      }));
+      if (changed) dirty = true;
+    }
+    // one-time: load the assigned starter book (additive, de-duped by domain)
+    let starterDone = false;
+    try { const f = LS.get("polaris:starter:v1"); starterDone = !!(f && f.value); } catch { starterDone = false; }
+    if (!starterDone) {
+      const have = new Set(idx.map((e) => (e.domain || "").toLowerCase()).filter(Boolean));
+      const adds = buildStarterBook().filter((s) => !have.has((s.domain || "").toLowerCase()));
+      for (const s of adds) { await writeClient(s); idx.push(mkEntry(s)); }
+      try { LS.set("polaris:starter:v1", "1"); } catch {}
+      if (adds.length) dirty = true;
+    }
+    if (dirty) await writeIndex(idx);
+    setIndex(idx); setLoading(false);
+  })(); }, []);
+  useEffect(() => { if (data) setSaved(false); }, [data]);
+
+  const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
+
+  const save = useCallback(async () => {
+    if (!data) return;
+    const rec = { ...data, updatedAt: Date.now() };
+    await writeClient(rec);
+    const idx = [...index.filter((x) => x.id !== rec.id), indexEntry(rec)];
+    setIndex(idx); await writeIndex(idx); setSaved(true);
+  }, [data, index]);
+
+  // quick stage/forecast change straight from the pipeline board (no full open)
+  const quickUpdate = async (id, patch) => {
+    const full = await readClient(id); if (!full) return;
+    const up = { ...full, ...patch, updatedAt: Date.now() };
+    await writeClient(up);
+    const idx = [...index.filter((x) => x.id !== id), indexEntry(up)];
+    setIndex(idx); await writeIndex(idx);
+    if (data && data.id === id) setData(up);
+  };
+
+  const openClient = async (id) => { const c = await readClient(id); if (c) { setData(c); setSaved(true); setView("editor"); } };
+  const newClientFile = () => { const c = newClient(); setData(c); setSaved(false); setView("editor"); };
+  const removeClient = async (id) => { await deleteClientStore(id); const idx = index.filter((x) => x.id !== id); setIndex(idx); await writeIndex(idx); };
+  const doPrint = async () => {
+    await save();
+    const el = document.querySelector(".packet");
+    if (!el) return;
+    const html = '<!doctype html><html><head><meta charset="utf-8"><title>' + ((data.clientName || "Client") + " — PEO Packet") +
+      '</title><style>body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:20px;color:' + INK + ';-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+      'table{border-collapse:collapse}.pbreak{page-break-after:always}@page{size:letter;margin:13mm}</style></head><body>' +
+      el.innerHTML + '<scr' + 'ipt>window.onload=function(){setTimeout(function(){window.print();},350);};</scr' + 'ipt></body></html>';
+    const w = window.open("", "_blank");
+    if (w && w.document) { w.document.open(); w.document.write(html); w.document.close(); }
+    else {
+      const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+      const a = document.createElement("a"); a.href = url; a.download = (data.clientName || "client").replace(/[^\w-]+/g, "-") + "-PEO-packet.html"; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+  };
+
+  const calc = data ? compute(data) : null;
+
+  return <div style={{ fontFamily: "Arial, Helvetica, sans-serif", color: INK, background: OFF, minHeight: "100vh" }}>
+    <style>{`
+      * { box-sizing: border-box; }
+      input:focus, select:focus { border-color: ${KALE} !important; }
+      .packet { display: none; }
+      @media print {
+        @page { size: letter; margin: 14mm; }
+        .app-chrome { display: none !important; }
+        .packet { display: block !important; }
+        .pbreak { page-break-after: always; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
+    `}</style>
+
+    <div className="app-chrome">
+      <div style={{ borderBottom: `1px solid ${LINE}`, background: "#fff", marginBottom: 22 }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "12px 20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontWeight: 800, fontSize: 22, color: GUAVA }}>gusto</span>
+            <span style={{ borderLeft: `1px solid ${LINE}`, paddingLeft: 10, display: "inline-flex", alignItems: "baseline", gap: 7 }}>
+              <span style={{ fontWeight: 800, fontSize: 17, color: INK, letterSpacing: -0.2 }}>{APP_NAME}</span>
+            </span>
+          </div>
+          <span style={{ fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700, textAlign: "right" }}>FOR ILLUSTRATIVE PURPOSES ONLY —<br />NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</span>
+        </div>
+      </div>
+      {loading ? <div style={{ textAlign: "center", padding: 60, color: INK60 }}>Loading your client files…</div>
+        : view === "dashboard" ? <Dashboard index={index} onOpen={openClient} onNew={newClientFile} onDelete={removeClient} onQuick={quickUpdate} />
+          : <Editor data={data} setData={setData} onBack={() => setView("dashboard")} onSave={save} saved={saved} onPrint={doPrint} />}
+    </div>
+
+    {data && calc && <Packet d={data} c={calc} />}
+  </div>;
+}
+
+/* ===================== END VANTAGE ===================== */
+
 export default function App() {
   const [unlocked, setUnlocked] = useState(false);
   const [showLetter, setShowLetter] = useState(false);
@@ -2393,6 +3683,7 @@ export default function App() {
       {tab === "keys" && <KeysTab />}
       {tab === "plan" && <PlanTab />}
       {tab === "resources" && <ResourcesTab onTerm={(k) => setTermKey(k)} />}
+      {tab === "crm" && <CrmTab />}
 
       <div className="footer">
         <span className="eyebrow">BUILT BY GABRIEL REVNEW · NOT AN OFFICIAL GUSTO PROPERTY · v2.0</span>

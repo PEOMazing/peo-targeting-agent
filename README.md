@@ -1,25 +1,25 @@
-# Gabriel Revnew x Gusto - Deployment (with live research)
+# Gabriel Revnew x Gusto — Deployment
 
-This version includes a live PEO research engine on the Targeting Agent tab. It needs an
-API key set in Vercel. Without the key, the site still works fully; the research box just
-falls back to "enter details manually" and everything else is unaffected.
+Full candidate microsite plus two working tools (the Prospecting Agent and the Vantage CRM).
+Both AI features need an API key in Vercel. Without it, the site still works; the research
+buttons fall back to a clear "not configured" message.
 
-## 1. Upload the files
-Replace the repo contents with everything in this zip (the `app` folder includes
-`app/api/research/route.js`, which powers live research). Commit.
+## 1. Upload everything in this zip to the repo root
+Includes app/ (with app/api/ and app/crm-tool/), public/, and the config files. Commit.
 
 ## 2. Add your API key in Vercel (required for live research)
-Vercel dashboard -> your project -> Settings -> Environment Variables. Add:
-- Name: ANTHROPIC_API_KEY   Value: your Anthropic API key
-- (optional) Name: APOLLO_API_KEY   Value: your Apollo key (adds firmographics)
-Set them for Production (and Preview if you want). Then redeploy (Deployments -> ... -> Redeploy)
-so the new variables are picked up.
+Settings -> Environment Variables:
+- ANTHROPIC_API_KEY = your Anthropic API key   (required)
+- APOLLO_API_KEY = your Apollo key              (optional, enriches the Prospecting Agent)
+Set for Production, then redeploy so the variables attach.
 
 ## 3. Test
-- Gate -> GUSTOWINS -> letter -> 9 tabs
-- Targeting Agent tab -> My Day top 10 -> type a company in Live Research -> "Research & score"
-- If you see "MANUAL MODE", the key isn't set yet or the call failed; manual scoring still works.
+- Gate -> GUSTOWINS -> letter -> tabs
+- Prospecting Agent: My Day, plus live research
+- Resources: download the competitive PDF
+- CRM & Tools -> Open Vantage (/crm-tool): pipeline, account brief research, ROI engine, PDF packet
 
 ## Notes
-- Keys live ONLY in Vercel env vars, never in the code. Keep the repo private.
-- Password: GUSTOWINS (in app/page.jsx). Search engines told not to index (robots: noindex).
+- Vantage saves deals to the rep's browser (localStorage). Clearing the cache clears the deals.
+- Keys live only in Vercel env vars, never in code. Keep the repo private.
+- Password: GUSTOWINS (in app/page.jsx). Search engines told not to index.
