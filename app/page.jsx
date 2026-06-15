@@ -41,13 +41,13 @@ const css = `
 .mono { font-family: 'IBM Plex Mono', monospace; }
 
 .topbar { background: var(--surface); border-bottom: 1px solid var(--rule); padding: 14px 0 0; position: sticky; top: 0; z-index: 20; }
-.topbar-inner { max-width: 920px; margin: 0 auto; padding: 0 20px; }
+.topbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
 .brandline { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
 .wordmark { font-weight: 800; font-size: 19px; letter-spacing: -0.01em; }
 .wordmark .x { color: var(--guava); }
 .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
 
-.tabbar { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; padding-right: 24px; }
+.tabbar { display: flex; flex-wrap: wrap; gap: 0 2px; justify-content: center; }
 .tabbar::-webkit-scrollbar { display: none; }
 .tab {
   border: none; background: none; cursor: pointer;
@@ -1035,7 +1035,7 @@ function ModuleView({ mod, progress, onLessonDone, onPass, onHome }) {
 
 const TABS = [
   { id: "about", label: "About Gabe" },
-  { id: "agent", label: "PEO Prospecting Agent" },
+  { id: "crm", label: "CRM & Tools" },
   { id: "course", label: "PEO Training" },
   { id: "landscape", label: "Competitors" },
   { id: "swot", label: "Market SWOT" },
@@ -1044,7 +1044,6 @@ const TABS = [
   { id: "keys", label: "What Makes a PEO Win" },
   { id: "plan", label: "90-Day Plan" },
   { id: "resources", label: "Resources" },
-  { id: "crm", label: "CRM & Tools" },
 ];
 
 function AboutTab() {
@@ -1405,7 +1404,7 @@ const MY_DAY_POOL = [
   { name: "Vista Ridge Home Health", industry: "Healthcare services", ees: 41, states: "CO", contact: "Dana Whitfield, Dir.", phone: "(303) 555‑0185", trigger: "Benefits renewal ~80 days; recruiting caregivers hard", signals: ["renewal", "hourly", "lost_candidate"] },
 ];
 
-function MyDay() {
+function MyDay({ onAdd, existing }) {
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
   // deterministic daily rotation so the list feels fresh but is stable within a day
   const dayNum = Math.floor(Date.now() / 86400000);
@@ -1413,14 +1412,30 @@ function MyDay() {
   const list = rotated.sort((x, y) => y.score - x.score).slice(0, 10);
   const [open, setOpen] = useState(-1);
   const [done, setDone] = useState([]);
+  const [added, setAdded] = useState([]);
   const tier = (s) => (s >= 80 ? ["HOT", "hot"] : s >= 65 ? ["WARM", "warm"] : ["WATCH", "watch"]);
   const toggleDone = (name) => setDone((d) => d.includes(name) ? d.filter((x) => x !== name) : [...d, name]);
+  const inPipeline = (name) => added.includes(name) || (existing || []).some((e) => (e.clientName || "").toLowerCase() === (name || "").toLowerCase());
+  const addToList = async (a) => {
+    if (!onAdd || inPipeline(a.name)) return;
+    setAdded((x) => [...x, a.name]);
+    try { await onAdd(a); } catch { setAdded((x) => x.filter((n) => n !== a.name)); }
+  };
+  const hotToAdd = list.filter((a) => a.score >= 80 && !inPipeline(a.name));
+  const addAllHot = async () => {
+    if (!onAdd || !hotToAdd.length) return;
+    setAdded((x) => [...x, ...hotToAdd.map((a) => a.name)]);
+    for (const a of hotToAdd) { try { await onAdd(a); } catch {} }
+  };
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
         <div className="src-tag">{today.toUpperCase()}</div>
-        <div className="src-tag">{done.length} / {list.length} WORKED</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {onAdd && hotToAdd.length > 0 && <button className="btn primary" style={{ padding: "6px 12px", fontSize: 13 }} onClick={addAllHot}>+ Add all {hotToAdd.length} HOT to list</button>}
+          <div className="src-tag">{done.length} / {list.length} WORKED</div>
+        </div>
       </div>
       <div style={{ marginTop: 12 }}>
         {list.map((a, i) => {
@@ -1455,9 +1470,14 @@ function MyDay() {
                   <div className="callout" style={{ marginTop: 12, marginBottom: 10 }}>
                     <span className="tag">OPENING TALK TRACK</span>{buildTalkTrack(a, a.signals)}
                   </div>
-                  <button className={"btn " + (isDone ? "ghost" : "primary")} onClick={() => toggleDone(a.name)}>
-                    {isDone ? "Mark as not worked" : "Mark as worked"}
-                  </button>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    <button className={"btn " + (isDone ? "ghost" : "primary")} onClick={() => toggleDone(a.name)}>
+                      {isDone ? "Mark as not worked" : "Mark as worked"}
+                    </button>
+                    {onAdd && (inPipeline(a.name)
+                      ? <span className="src-tag" style={{ color: "var(--green)", display: "inline-flex", alignItems: "center", gap: 6 }}>ADDED TO ACCOUNT LIST</span>
+                      : <button className="btn ghost" onClick={() => addToList(a)}>+ Add to Account List</button>)}
+                  </div>
                 </div>
               )}
             </div>
@@ -2866,9 +2886,9 @@ function Bar({ label, value, max, count, color }) {
     <div style={{ height: 9, background: OFF, borderRadius: 5, overflow: "hidden" }}><div style={{ width: w + "%", height: "100%", background: color, borderRadius: 5 }} /></div>
   </div>;
 }
-function Dashboard({ index, onOpen, onNew, onDelete, onQuick }) {
+function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onPrintDeal }) {
   const [q, setQ] = useState("");
-  const [view, setView] = useState("forecast"); // forecast | deals
+  const [view, setView] = useState("myday"); // forecast | deals
   const list = index.filter((c) => (c.clientName || "Untitled").toLowerCase().includes(q.toLowerCase())).sort((a, b) => b.updatedAt - a.updatedAt);
 
   const allOpen = index.filter((c) => isOpen(c.stage)), won = index.filter((c) => isWon(c.stage)), lost = index.filter((c) => isLost(c.stage));
@@ -2898,7 +2918,7 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick }) {
   const renderCard = (c) => { const si = stageInfo(c.stage); return <div key={c.id} style={{ ...card, padding: 16, position: "relative" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
       <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "3px 10px" }}>{c.stage}</span>
-      <Trash2 size={16} style={{ color: INK60, cursor: "pointer" }} onClick={() => { if (confirm("Delete this deal? This can't be undone.")) onDelete(c.id); }} />
+      <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>{onPrintDeal && <FileText size={16} style={{ color: INK60, cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); onPrintDeal(c.id); }} />}<Trash2 size={16} style={{ color: INK60, cursor: "pointer" }} onClick={() => { if (confirm("Delete this deal? This can't be undone.")) onDelete(c.id); }} /></span>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 11, marginTop: 12 }}>
       <LogoAvatar name={c.clientName} domain={c.domain} size={42} radius={11} />
@@ -2927,17 +2947,17 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick }) {
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ display: "flex", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, overflow: "hidden" }}>
-          {[["forecast", "Forecast"], ["assigned", "Assigned"], ["active", "Active"], ["today", "Today"]].map(([v, l]) => <button key={v} onClick={() => setView(v)} style={{ padding: "8px 14px", border: "none", background: view === v ? KALE : "#fff", color: view === v ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{l}{v === "active" ? " (" + open.length + ")" : ""}{v === "today" && dueCount > 0 ? " (" + dueCount + ")" : ""}</button>)}
+          {[["myday", "My Day"], ["forecast", "Forecast"], ["assigned", "Assigned"], ["active", "Active"], ["today", "Today"]].map(([v, l]) => <button key={v} onClick={() => setView(v)} style={{ padding: "8px 14px", border: "none", background: view === v ? KALE : "#fff", color: view === v ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{l}{v === "active" ? " (" + open.length + ")" : ""}{v === "today" && dueCount > 0 ? " (" + dueCount + ")" : ""}</button>)}
         </div>
         <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
       </div>
     </div>
 
-    {index.length === 0 ? <div style={{ ...card, padding: "48px 20px", textAlign: "center", color: INK60 }}>
+    {index.length === 0 && view !== "myday" ? <div style={{ ...card, padding: "48px 20px", textAlign: "center", color: INK60 }}>
       <Folder size={34} style={{ color: KALE, marginBottom: 8 }} /><div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>No deals yet</div>
       <div style={{ fontSize: 14, marginBottom: 16 }}>Create a deal to start building pipeline. Each one saves automatically and rolls into your forecast.</div>
       <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
-    </div> : view === "forecast" ? <>
+    </div> : view === "myday" ? <div style={{ marginTop: 4 }}><MyDay onAdd={onAddProspect} existing={index} /></div> : view === "forecast" ? <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(165px,1fr))", gap: 12, marginBottom: 20 }}>
         <PipeStat label="Open pipeline" value={money(openACV)} sub={open.length + " active" + (omit.length ? " · " + omit.length + " omitted" : "")} info="Total ACV of your active open deals — started and not omitted. Your live opportunity volume before any probability is applied." />
         <PipeStat label="Weighted forecast" value={money(weighted)} sub="Σ ACV × stage probability" info="Each active deal's ACV multiplied by the win-probability of its stage, then summed. It's the conservative, expected-value view of your pipeline — what you'd realistically book if every deal converted at its stage's odds (Meeting 10% → First Meeting 20% → Quote Info 30% → Deep Dive 45% → Proposal 60%). Not-started and omitted deals are excluded. Stage drives this number, not your Commit/Best-Case tags." />
@@ -3300,7 +3320,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flex: 1, minWidth: 160 }}><LogoAvatar name={d.clientName} domain={domainFor(d)} size={30} radius={8} /><span style={{ fontWeight: 800, fontSize: 18 }}>{d.clientName || "Untitled account"}</span><span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: stageInfo(d.stage).c, borderRadius: 20, padding: "3px 10px" }}>{d.stage}</span></div>
       <div style={{ display: "flex", gap: 8 }}>
         <Btn kind="kale" onClick={() => setManage(true)}><Users size={16} /> Manage account</Btn>
-        <Btn kind={saved ? "ghost" : "primary"} onClick={onSave}>{saved ? <><Check size={16} /> Saved</> : <><Save size={16} /> Save</>}</Btn>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: saved ? INK60 : KALE, padding: "9px 4px", minWidth: 78, justifyContent: "center" }}>{saved ? <><Check size={15} /> Saved</> : <><Save size={15} /> Saving</>}</span>
         <Btn kind="ghost" onClick={onPrint}><FileText size={16} /> PDF</Btn>
       </div>
     </div>
@@ -3441,6 +3461,12 @@ function VantageApp() {
     setIndex(idx); setLoading(false);
   })(); }, []);
   useEffect(() => { if (data) setSaved(false); }, [data]);
+  // autosave: debounce every change so the rep never clicks save
+  useEffect(() => {
+    if (!data || saved) return;
+    const t = setTimeout(() => { save(); }, 700);
+    return () => clearTimeout(t);
+  }, [data, saved, save]);
 
   const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
 
@@ -3463,7 +3489,32 @@ function VantageApp() {
   };
 
   const openClient = async (id) => { const c = await readClient(id); if (c) { setData(c); setSaved(true); setView("editor"); } };
+  const [pendingPrint, setPendingPrint] = useState(false);
+  const openAndPrint = async (id) => { const c = await readClient(id); if (c) { setData(c); setSaved(true); setView("editor"); setPendingPrint(true); } };
+  useEffect(() => {
+    if (pendingPrint && data) {
+      const t = setTimeout(() => { doPrint(); setPendingPrint(false); }, 300);
+      return () => clearTimeout(t);
+    }
+  }, [pendingPrint, data]);
   const newClientFile = () => { const c = newClient(); setData(c); setSaved(false); setView("editor"); };
+  const addProspect = useCallback(async (p) => {
+    const c = newClient();
+    const rec = { ...c,
+      clientName: p.name || "",
+      industry: p.industry || "",
+      employees: p.ees || c.employees,
+      stage: "Assigned", forecast: "Pipeline", leadSource: "PEO Prospecting Agent",
+      preparedBy: "Gabe",
+      winPlan: [p.states ? "Location: " + p.states : "", p.trigger ? "Why now: " + p.trigger : ""].filter(Boolean).join("\n"),
+      contacts: [{ name: p.contact || "", title: "", email: "", phone: p.phone || "" }],
+      updatedAt: Date.now(),
+    };
+    await writeClient(rec);
+    const idx = [...index.filter((x) => x.id !== rec.id), indexEntry(rec)];
+    setIndex(idx); await writeIndex(idx);
+    return true;
+  }, [index]);
   const removeClient = async (id) => { await deleteClientStore(id); const idx = index.filter((x) => x.id !== id); setIndex(idx); await writeIndex(idx); };
   const doPrint = async () => {
     await save();
@@ -3511,7 +3562,7 @@ function VantageApp() {
         </div>
       </div>
       {loading ? <div style={{ textAlign: "center", padding: 60, color: INK60 }}>Loading your client files…</div>
-        : view === "dashboard" ? <Dashboard index={index} onOpen={openClient} onNew={newClientFile} onDelete={removeClient} onQuick={quickUpdate} />
+        : view === "dashboard" ? <Dashboard index={index} onOpen={openClient} onNew={newClientFile} onDelete={removeClient} onQuick={quickUpdate} onAddProspect={addProspect} onPrintDeal={openAndPrint} />
           : <Editor data={data} setData={setData} onBack={() => setView("dashboard")} onSave={save} saved={saved} onPrint={doPrint} />}
     </div>
 
@@ -3674,7 +3725,6 @@ export default function App() {
       </div>
 
       {tab === "about" && <AboutTab />}
-      {tab === "agent" && <AgentTab />}
       {tab === "course" && renderCourse()}
       {tab === "landscape" && <LandscapeTab />}
       {tab === "swot" && <SwotTab />}
