@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback, createContext, useContext } from "react";
-import { Folder, Plus, Trash2, ChevronLeft, FileText, Search, Save, Check, Users, DollarSign, Clock, TrendingUp, Calendar, Phone, Mail, Building2, MessageSquare, Sparkles, X, Info } from "lucide-react";
+import { Folder, Plus, Trash2, ChevronLeft, FileText, Search, Save, Check, Users, DollarSign, Clock, TrendingUp, Calendar, Phone, Mail, Building2, MessageSquare, Sparkles, X, Info, Upload } from "lucide-react";
 
 /* ============================================================
    GABE × GUSTO, HEAD OF PEO SALES
@@ -1929,7 +1929,6 @@ function GTMTab() {
         <div className="phase-head"><span className="phase-days">SHORT TERM · MONTHS 0–12</span><h3>Earn the right to scale</h3></div>
         <p className="theme">Prove the motion with the in-base pilot while the operating controls come online.</p>
         <ul>
-          <li><b>Publish pricing on day one.</b> One flat PEPM admin fee per tier and headcount band, looked up rather than negotiated, with pass-throughs itemized at cost and the renewal philosophy in writing. No percent-of-payroll, no bundled rates, ever, as brand law. Justworks just raised Plus ~18% to ~$129; the "transparent, affordable PEO" mantle is being vacated in real time, and Gusto should take it at launch.</li>
           <li><b>Distribution before advertising.</b> The in-base motion is the whole short-term GTM: ICP-score the payroll base (NAPEO: nearly two-thirds of all PEO clients are 10–49 employees, exactly where Gusto's base lives), and work lifecycle triggers, new state registrations, headcount crossings, benefits-seeking signals, renewal windows.</li>
           <li><b>Internal partnership before external motion.</b> Week one belongs to peer sales leaders: written rules of engagement for install-base conversion, who owns the account, how credit and comp are shared, when a payroll AE brings PEO in, so converting the base makes allies of the payroll org, never victims. Co-selling into a shared customer base only works when the peer team wins every time we win.</li>
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
@@ -1937,7 +1936,7 @@ function GTMTab() {
           <li><b>Start the CPEO clock immediately.</b> Certification takes time and PEO 3 waits on it. File early, pursue ESAC in parallel, and market the pursuit itself, "certification in progress" beats silence.</li>
           <li><b>A clear ICP that drives underwriting.</b> Define the book we write well before we scale: the industries, sizes, class codes, and states where the risk math works and the renewal holds. A sharp ICP isn't a marketing exercise, it's how the field, risk, and underwriting agree on what a good deal looks like, so reps chase the right accounts and pricing comes back clean.</li>
           <li><b>A small, certified founding team.</b> PEO-fluent consultants, every rep certifies through the Operator Course before touching a prospect, with compensation aligned to underwriting quality, so Gusto scales the book it wants.</li>
-          <li><b>Implementation as a named function.</b> First-payroll SLA, over-communication until it lands clean, and a service model of self-serve plus genuinely reachable humans, the under-50 service gap TriNet leaves open.</li>
+          <li><b>Implementation as a named function.</b> First-payroll SLA, over-communication until it lands clean, and a service model of self-serve plus genuinely reachable humans, the under-50 service gap the incumbents leave open.</li>
           <li><b>Accountant channel pilot.</b> A handful of top People Advisory partners, defined referral economics, real feedback, the seed of the long-term moat.</li>
           <li><b>Instrument everything from client one.</b> Funnel stages through underwriting, gross profit per WSE, win/loss, time-to-first-payroll. The day-90 readout becomes the month-12 scaling case.</li>
         </ul>
@@ -1953,7 +1952,7 @@ function GTMTab() {
           <li><b>Risk infrastructure as profit.</b> Claims management, safety, and return-to-work programs; large-deductible economics when the book justifies retaining the working layer; disciplined portfolio re-underwriting at renewal.</li>
           <li><b>The channel moat.</b> Scale the accountant channel, a PEO track inside People Advisory, channel-originated revenue as a tracked metric, plus written broker rules of engagement, with PEO 2 as the broker-friendly offer that turns a threat into a lane.</li>
           <li><b>Segment expansion on purpose.</b> Blue-collar through the EWA wedge, NAPEO shows almost half of PEO clients already sit in professional services, manufacturing, and construction, then multi-state mid-market as service depth matures. Expansion follows capability, never precedes it.</li>
-          <li><b>Product roadmap fed by the field.</b> Reporting parity (the TriNet bar: saved, auto-scheduled custom reports), earned wage access, and a benefits enrollment experience that meets the Healthee bar, a head of sales who feeds product is a multiplier.</li>
+          <li><b>Product roadmap fed by the field.</b> Reporting parity (the enterprise bar: saved, auto-scheduled custom reports), earned wage access, and a benefits enrollment experience that meets the Healthee bar, a head of sales who feeds product is a multiplier.</li>
           <li><b>Retention as the engine.</b> Implementation-to-first-renewal playbooks, graduation capture so clients scale to 100+ employees inside Gusto instead of out of it, and WSE retention treated as the company's north star, because in PEO economics, the renewal is the product.</li>
         </ul>
       </div>
@@ -2142,6 +2141,7 @@ function PlanTab() {
           <li><b>Interview customers and lost deals.</b> Sit with early PEO-curious clients, recent wins, and the deals that walked. Go deep on what they actually need, what they want, and what they're afraid of. The losses teach more than the wins; both define the real ICP better than any model.</li>
           <li><b>Interview the base about benefits and HR pain.</b> Talk to existing payroll clients about how they handle benefits, compliance, and HR today, what frustrates them, what they wish they had. That's the demand signal that tells us which parts of the base are quietly ready for a PEO upgrade.</li>
           <li><b>Call the clients who left Gusto for a PEO.</b> The most honest feedback in the building. Interview the customers who churned to a competitor's PEO: what pulled them, what they like now, and what they miss about Gusto. That tells us exactly what the Gusto PEO has to deliver to have kept them, and to win the next one.</li>
+          <li><b>Meet the key channel partners.</b> Sit with our top accountant and broker partners and learn their world: their experience with PEO, what they look for in one, and what actually matters to them when they refer a client. The goal is to find where we can best support them and their clients at the same time, so the channel sees Gusto's PEO as something that makes them more valuable to their book, not a threat to it.</li>
           <li><b>Shadow the front line.</b> Ride along on payroll and benefits sales calls and listen to account managers handle renewals and escalations. The current motion is the foundation I have to build on, so I need to hear it live.</li>
           <li><b>Learn the Gusto way.</b> Study how Gusto already sells, onboards, and supports, the tone, the self-serve philosophy, the values in practice, so the PEO motion extends the brand instead of fighting it.</li>
         </ul>
@@ -2152,10 +2152,12 @@ function PlanTab() {
           <li><b>Establish the metrics and data picture.</b> What data exists on the base, what's the pricing structure, what are the key pricing levers (PEPM, comp, tax, benefits load), and what targets and goals already exist. Find the gaps in what we can measure.</li>
           <li><b>Learn the current Gusto pricing structure cold.</b> Understand exactly how the existing payroll and benefits base is priced today, where the margin sits, and how a PEO upgrade prices on top of it. You can't position the upsell until you know what the customer already pays and what we already make on them.</li>
           <li><b>Segment the base by profitability and PEO fit.</b> Identify which clients are profitable, which are thin, and which are the right shape to move into an upsell motion, so we grow margin on the base instead of cannibalizing it. The goal is to upgrade the accounts that get better as PEO clients, not to discount our way through the ones that don't.</li>
+          <li><b>Build the CAC picture.</b> Establish what it actually costs to acquire a PEO client across the in-base motion and the partner channel, and how that lands against gross profit per WSE and payback period. You can't size a sales team, a comp plan, or a channel investment until you know what a customer costs to win and how fast they pay back.</li>
+          <li><b>Design comp once pricing and CAC are known.</b> With margin and acquisition cost understood, build consultant comp that pays for the book we want (profitable, retainable WSEs, not just signed logos) and a strategic-partner comp structure that makes the accountant channel worth their while. Comp is how strategy actually gets executed, so it comes after the numbers, not before.</li>
           <li><b>Size the in-base opportunity.</b> Mine the payroll base for PEO propensity, headcount band, multi-state, industry mix, benefits-seeking signals, and define the ICP from data, not instinct.</li>
         </ul>
 
-        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, customer and churned-to-PEO interview themes, written read-back of product and underwriting reality, current Gusto pricing teardown with base profitability segmentation, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
+        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, customer and churned-to-PEO interview themes, written read-back of product and underwriting reality, current Gusto pricing teardown with base profitability segmentation, CAC and payback model by channel, draft consultant and partner comp framework, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
       </div>
 
       <div className="phase">
@@ -2167,6 +2169,7 @@ function PlanTab() {
           <li><b>Align with the sales org.</b> Co-design the co-sell rules of engagement with the payroll and benefits sales leaders, account ownership, shared credit, comp, and the warm-handoff motion, so converting the base makes the peer team win every time we win.</li>
           <li><b>Build the account-manager feedback loop.</b> AMs see renewal pain, churn signals, and benefits frustration first. Stand up a standing channel so what they hear becomes pipeline and product input, not lost signal.</li>
           <li><b>Open the partner lane.</b> Pilot PEO referrals with a handful of top accountant partners; define the referral motion, materials, and economics with the partnerships team.</li>
+          <li><b>Protect the broker book.</b> Identify which clients came through Gusto's in-house brokerage versus a third-party broker, then sit with the broker team to build a PEO strategy that doesn't cannibalize the existing book or strain broker relationships. The PEO motion has to grow the channel, not compete with it, so we agree up front on who owns what and where PEO fits the client versus where it doesn't.</li>
         </ul>
 
         <p className="workstream">BUILD THE PLATFORM & PLAYBOOK</p>
@@ -2534,7 +2537,7 @@ function buildSamples() {
 
 /* ============================ computation ============================ */
 function planBy(list, name) { return list.find((p) => p.name === name) || list[0]; }
-function tierTotal(plan, census) { return TIERS.reduce((s, [, k]) => s + (census[k] || 0) * (plan.r[k] || 0) * 12, 0); }
+function tierTotal(plan, census, rates) { return TIERS.reduce((s, [, k]) => { const rate = (rates && rates[k] != null) ? rates[k] : (plan.r[k] || 0); return s + (census[k] || 0) * rate * 12; }, 0); }
 
 function compute(d) {
   const medC = planBy(MED_PLANS, d.med.cur), medP = planBy(MED_PLANS, d.med.prop);
@@ -2543,10 +2546,10 @@ function compute(d) {
   const medBanded = d.med.rateType === "banded";
   const memCur = (d.med.members || []).reduce((s, m) => s + (+m.curRate || 0), 0);
   const memProp = (d.med.members || []).reduce((s, m) => s + (+m.propRate || 0), 0);
-  const medTC = medBanded ? memCur * 12 : tierTotal(medC, d.med.census);
-  const medTP = medBanded ? memProp * 12 : tierTotal(medP, d.med.census);
-  const denTC = tierTotal(denC, d.den.census), denTP = tierTotal(denP, d.den.census);
-  const visTC = tierTotal(visC, d.vis.census), visTP = tierTotal(visP, d.vis.census);
+  const medTC = medBanded ? memCur * 12 : tierTotal(medC, d.med.census, d.med.curRates);
+  const medTP = medBanded ? memProp * 12 : tierTotal(medP, d.med.census, d.med.propRates);
+  const denTC = tierTotal(denC, d.den.census, d.den.curRates), denTP = tierTotal(denP, d.den.census, d.den.propRates);
+  const visTC = tierTotal(visC, d.vis.census, d.vis.curRates), visTP = tierTotal(visP, d.vis.census, d.vis.propRates);
   const medEC = medTC * d.medER, medEP = medTP * d.medER;
   const denEC = denTC * d.denER, denEP = denTP * d.denER;
   const visEC = visTC * d.visER, visEP = visTP * d.visER;
@@ -2752,6 +2755,69 @@ function LifeEditor({ d, set, c }) {
   );
 }
 
+function InvoiceDrop({ onRates }) {
+  const [state, setState] = useState("idle"); // idle | reading | done | error
+  const [msg, setMsg] = useState("");
+  const [drag, setDrag] = useState(false);
+  const inputRef = React.useRef(null);
+
+  const handleFile = async (file) => {
+    if (!file) return;
+    const okTypes = ["application/pdf", "image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!okTypes.includes(file.type)) { setState("error"); setMsg("Drop a PDF or image (PNG/JPG) of the carrier invoice."); return; }
+    if (file.size > 12 * 1024 * 1024) { setState("error"); setMsg("File is too large (max ~12MB). Try a single page or a photo."); return; }
+    setState("reading"); setMsg("Reading the invoice…");
+    try {
+      const data = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result).split(",")[1]);
+        r.onerror = () => rej(new Error("read failed"));
+        r.readAsDataURL(file);
+      });
+      const resp = await fetch("/api/extract-invoice", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data, mediaType: file.type }),
+      });
+      const out = await resp.json();
+      if (!out.ok || !out.result || !out.result.rates) { setState("error"); setMsg(out.message || "Couldn't read rates. Enter them by hand below."); return; }
+      const rates = out.result.rates;
+      const found = Object.values(rates).filter((v) => v != null).length;
+      if (!found) { setState("error"); setMsg("No tier rates found in that file. Enter them by hand below."); return; }
+      onRates(rates, out.result.planName || "");
+      setState("done");
+      setMsg(`Pulled ${found} tier rate${found > 1 ? "s" : ""}${out.result.planName ? " from " + out.result.planName : ""}. ${out.result.confidence === "low" ? "Low confidence, double-check the numbers." : "Review and adjust below."}`);
+    } catch (e) {
+      setState("error"); setMsg("Something went wrong reading the file. Enter rates by hand below.");
+    }
+  };
+
+  const onDrop = (e) => { e.preventDefault(); setDrag(false); const f = e.dataTransfer.files && e.dataTransfer.files[0]; handleFile(f); };
+  const border = state === "done" ? KALE : state === "error" ? "#C24A38" : drag ? KALE : LINE;
+  const bg = drag ? KALE20 : state === "done" ? KALE20 : "#fff";
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={onDrop}
+        onClick={() => inputRef.current && inputRef.current.click()}
+        style={{ border: `1.5px dashed ${border}`, background: bg, borderRadius: 12, padding: "16px 18px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12, transition: "all .15s" }}>
+        <Upload size={20} style={{ color: state === "error" ? "#C24A38" : KALE, flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 13.5, color: INK }}>
+            {state === "reading" ? "Reading the invoice…" : state === "done" ? "Rates pulled from invoice" : "Drop the current carrier invoice to auto-fill rates"}
+          </div>
+          <div style={{ fontSize: 12, color: state === "error" ? "#C24A38" : INK60, marginTop: 2 }}>
+            {msg || "PDF or photo. We read the per-tier monthly premiums; you can correct anything below."}
+          </div>
+        </div>
+        {state === "reading" && <div style={{ width: 16, height: 16, border: `2px solid ${KALE}`, borderTopColor: "transparent", borderRadius: "50%", animation: "vspin 0.7s linear infinite", flexShrink: 0 }} />}
+      </div>
+      <input ref={inputRef} type="file" accept="application/pdf,image/png,image/jpeg,image/webp" style={{ display: "none" }} onChange={(e) => handleFile(e.target.files && e.target.files[0])} />
+    </div>
+  );
+}
+
 function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
   const b = d[kind];
   const opts = plans.map((p) => p.name);
@@ -2777,20 +2843,31 @@ function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
     </div>}
 
     {!banded && <>
-      <SectionTitle>Enrollment by tier (census)</SectionTitle>
+      {advanced && <InvoiceDrop onRates={(rates, planName) => {
+        const patch = { curRates: { ...(b.curRates || {}), ...Object.fromEntries(Object.entries(rates).filter(([, v]) => v != null)) } };
+        setB(patch);
+      }} />}
+      <SectionTitle>Enrollment & rates by tier</SectionTitle>
+      <div style={{ fontSize: 12.5, color: INK60, margin: "-6px 0 8px" }}>Enter the prospect's actual monthly rate per tier. Defaults to the selected plan's rate; type over it with their real premiums.</div>
       <div style={{ ...card, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", background: OFF, fontWeight: 700, fontSize: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr 1fr 1fr 1fr 1fr", background: OFF, fontWeight: 700, fontSize: 12 }}>
           <div style={cellHd}>Tier</div><div style={{ ...cellHd, textAlign: "center" }}>Enrolled</div>
+          <div style={{ ...cellHd, textAlign: "center" }}>Cur $/mo</div><div style={{ ...cellHd, textAlign: "center" }}>Prop $/mo</div>
           <div style={{ ...cellHd, textAlign: "center" }}>Current /yr</div><div style={{ ...cellHd, textAlign: "center" }}>Proposed /yr</div>
         </div>
-        {TIERS.map(([lbl, k]) => <div key={k} style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", borderTop: `1px solid ${LINE}`, alignItems: "center" }}>
+        {TIERS.map(([lbl, k]) => {
+          const cr = (b.curRates && b.curRates[k] != null) ? b.curRates[k] : cur.r[k];
+          const pr = (b.propRates && b.propRates[k] != null) ? b.propRates[k] : prop.r[k];
+          return <div key={k} style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr 1fr 1fr 1fr 1fr", borderTop: `1px solid ${LINE}`, alignItems: "center" }}>
           <div style={{ padding: "6px 12px", fontSize: 13 }}>{lbl}</div>
-          <div style={{ padding: "5px 8px" }}><Num v={b.census[k]} on={(v) => setCensus(k, v)} /></div>
-          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * cur.r[k] * 12)}</div>
-          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * prop.r[k] * 12)}</div>
-        </div>)}
-        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr 1fr 1fr", background: KALE, color: "#fff", fontWeight: 700 }}>
-          <div style={cellHd}>Employer share ({pct(d[erKey])})</div><div></div>
+          <div style={{ padding: "5px 6px" }}><Num v={b.census[k]} on={(v) => setCensus(k, v)} /></div>
+          <div style={{ padding: "5px 6px" }}><Num v={cr} on={(v) => setB({ curRates: { ...(b.curRates || {}), [k]: v } })} /></div>
+          <div style={{ padding: "5px 6px" }}><Num v={pr} on={(v) => setB({ propRates: { ...(b.propRates || {}), [k]: v } })} /></div>
+          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * cr * 12)}</div>
+          <div style={{ padding: "6px 12px", textAlign: "center", fontSize: 13 }}>{money(b.census[k] * pr * 12)}</div>
+        </div>; })}
+        <div style={{ display: "grid", gridTemplateColumns: "1.3fr 0.8fr 1fr 1fr 1fr 1fr", background: KALE, color: "#fff", fontWeight: 700 }}>
+          <div style={cellHd}>Employer share ({pct(d[erKey])})</div><div></div><div></div><div></div>
           <div style={{ ...cellHd, textAlign: "center" }}>{money(totals.tc * d[erKey])}</div>
           <div style={{ ...cellHd, textAlign: "center" }}>{money(totals.tp * d[erKey])}</div>
         </div>
@@ -3745,6 +3822,7 @@ function VantageApp() {
     <style>{`
       * { box-sizing: border-box; }
       @keyframes vpulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+      @keyframes vspin { to { transform: rotate(360deg); } }
       input:focus, select:focus { border-color: ${KALE} !important; }
       .packet { display: none; }
       @media print {
