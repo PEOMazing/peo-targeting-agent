@@ -1,21 +1,25 @@
-// CRM account-research route for Vantage: Claude + web search, with optional Apollo MCP.
-// Tries Apollo MCP first; if that errors (e.g. 400), retries without MCP so research still works.
+// CRM account-research route for Vantage: Claude + web search.
+// Apollo MCP is OFF by default (it was failing and doubling latency). Flip USE_APOLLO to true
+// only once the Apollo MCP connector is actually authorized for your API key.
 export const runtime = "nodejs";
 export const maxDuration = 60;
+
+const USE_APOLLO = process.env.APOLLO_MCP === "on"; // opt-in; off = fast path
 
 export async function GET() {
   const hasKey = !!process.env.ANTHROPIC_API_KEY;
   return Response.json({
     research: hasKey ? "configured" : "NOT configured",
     ANTHROPIC_API_KEY: hasKey ? "set" : "MISSING",
-    note: hasKey ? "Research is on. Apollo MCP is attempted first, with a web-search-only fallback." : "Set ANTHROPIC_API_KEY in Vercel, then redeploy.",
+    apollo_mcp: USE_APOLLO ? "on" : "off (fast web-search path)",
+    note: hasKey ? "Research is on." : "Set ANTHROPIC_API_KEY in Vercel, then redeploy.",
   }, { status: 200 });
 }
 
-async function callClaude(key, prompt, useApollo) {
+async function callClaude(key, prompt, useApollo, maxTokens) {
   const body = {
     model: "claude-sonnet-4-6",
-    max_tokens: 1500,
+    max_tokens: maxTokens,
     messages: [{ role: "user", content: prompt }],
     tools: [{ type: "web_search_20250305", name: "web_search" }],
   };
@@ -28,10 +32,7 @@ async function callClaude(key, prompt, useApollo) {
     body.mcp_servers = [{ type: "url", url: "https://mcp.apollo.io/mcp", name: "apollo" }];
     headers["anthropic-beta"] = "mcp-client-2025-04-04";
   }
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST", headers, body: JSON.stringify(body),
-  });
-  return r;
+  return fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers, body: JSON.stringify(body) });
 }
 
 export async function POST(req) {
@@ -44,12 +45,10 @@ export async function POST(req) {
   if (!prompt) return Response.json({ ok: false, message: "Empty request" }, { status: 400 });
 
   try {
-    // Attempt 1: with Apollo MCP
-    let r = await callClaude(key, prompt, true);
-    // If Apollo MCP causes a failure, retry without it (web search still gives a useful brief)
-    if (!r.ok) {
-      r = await callClaude(key, prompt, false);
-    }
+    // Fast path: web-search-only (Apollo skipped unless explicitly enabled). Trimmed token budget.
+    let r = await callClaude(key, prompt, USE_APOLLO, 1100);
+    // Only fall back if Apollo was on AND failed.
+    if (!r.ok && USE_APOLLO) r = await callClaude(key, prompt, false, 1100);
     if (!r.ok) {
       const t = await r.text();
       return Response.json({ ok: false, message: "Research call failed (" + r.status + ").", detail: t.slice(0, 400) }, { status: 200 });

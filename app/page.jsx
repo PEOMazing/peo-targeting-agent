@@ -3207,7 +3207,7 @@ const MOTION_COLOR = { "Upsell": "#0A8080", "Displacement": "#F45D48", "Likely M
 const HR_TECH = ["gusto", "adp", "paychex", "oasis", "trinet", "insperity", "justworks", "rippling", "bamboohr", "namely", "paylocity", "paycor", "workday", "successfactors", "ukg", "dayforce", "zenefits", "sequoia", "vensure", "deel", "remote", "sap", "quickbooks", "bambee", "trnet"];
 const isHRTech = (t) => HR_TECH.some((h) => (t || "").toLowerCase().includes(h));
 function InfoCard({ label, value }) {
-  return <div style={{ ...card, padding: "11px 13px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value || "\u2014"}</div></div>;
+  return <div style={{ ...card, padding: "11px 13px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value || "—"}</div></div>;
 }
 function ListBlock({ title, items, color }) {
   if (!items || !items.length) return null;
@@ -3262,30 +3262,30 @@ function BriefTab({ d, set }) {
         <LogoAvatar name={d.clientName} domain={domainFor(d)} size={46} radius={12} />
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontWeight: 800, fontSize: 18 }}>{d.clientName || "Untitled account"}</span>{b && b.motion ? <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: MOTION_COLOR[b.motion] || INK60, borderRadius: 20, padding: "3px 10px" }}>{b.motion}</span> : null}</div>
-          <div style={{ fontSize: 12, color: INK60 }}>{domainFor(d) || "no website yet"}{b && b.updatedAt ? " \u00b7 researched " + new Date(b.updatedAt).toLocaleDateString() : ""}</div>
+          <div style={{ fontSize: 12, color: INK60 }}>{domainFor(d) || "no website yet"}{b && b.updatedAt ? " · researched " + new Date(b.updatedAt).toLocaleDateString() : ""}</div>
         </div>
       </div>
-      <Btn onClick={run} disabled={loading}><Sparkles size={15} /> {loading ? "Researching\u2026" : b ? "Refresh research" : "Run Apollo + AI research"}</Btn>
+      <Btn onClick={run} disabled={loading}><Sparkles size={15} /> {loading ? "Researching…" : b ? "Refresh research" : "Run Apollo + AI research"}</Btn>
     </div>
-    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Firmographics &amp; contacts powered by Apollo \u00b7 signals via live web search</div>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Firmographics &amp; contacts powered by Apollo · signals via live web search</div>
     {err && <div style={{ ...card, padding: 12, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 13, marginBottom: 12 }}>{err}</div>}
     {!b && !loading && <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}>
       <Sparkles size={30} style={{ color: KALE, marginBottom: 8 }} />
       <div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>Build the account brief</div>
-      <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Pull firmographics, the tech stack, and decision-maker contacts from Apollo, plus recent "why now" signals from the web. It classifies the motion (Upsell / Displacement / Likely Multi-vendor) and drafts your value prop, objection handling, benefits play, and outreach \u2014 then auto-fills the deal.</div>
+      <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Pull firmographics, the tech stack, and decision-maker contacts from Apollo, plus recent "why now" signals from the web. It classifies the motion (Upsell / Displacement / Likely Multi-vendor) and drafts your value prop, objection handling, benefits play, and outreach — then auto-fills the deal.</div>
       <Btn onClick={run}><Sparkles size={15} /> Run Apollo + AI research</Btn>
       <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Powered by Apollo</div>
     </div>}
-    {loading && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>Pulling Apollo firmographics, tech stack, contacts, and live signals\u2026</div>}
+    {loading && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>Pulling Apollo firmographics, tech stack, contacts, and live signals…</div>}
     {b && <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
-        <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "\u2014"} />
+        <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "—"} />
         <InfoCard label="Industry" value={b.industry} />
         <InfoCard label="HQ" value={b.hq} />
         <InfoCard label="Revenue" value={b.revenue} />
         <InfoCard label="Incumbent" value={b.incumbent} />
       </div>
-      <ListBlock title={"Why now \u2014 signals"} items={b.signals} color={GUAVA} />
+      <ListBlock title={"Why now — signals"} items={b.signals} color={GUAVA} />
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", margin: "18px 0 14px" }}>
         {SUBS.map(([id, label]) => <button key={id} onClick={() => setSub(id)} style={{ padding: "6px 12px", borderRadius: 20, border: `1px solid ${sub === id ? KALE : LINE}`, background: sub === id ? KALE : "#fff", color: sub === id ? "#fff" : INK, fontWeight: 600, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>{label}</button>)}
       </div>
@@ -3308,7 +3308,7 @@ function BriefTab({ d, set }) {
         <CopyBox label="Phone opener" text={b.outreach && b.outreach.call} />
         {(!b.outreach || (!b.outreach.email && !b.outreach.linkedin && !b.outreach.call)) && <div style={{ color: INK60, fontSize: 13 }}>No outreach drafted yet.</div>}
       </div>}
-      <div style={{ fontSize: 11, color: INK60, marginTop: 14, fontStyle: "italic" }}>Apollo + AI research is a starting point \u2014 verify headcount and contacts before outreach.</div>
+      <div style={{ fontSize: 11, color: INK60, marginTop: 14, fontStyle: "italic" }}>Apollo + AI research is a starting point — verify headcount and contacts before outreach.</div>
     </div>}
   </div>;
 }
@@ -3379,7 +3379,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
             <SectionTitle>Contribution & trend assumptions</SectionTitle>
             <div style={grid3}>{field("medER", "Medical ER %", { pct: true })}{field("denER", "Dental ER %", { pct: true })}{field("visER", "Vision ER %", { pct: true })}{field("curTrend", "Current med trend", { pct: true })}{field("propTrend", "Proposed med trend", { pct: true })}</div>
             <SectionTitle>Admin & other</SectionTitle>
-            <div style={grid3}>{field("proposedPEPM", "Proposed PEO fee (PEPM)")}{field("implFee", "One-time implementation fee")}{field("lifeCur", "Life/STD/LTD \u2014 current")}{field("lifeProp", "Life/STD/LTD \u2014 proposed")}</div>
+            <div style={grid3}>{field("proposedPEPM", "Proposed PEO fee (PEPM)")}{field("implFee", "One-time implementation fee")}{field("lifeCur", "Life/STD/LTD — current")}{field("lifeProp", "Life/STD/LTD — proposed")}</div>
           </div>}
           {qtab === "Medical" && <BenefitEditor d={d} set={set} kind="med" plans={MED_PLANS} rows={MED_ROWS} erKey="medER" totals={{ tc: c.medTC, tp: c.medTP }} advanced />}
           {qtab === "Dental" && <BenefitEditor d={d} set={set} kind="den" plans={DEN_PLANS} rows={DEN_ROWS} erKey="denER" totals={{ tc: c.denTC, tp: c.denTP }} />}
@@ -3400,7 +3400,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
           </div>}
           {qtab === "Gusto Invoice" && <InvoiceEditor d={d} set={set} adminC={c.adminC} />}
           {qtab === "Soft-Cost" && <div>
-            <SectionTitle>Administrative time \u2014 current state</SectionTitle>
+            <SectionTitle>Administrative time — current state</SectionTitle>
             <div style={grid3}>
               <Field label="Hours / week on HR & payroll" hint="Owner + admin staff"><Num v={d.soft.hours} on={(v) => set({ ...d, soft: { ...d.soft, hours: v } })} step={0.5} /></Field>
               <Field label="Blended loaded hourly cost"><Num v={d.soft.rate} on={(v) => set({ ...d, soft: { ...d.soft, rate: v } })} /></Field>
@@ -3411,7 +3411,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint }) {
             <div style={{ ...card, padding: 16, background: PEACH, borderColor: GUAVA20, marginTop: 6 }}>
               <div style={{ fontSize: 12, color: INK60 }}>Annual reclaimed-time value (soft-cost savings)</div>
               <div style={{ fontWeight: 800, fontSize: 26, color: GUAVA }}>{money(c.soft)}</div>
-              <div style={{ fontSize: 11, color: INK60, marginTop: 6 }}>NAPEO/McBassi 2019: avg $1,775/EE/yr = {money(1775 * d.employees)} \u00b7 27.2% ROI. Shown separately from hard-dollar savings.</div>
+              <div style={{ fontSize: 11, color: INK60, marginTop: 6 }}>NAPEO/McBassi 2019: avg $1,775/EE/yr = {money(1775 * d.employees)} · 27.2% ROI. Shown separately from hard-dollar savings.</div>
             </div>
           </div>}
           {qtab === "Summary" && <Results c={c} d={d} />}
