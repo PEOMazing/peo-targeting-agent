@@ -2245,7 +2245,10 @@ function WelcomeLetter({ onClose }) {
           So instead of sending over a document, I built this. Inside you'll find the
           certification course I'd use to train our team, the market knowledge we'd carry into
           every conversation, a product construct, and my ideas for a go-to-market plan that
-          we'd shape and execute together.
+          we'd shape and execute together. I also built the working tools a rep would actually
+          use day to day: a CRM with a prospecting agent that scores and ranks accounts, and a
+          financial analysis engine that builds a side-by-side cost comparison and the real ROI
+          for any deal. You can open all of it under CRM and Tools.
         </p>
         <p className="body">
           The biggest opportunity here isn't winning strangers. It's growing with the 500,000+
@@ -2631,7 +2634,7 @@ const inputStyle = { width: "100%", boxSizing: "border-box", padding: "9px 11px"
 function Num({ v, on, step = 1, pct: isPct }) {
   return <input type="number" step={step} value={isPct ? Math.round(v * 1000) / 10 : v} onChange={(e) => { const x = parseFloat(e.target.value); on(isPct ? (isNaN(x) ? 0 : x / 100) : (isNaN(x) ? 0 : x)); }} style={inputStyle} />;
 }
-function Txt({ v, on }) { return <input value={v} onChange={(e) => on(e.target.value)} style={inputStyle} />; }
+function Txt({ v, on, multiline, placeholder }) { return multiline ? <textarea value={v || ""} onChange={(e) => on(e.target.value)} placeholder={placeholder} rows={4} style={{ ...inputStyle, resize: "vertical", lineHeight: 1.5, fontFamily: "inherit" }} /> : <input value={v || ""} onChange={(e) => on(e.target.value)} placeholder={placeholder} style={inputStyle} />; }
 function Sel({ v, on, opts }) {
   return <select value={v} onChange={(e) => on(e.target.value)} style={{ ...inputStyle, appearance: "auto" }}>
     {opts.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -3156,6 +3159,52 @@ function ContactTab({ d, set }) {
   </div>;
 }
 
+function StatusTab({ d, set, onManage }) {
+  const acts = (d.activities || []).slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.id - a.id));
+  const meetings = acts.filter((a) => a.type === "Meeting" || a.type === "Call");
+  const firstMeeting = meetings.length ? meetings[meetings.length - 1] : null;
+  const lastMeeting = meetings.length ? meetings[0] : null;
+  const si = stageInfo(d.stage);
+  const fmtD = (s) => { if (!s) return "—"; const dt = new Date(s + (s.length === 7 ? "-01" : "") + "T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); };
+  const fmtMonth = (s) => { if (!s) return "—"; const dt = new Date(s + "-01T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
+  let c = {};
+  try { c = compute(d); } catch { c = { acv: d.acv || 0 }; }
+  const Stat = ({ label, value, sub, accent }) => <div style={{ ...card, padding: "12px 14px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600, textTransform: "uppercase", letterSpacing: .3 }}>{label}</div><div style={{ fontSize: 19, fontWeight: 800, marginTop: 3, color: accent || INK }}>{value}</div>{sub && <div style={{ fontSize: 12, color: INK60, marginTop: 1 }}>{sub}</div>}</div>;
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800 }}>{d.clientName || "Untitled deal"}</div>
+          <div style={{ fontSize: 13, color: INK60 }}>{[d.industry, d.contacts && d.contacts[0] && d.contacts[0].name].filter(Boolean).join(" · ") || "Add details in Manage account"}</div>
+        </div>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "5px 13px" }}>{d.stage}</span>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10, marginBottom: 18 }}>
+        <Stat label="Annual value" value={money(c.acv || 0)} accent={GUAVA} />
+        <Stat label="Expected close" value={fmtMonth(d.expectedClose)} sub={d.forecast} />
+        <Stat label="Employees" value={d.employees || "—"} sub={d.industry || ""} />
+        <Stat label="First meeting" value={firstMeeting ? fmtD(firstMeeting.date) : "Not yet"} />
+        <Stat label="Last touch" value={lastMeeting ? fmtD(lastMeeting.date) : "Not yet"} sub={lastMeeting ? lastMeeting.type : ""} />
+        <Stat label="Incumbent" value={d.incumbent || "—"} />
+      </div>
+
+      <SectionTitle>Next steps to win</SectionTitle>
+      <div style={{ marginBottom: 18 }}>
+        <Txt v={d.winPlan} on={(v) => set({ ...d, winPlan: v })} multiline placeholder="What has to happen to win this deal? Champion, economic buyer, blockers, the path to close…" />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 18 }}>
+        <Field label="Stage"><select value={d.stage} onChange={(e) => set({ ...d, stage: e.target.value })} style={inputStyle}>{STAGES.map((s) => <option key={s.name}>{s.name}</option>)}</select></Field>
+        <Field label="Expected close (month)"><input type="month" value={d.expectedClose || ""} onChange={(e) => set({ ...d, expectedClose: e.target.value })} style={inputStyle} /></Field>
+      </div>
+
+      <SectionTitle>Meeting & activity log</SectionTitle>
+      <ActivityTab d={d} set={set} />
+    </div>
+  );
+}
+
 function ActivityTab({ d, set }) {
   const [type, setType] = useState("Note");
   const [date, setDate] = useState(localToday());
@@ -3230,7 +3279,7 @@ function CopyBox({ label, text }) {
     <div style={{ ...card, padding: "10px 12px", fontSize: 13, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{text}</div>
   </div>;
 }
-function BriefTab({ d, set, onDeepResearch, deepRunning }) {
+function BriefTab({ d, set, onSave, onDeepResearch, deepRunning }) {
   const [loading, setLoading] = useState(false);
   const [deepLoading, setDeepLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -3254,6 +3303,7 @@ function BriefTab({ d, set, onDeepResearch, deepRunning }) {
         patch.contacts = merged.length ? merged : d.contacts;
       }
       set(patch);
+      if (onSave) await onSave(patch);
     } catch (e) { setErr((e && e.message) || "Research failed"); }
     setLoading(false); setDeepLoading(false);
   };
@@ -3348,13 +3398,13 @@ function ManagePanel({ d, set, c, onClose }) {
   </div>;
 }
 function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch, deepRunning }) {
-  const [primary, setPrimary] = useState("Brief");
+  const [primary, setPrimary] = useState("Status");
   const [qtab, setQtab] = useState("Assumptions");
   const [manage, setManage] = useState(false);
   const d = data, set = setData;
   const c = useMemo(() => compute(d), [d]);
   const field = (k, label, opts = {}) => <Field label={label} hint={opts.hint}>{opts.pct ? <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} pct step={0.1} /> : opts.text ? <Txt v={d[k]} on={(v) => set({ ...d, [k]: v })} /> : <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} step={opts.step || 1} />}</Field>;
-  const PRIMARY = [["Brief", "Account Brief"], ["Contacts", "Contacts"], ["Analysis", "Return on Analysis"]];
+  const PRIMARY = [["Status", "Deal Status"], ["Brief", "Account Brief"], ["Contacts", "Contacts"], ["Analysis", "Return on Analysis"]];
   const QTABS = ["Assumptions", "Medical", "Dental", "Vision", "Workers' Comp", "Gusto Invoice", "Soft-Cost", "Summary"];
   return <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 20px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "8px 0 14px", flexWrap: "wrap", gap: 10 }}>
@@ -3369,7 +3419,8 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch,
     <div style={{ display: "flex", gap: 4, marginBottom: 18, borderBottom: `1px solid ${LINE}` }}>
       {PRIMARY.map(([v, l]) => <button key={v} onClick={() => setPrimary(v)} style={{ padding: "10px 16px", border: "none", borderBottom: `3px solid ${primary === v ? GUAVA : "transparent"}`, background: "transparent", color: primary === v ? INK : INK60, fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", marginBottom: -1 }}>{l}</button>)}
     </div>
-    {primary === "Brief" && <BriefTab d={d} set={set} onDeepResearch={onDeepResearch} deepRunning={deepRunning} />}
+    {primary === "Status" && <StatusTab d={d} set={set} onManage={() => setManage(true)} />}
+    {primary === "Brief" && <BriefTab d={d} set={set} onSave={onSave} onDeepResearch={onDeepResearch} deepRunning={deepRunning} />}
     {primary === "Contacts" && <ContactTab d={d} set={set} />}
     {primary === "Analysis" && <div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
@@ -3508,9 +3559,10 @@ function VantageApp() {
 
   const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec), employees: rec.employees, industry: rec.industry || "", winPlan: rec.winPlan || "" }; };
 
-  const save = useCallback(async () => {
-    if (!data) return;
-    const rec = { ...data, updatedAt: Date.now() };
+  const save = useCallback(async (override) => {
+    const base = override || data;
+    if (!base) return;
+    const rec = { ...base, updatedAt: Date.now() };
     await writeClient(rec);
     const idx = [...index.filter((x) => x.id !== rec.id), indexEntry(rec)];
     setIndex(idx); await writeIndex(idx); setSaved(true);
