@@ -240,7 +240,9 @@ const css = `
 .score-pill.hot { background: var(--guava-soft); color: var(--guava-deep); border: 1px solid var(--guava); }
 .score-pill.warm { background: #F6EDDC; color: var(--gold); border: 1px solid var(--gold); }
 .score-pill.watch { background: var(--bg); color: var(--ink-soft); border: 1px solid var(--rule); }
-.swot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
+.swot-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+@media (max-width: 900px) { .swot-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .swot-grid { grid-template-columns: 1fr; } }
 .swot-cell { border-radius: 14px; padding: 20px 22px; border: 1px solid var(--rule); background: var(--surface); }
 .swot-cell h3 { margin: 0 0 10px; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
 .swot-cell.s h3 { color: var(--green); } .swot-cell.s { border-top: 4px solid var(--green); }
@@ -1063,7 +1065,7 @@ function AboutTab() {
 
       <div className="stat-grid">
         <div className="stat"><div className="v">Leader of the Year</div><div className="l">C-suite-selected top leader across all of TriNet, 2022–23</div></div>
-        <div className="stat"><div className="v">5 years</div><div className="l">Running the #1-ranked team in the country · 128% of plan FY2025–26</div></div>
+        <div className="stat"><div className="v">4 years</div><div className="l">Running the #1-ranked team in the country · 128% of plan FY2025–26</div></div>
         <div className="stat"><div className="v">7×</div><div className="l">Summit Achiever at 150%+ of quota (2019–2025)</div></div>
         <div className="stat"><div className="v">100%</div><div className="l">Of consultants to President's Club · the only team at TriNet to do it</div></div>
         <div className="stat"><div className="v">35%+</div><div className="l">YoY growth, five consecutive years</div></div>
@@ -1578,7 +1580,7 @@ const MATRIX_REFERENCE = {
             ["Justworks", "Published flat PEPM, Basic and Plus tiers (volume discounts at headcount breaks); 3 WSE minimum; month-to-month, no setup fees", "Basic: payroll, compliance, WC administration, 401(k) access, HR tools, 24/7 support", "Master medical/dental/vision access requires the Plus tier, recently raised from $109 to ~$129 PEPM; premiums always extra; time tracking, international contractors, and marketplace perks billed per item"],
             ["Rippling", "Modular: base platform PEPM plus per-module fees; PEO service custom-quoted on top", "Software platform (HR records, workflows); PEO quote includes payroll, tax filing, WC and EPLI coverage, compliance support", "Nearly everything is a module, benefits admin, time, IT, spend each add PEPM; implementation fees can apply; premiums extra. Strength and risk in one design: pay for what you use, but the stack adds up"],
           ]},
-          { t: "p", x: "Two disciplines turn this matrix into wins. First, normalize before comparing: convert every structure to effective PEPM on the same census, then list what that PEPM actually buys at each provider. A $59 fee without master-plan access, a $109 fee with it, a custom bundled rate hiding the fee entirely, and a modular stack that grows per feature are four different products wearing one label. Second, ask the inclusion question out loud in every deal, 'walk me through exactly what the administrative fee covers, and show me the add-on price list', because the answer is the comparison." },
+          { t: "p", x: "Two disciplines turn this matrix into wins. First, normalize before comparing: convert every structure to effective PEPM on the same census, then list what that PEPM actually buys at each provider. An $89 fee without master-plan access, a $109 fee with it, a custom bundled rate hiding the fee entirely, and a modular stack that grows per feature are four different products wearing one label. Second, ask the inclusion question out loud in every deal, 'walk me through exactly what the administrative fee covers, and show me the add-on price list', because the answer is the comparison." },
           { t: "callout", tag: "ALWAYS EXTRA: EVERYWHERE", x: "No admin fee at any PEO includes: gross wages, employer taxes (FICA, FUTA, SUTA), health/dental/vision premiums, workers' comp premium, state-mandated coverages, or 401(k) employer contributions. Any proposal implying otherwise is blending, not including, unbundle it." },
           { t: "p", x: "Sourcing note: published pricing links below. Competitor service-model and fee-structure details (service tiering, EPLI deductibles, individual fee line items) are field-verified as of mid-2026 from live deals and proposals, packaging changes, so confirm every figure against the actual proposal in front of you." },
           { t: "sources", items: [
@@ -1933,7 +1935,7 @@ function GTMTab() {
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
           <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Prospecting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
           <li><b>Start the CPEO clock immediately.</b> Certification takes time and PEO 3 waits on it. File early, pursue ESAC in parallel, and market the pursuit itself, "certification in progress" beats silence.</li>
-          <li><b>Underwriting before rep five.</b> Deal desk, credit screening, and funds-flow controls live before the sales team scales. The deals competitors decline will find the new entrant first; the controls have to be standing when they arrive.</li>
+          <li><b>A clear ICP that drives underwriting.</b> Define the book we write well before we scale: the industries, sizes, class codes, and states where the risk math works and the renewal holds. A sharp ICP isn't a marketing exercise, it's how the field, risk, and underwriting agree on what a good deal looks like, so reps chase the right accounts and pricing comes back clean.</li>
           <li><b>A small, certified founding team.</b> PEO-fluent consultants, every rep certifies through the Operator Course before touching a prospect, with compensation aligned to underwriting quality, so Gusto scales the book it wants.</li>
           <li><b>Implementation as a named function.</b> First-payroll SLA, over-communication until it lands clean, and a service model of self-serve plus genuinely reachable humans, the under-50 service gap TriNet leaves open.</li>
           <li><b>Accountant channel pilot.</b> A handful of top People Advisory partners, defined referral economics, real feedback, the seed of the long-term moat.</li>
@@ -2137,7 +2139,9 @@ function PlanTab() {
         <p className="workstream">LISTEN & UNDERSTAND</p>
         <ul>
           <li><b>Map and meet every key stakeholder.</b> Product, underwriting and risk, finance and BizOps, benefits, implementation, marketing, partnerships, and the payroll and benefits sales leaders. One goal per conversation: understand their world, their constraints, and what a PEO does to their roadmap.</li>
-          <li><b>Interview customers and lost deals.</b> Sit with early PEO-curious clients, recent wins, and the deals that walked. The losses teach more than the wins; both define the real ICP better than any model.</li>
+          <li><b>Interview customers and lost deals.</b> Sit with early PEO-curious clients, recent wins, and the deals that walked. Go deep on what they actually need, what they want, and what they're afraid of. The losses teach more than the wins; both define the real ICP better than any model.</li>
+          <li><b>Interview the base about benefits and HR pain.</b> Talk to existing payroll clients about how they handle benefits, compliance, and HR today, what frustrates them, what they wish they had. That's the demand signal that tells us which parts of the base are quietly ready for a PEO upgrade.</li>
+          <li><b>Call the clients who left Gusto for a PEO.</b> The most honest feedback in the building. Interview the customers who churned to a competitor's PEO: what pulled them, what they like now, and what they miss about Gusto. That tells us exactly what the Gusto PEO has to deliver to have kept them, and to win the next one.</li>
           <li><b>Shadow the front line.</b> Ride along on payroll and benefits sales calls and listen to account managers handle renewals and escalations. The current motion is the foundation I have to build on, so I need to hear it live.</li>
           <li><b>Learn the Gusto way.</b> Study how Gusto already sells, onboards, and supports, the tone, the self-serve philosophy, the values in practice, so the PEO motion extends the brand instead of fighting it.</li>
         </ul>
@@ -2146,10 +2150,12 @@ function PlanTab() {
         <ul>
           <li><b>Review underwriting policy and appetite.</b> What can we write, in which states, for which class codes, at what size? Where are the declines? Know the box before selling to its edges.</li>
           <li><b>Establish the metrics and data picture.</b> What data exists on the base, what's the pricing structure, what are the key pricing levers (PEPM, comp, tax, benefits load), and what targets and goals already exist. Find the gaps in what we can measure.</li>
+          <li><b>Learn the current Gusto pricing structure cold.</b> Understand exactly how the existing payroll and benefits base is priced today, where the margin sits, and how a PEO upgrade prices on top of it. You can't position the upsell until you know what the customer already pays and what we already make on them.</li>
+          <li><b>Segment the base by profitability and PEO fit.</b> Identify which clients are profitable, which are thin, and which are the right shape to move into an upsell motion, so we grow margin on the base instead of cannibalizing it. The goal is to upgrade the accounts that get better as PEO clients, not to discount our way through the ones that don't.</li>
           <li><b>Size the in-base opportunity.</b> Mine the payroll base for PEO propensity, headcount band, multi-state, industry mix, benefits-seeking signals, and define the ICP from data, not instinct.</li>
         </ul>
 
-        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, written read-back of product and underwriting reality, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
+        <div className="callout"><span className="tag">DAY-30 DELIVERABLES</span>Stakeholder map and listening-tour findings, customer and churned-to-PEO interview themes, written read-back of product and underwriting reality, current Gusto pricing teardown with base profitability segmentation, data and metrics inventory with gaps named, ICP definition plus sized in-base opportunity, and a v1 scored target list from the Prospecting Agent.</div>
       </div>
 
       <div className="phase">
@@ -2259,7 +2265,7 @@ function WelcomeLetter({ onClose }) {
         </p>
         <p className="body">
           Gusto has one shot at entering PEO the right way, and my record is why I believe I
-          can help build it. Five years running the number one team in the country at TriNet.
+          can help build it. Four years running the number one team in the country at TriNet.
           The only team to put 100% of its consultants in President's Club. Leader of the Year
           chosen by the C-suite as the top leader across all of TriNet. Every page of this site comes from that experience.
           And I know none of it works alone, so treat everything here as a starting point for
@@ -2357,8 +2363,8 @@ const MED_PLANS = [
     d: { dedII: "$1,500", dedFI: "$3,000", dedIO: "Not covered", dedFO: "Not covered", oopII: "$6,500", oopFI: "$13,000", coinsI: "20%", coinsO: "N/A", pcp: "$20", spec: "$40", prev: "$0 (covered)", tele: "$0", urgent: "$50", er: "$250 copay", inpat: "20% after ded.", outpat: "20% after ded.", lab: "$25", img: "$100", rxDed: "$150", rxT1: "$15", rxT2: "$30", rxT3: "$50", rxT4: "20% to $250" } },
 ];
 const MED_ROWS = [["Plan Overview"], ["Carrier", "carrier"], ["Plan Type", "type"], ["HSA-Eligible", "hsa"],
-  ["Annual Deductible"], ["Individual — In-Net", "dedII"], ["Family — In-Net", "dedFI"], ["Individual — Out", "dedIO"], ["Family — Out", "dedFO"],
-  ["Out-of-Pocket Max"], ["Individual — In-Net", "oopII"], ["Family — In-Net", "oopFI"],
+  ["Annual Deductible"], ["Individual - In-Net", "dedII"], ["Family - In-Net", "dedFI"], ["Individual - Out", "dedIO"], ["Family - Out", "dedFO"],
+  ["Out-of-Pocket Max"], ["Individual - In-Net", "oopII"], ["Family - In-Net", "oopFI"],
   ["Coinsurance"], ["In-Network", "coinsI"], ["Out-of-Network", "coinsO"],
   ["Office & Urgent"], ["PCP Copay", "pcp"], ["Specialist Copay", "spec"], ["Preventive", "prev"], ["Telehealth", "tele"], ["Urgent Care", "urgent"], ["Emergency Room", "er"],
   ["Hospital & Outpatient"], ["Inpatient", "inpat"], ["Outpatient Surgery", "outpat"], ["Lab / X-ray", "lab"], ["Advanced Imaging", "img"],
@@ -2370,10 +2376,10 @@ const DEN_PLANS = [
   { name: "Cigna Dental DHMO", carrier: "Cigna", type: "DHMO", r: { eeOnly: 22, eeSpouse: 44, eeChild: 48, family: 70 }, d: { dedI: "$0", dedF: "$0", max: "None", prev: "100%", basic: "Copay sched.", major: "Copay sched.", ortho: "Copay sched.", orthoMax: "N/A", waitB: "None", waitM: "None", oon: "In-network only" } },
 ];
 const DEN_ROWS = [["Plan Overview"], ["Carrier", "carrier"], ["Plan Type", "type"],
-  ["Deductible & Maximum"], ["Deductible — Ind", "dedI"], ["Deductible — Fam", "dedF"], ["Annual Maximum", "max"],
+  ["Deductible & Maximum"], ["Deductible - Ind", "dedI"], ["Deductible - Fam", "dedF"], ["Annual Maximum", "max"],
   ["Coverage (plan pays)"], ["Preventive", "prev"], ["Basic Services", "basic"], ["Major Services", "major"],
   ["Orthodontia"], ["Ortho Coverage", "ortho"], ["Ortho Lifetime Max", "orthoMax"],
-  ["Waiting & Network"], ["Wait — Basic", "waitB"], ["Wait — Major", "waitM"], ["Out-of-Network", "oon"]];
+  ["Waiting & Network"], ["Wait - Basic", "waitB"], ["Wait - Major", "waitM"], ["Out-of-Network", "oon"]];
 
 const VIS_PLANS = [
   { name: "VSP Vision", carrier: "VSP", type: "PPO", r: { eeOnly: 8, eeSpouse: 14, eeChild: 15, family: 22 }, d: { exam: "$10", examFreq: "12 months", materials: "$25", lenses: "Covered in full", frame: "$150", frameFreq: "24 months", contacts: "$150 allowance", oon: "Schedule" } },
@@ -2395,8 +2401,8 @@ const GUSTO_TEMPLATE = [
   { g: "Payroll & Support", n: "Faster / Next-Day Direct Deposit", basis: "$15/mo + $3/EE", rate: 0, qty: 0 },
   { g: "Payroll & Support", n: "Time Tracking & Scheduling", basis: "Per EE / mo (Simple)", rate: 6, qty: 0 },
   { g: "Payroll & Support", n: "Performance Reviews", basis: "Per EE / mo", rate: 3, qty: 0 },
-  { g: "Payroll & Support", n: "Priority Support & HR — Base", basis: "Flat / mo", rate: 30, qty: 0 },
-  { g: "Payroll & Support", n: "Priority Support & HR — Per EE", basis: "Per EE / mo", rate: 3, qty: 0 },
+  { g: "Payroll & Support", n: "Priority Support & HR - Base", basis: "Flat / mo", rate: 30, qty: 0 },
+  { g: "Payroll & Support", n: "Priority Support & HR - Per EE", basis: "Per EE / mo", rate: 3, qty: 0 },
   { g: "Benefits Admin", n: "Broker Integration (BYO broker)", basis: "Per elig. EE / mo", rate: 6, perEE: true },
   { g: "Benefits Admin", n: "Tax-Advantaged Accounts Fee", basis: "$200 / yr flat", rate: 16.67, qty: 1 },
   { g: "Benefits Admin", n: "HSA Administration", basis: "Per participant / mo", rate: 2.5, qty: 0 },
@@ -2424,7 +2430,6 @@ function newClient() {
     activities: [],
     employees: 13, payroll: 1200000,
     medER: 0.7, denER: 0.5, visER: 0, curTrend: 0.1, propTrend: 0.05, proposedPEPM: 171, implFee: 0,
-    lifeCur: 0, lifeProp: 144,
     med: { cur: "Anthem PPO 1500", prop: "UHC Choice Plus", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 },
       rateType: "tier",
       members: [
@@ -2435,6 +2440,11 @@ function newClient() {
       renewal: { enabled: false, renewalMonth: 1, effectiveMonth: 10, increase: 0.11 } },
     den: { cur: "MetLife Dental PPO", prop: "Guardian DPPO", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 } },
     vis: { cur: "VSP Vision", prop: "VSP Choice", census: { eeOnly: 8, eeSpouse: 2, eeChild: 1, family: 2 } },
+    life: {
+      lifeCur: 320, lifeProp: 290, lifeER: 1,
+      stdCur: 480, stdProp: 430, stdER: 1,
+      ltdCur: 360, ltdProp: 320, ltdER: 1,
+    },
     wc: { payroll: 1200000, curRate: 0.45, curMod: 1, propRate: 0.38, propMod: 1 },
     invoice: GUSTO_TEMPLATE.map((l) => ({ ...l })),
     soft: { hours: 15, rate: 55, weeks: 52, reduction: 0.5 },
@@ -2451,7 +2461,7 @@ const STARTER_BOOK = [
   { clientName: "Webolutions", domain: "webolutions.com", industry: "Digital / web agency", employees: 14, city: "Centennial, CO", note: "Tech-adjacent, ~14 EEs." },
   { clientName: "Lanphier LLP", domain: "lanphiercpa.com", industry: "Accounting / CPA", employees: 12, city: "Denver, CO" },
   { clientName: "Fraser, Waldrop & Company CPAs", domain: "coprotax.com", industry: "Accounting / CPA", employees: 10, city: "Denver, CO" },
-  { clientName: "SBA CPA", domain: "thesbacpa.com", industry: "Accounting / CPA", employees: 12, city: "Denver, CO", note: "Already runs payroll for clients — value prop lands fast." },
+  { clientName: "SBA CPA", domain: "thesbacpa.com", industry: "Accounting / CPA", employees: 12, city: "Denver, CO", note: "Already runs payroll for clients, value prop lands fast." },
   { clientName: "O'Connor CPA Firm", domain: "oconnorcpafirm.com", industry: "Accounting / CPA", employees: 8, city: "Denver, CO" },
   { clientName: "John P. Morse, CPA", domain: "cpamorse.com", industry: "Accounting / CPA", employees: 6, city: "Denver, CO" },
   { clientName: "Aspen Dental – Private Practice of Cherry Creek", domain: "cherry-creekdentist.com", industry: "Dental practice", employees: 18, city: "Denver, CO", note: "3-dentist practice, solid 5–25 fit." },
@@ -2468,9 +2478,9 @@ function buildSamples() {
       employees: 45, payroll: 4600000, proposedPEPM: 165, stage: "Deep Dive Discovery Meeting", forecast: "Commit",
       expectedClose: mOffset(1), nextStep: dOffset(4), preparedBy: "Gabe",
       contacts: [{ name: "Dana Whitfield", title: "VP Operations", email: "dana@summitrobotics.com", phone: "303-555-0142" }, { name: "Mark Reyes", title: "CFO", email: "mreyes@summitrobotics.com", phone: "303-555-0177" }],
-      winPlan: "Champion: Dana (VP Ops). Economic buyer: Mark (CFO) — get him into the deep-dive.\nPain: Anthem renewal projected +11% on 1/1; they transition 10/1, so pitch the skipped-renewal savings hard.\nLevers: R&D tax credit service + WC pay-go. Competing vs Insperity — differentiate on dedicated HR + master medical.\nNext: send age-banded census template, confirm renewal date, schedule CFO deep-dive.",
+      winPlan: "Champion: Dana (VP Ops). Economic buyer: Mark (CFO), get him into the deep-dive.\nPain: Anthem renewal projected +11% on 1/1; they transition 10/1, so pitch the skipped-renewal savings hard.\nLevers: R&D tax credit service + WC pay-go. Competing vs Insperity, differentiate on dedicated HR + master medical.\nNext: send age-banded census template, confirm renewal date, schedule CFO deep-dive.",
       activities: [
-        { id: 1, type: "Meeting", date: dOffset(-6), text: "Intro call with Dana. Strong fit — frustrated with Insperity service levels." },
+        { id: 1, type: "Meeting", date: dOffset(-6), text: "Intro call with Dana. Strong fit, frustrated with Insperity service levels." },
         { id: 2, type: "Email", date: dOffset(-2), text: "Sent follow-up + requested current Anthem renewal and census." },
       ],
     }),
@@ -2481,7 +2491,7 @@ function buildSamples() {
       contacts: [{ name: "Dr. Priya Nair", title: "Owner / Managing Partner", email: "priya@harborpeds.com", phone: "206-555-0190" }],
       winPlan: "Owner-led decision. Pain: broker is unresponsive at renewal, wants better medical + real HR support.\nLevers: master medical plan, dedicated benefits admin, COBRA/ACA off their plate.\nNext: walk through the proposal live; send dental side-by-side; lock age-banded rates from invoice.",
       activities: [
-        { id: 1, type: "Call", date: dOffset(-9), text: "Discovery — 18 EEs, current medical with Regence, dental separate. Renewal in Q1." },
+        { id: 1, type: "Call", date: dOffset(-9), text: "Discovery, 18 EEs, current medical with Regence, dental separate. Renewal in Q1." },
         { id: 2, type: "Note", date: dOffset(-3), text: "Built comparison; UHC proposed plan richer for less. Strong dental story." },
       ],
     }),
@@ -2502,11 +2512,11 @@ function buildSamples() {
       employees: 26, payroll: 1300000, proposedPEPM: 170, stage: "Closed Lost", forecast: "Pipeline", lostReason: "Price / cost",
       expectedClose: mOffset(-1), nextStep: "", preparedBy: "Gabe",
       contacts: [{ name: "Rosa Belmonte", title: "Owner", email: "rosa@mapleandvine.com", phone: "512-555-0166" }],
-      winPlan: "LOST on price — our PEPM came in above their incumbent TriNet renewal. Relationship intact.\nRe-engage 60 days before their next renewal (Q3) with a sharper number and the soft-cost story.",
+      winPlan: "LOST on price, our PEPM came in above their incumbent TriNet renewal. Relationship intact.\nRe-engage 60 days before their next renewal (Q3) with a sharper number and the soft-cost story.",
       activities: [
         { id: 1, type: "Call", date: dOffset(-40), text: "Good discovery, high-turnover hourly workforce." },
         { id: 2, type: "Email", date: dOffset(-15), text: "Sent proposal." },
-        { id: 3, type: "Note", date: dOffset(-8), text: "Lost — incumbent matched on price. Set reminder to revisit at renewal." },
+        { id: 3, type: "Note", date: dOffset(-8), text: "Lost, incumbent matched on price. Set reminder to revisit at renewal." },
       ],
     }),
     base({
@@ -2514,7 +2524,7 @@ function buildSamples() {
       employees: 12, payroll: 950000, proposedPEPM: 185, stage: "Meeting Scheduled", forecast: "Pipeline",
       expectedClose: mOffset(2), nextStep: dOffset(-5), preparedBy: "Gabe",
       contacts: [{ name: "Kevin Osei", title: "Practice Manager", email: "kevin@apexdental.com", phone: "480-555-0118" }],
-      winPlan: "Early stage. Confirm eligible headcount and current carrier + renewal date.\nFollow-up is OVERDUE — re-book the discovery call. Likely pain: payroll tax across multi-location, benefits admin burden.",
+      winPlan: "Early stage. Confirm eligible headcount and current carrier + renewal date.\nFollow-up is OVERDUE, re-book the discovery call. Likely pain: payroll tax across multi-location, benefits admin burden.",
       activities: [
         { id: 1, type: "Note", date: dOffset(-10), text: "Connected on LinkedIn; booked intro. 2 locations, ~12 EEs." },
       ],
@@ -2540,6 +2550,12 @@ function compute(d) {
   const medEC = medTC * d.medER, medEP = medTP * d.medER;
   const denEC = denTC * d.denER, denEP = denTP * d.denER;
   const visEC = visTC * d.visER, visEP = visTP * d.visER;
+  // Life / STD / LTD: monthly premiums annualized, employer share per line
+  const lf = d.life || {};
+  const lifeTC = ((+lf.lifeCur || 0) + (+lf.stdCur || 0) + (+lf.ltdCur || 0)) * 12;
+  const lifeTP = ((+lf.lifeProp || 0) + (+lf.stdProp || 0) + (+lf.ltdProp || 0)) * 12;
+  const lifeEC = ((+lf.lifeCur || 0) * (lf.lifeER ?? 1) + (+lf.stdCur || 0) * (lf.stdER ?? 1) + (+lf.ltdCur || 0) * (lf.ltdER ?? 1)) * 12;
+  const lifeEP = ((+lf.lifeProp || 0) * (lf.lifeER ?? 1) + (+lf.stdProp || 0) * (lf.stdER ?? 1) + (+lf.ltdProp || 0) * (lf.ltdER ?? 1)) * 12;
   const wcC = (d.wc.payroll / 100) * d.wc.curRate * d.wc.curMod;
   const wcP = (d.wc.payroll / 100) * d.wc.propRate * d.wc.propMod;
   const adminC = d.invoice.reduce((s, l) => {
@@ -2547,8 +2563,8 @@ function compute(d) {
     return s + (l.oneTime ? q * l.rate : q * l.rate * 12);
   }, 0);
   const adminP = d.proposedPEPM * d.employees * 12;
-  const curTotal = wcC + medEC + denEC + visEC + d.lifeCur + adminC;
-  const propTotal = wcP + medEP + denEP + visEP + d.lifeProp + adminP;
+  const curTotal = wcC + medEC + denEC + visEC + lifeEC + adminC;
+  const propTotal = wcP + medEP + denEP + visEP + lifeEP + adminP;
   const hard = curTotal - propTotal;
   const soft = d.soft.hours * d.soft.rate * d.soft.weeks * d.soft.reduction;
   // skipped-renewal savings (Year 1, hard dollars)
@@ -2564,13 +2580,13 @@ function compute(d) {
   let cum = 0; const years = [];
   for (let y = 0; y < 4; y++) {
     const mC = medEC * Math.pow(1 + d.curTrend, y), mP = medEP * Math.pow(1 + d.propTrend, y);
-    const ct = wcC + adminC + mC + denEC + visEC + d.lifeCur;
-    const pt = wcP + adminP + mP + denEP + visEP + d.lifeProp;
+    const ct = wcC + adminC + mC + denEC + visEC + lifeEC;
+    const pt = wcP + adminP + mP + denEP + visEP + lifeEP;
     const sv = ct - pt; cum += sv; years.push({ y: y + 1, ct, pt, sv });
   }
   const total4 = cum + avoidedRenewal + soft * 4;
   const acv = d.proposedPEPM * d.employees * 12;
-  return { medC, medP, denC, denP, visC, visP, medTC, medTP, denTC, denTP, visTC, visTP, medEC, medEP, denEC, denEP, visEC, visEP, wcC, wcP, adminC, adminP, curTotal, propTotal, hard, soft, avoidedRenewal, renewalMonths, totalValue, acv, years, cum, total4 };
+  return { medC, medP, denC, denP, visC, visP, medTC, medTP, denTC, denTP, visTC, visTP, medEC, medEP, denEC, denEP, visEC, visEP, lifeTC, lifeTP, lifeEC, lifeEP, wcC, wcP, adminC, adminP, curTotal, propTotal, hard, soft, avoidedRenewal, renewalMonths, totalValue, acv, years, cum, total4 };
 }
 
 /* ============================ pipeline model ============================ */
@@ -2586,8 +2602,8 @@ const STAGES = [
   { name: "Closed Lost", p: 0, c: "#C2544A" },
 ];
 const FORECAST_CATS = ["Commit", "Best Case", "Pipeline", "Omit"];
-const FORECAST_DEFS = { Commit: "Gave us a verbal", "Best Case": "Likely to move forward", Pipeline: "Unsure it'll move forward", Omit: "Zero chance — excluded from forecast" };
-const LOSS_REASONS = ["Price / cost", "Stayed with current PEO", "Chose a competitor", "No decision / status quo", "Timing — not ready", "Lost to their broker", "Unresponsive / ghosted", "Other"];
+const FORECAST_DEFS = { Commit: "Gave us a verbal", "Best Case": "Likely to move forward", Pipeline: "Unsure it'll move forward", Omit: "Zero chance, excluded from forecast" };
+const LOSS_REASONS = ["Price / cost", "Stayed with current PEO", "Chose a competitor", "No decision / status quo", "Timing, not ready", "Lost to their broker", "Unresponsive / ghosted", "Other"];
 const stageInfo = (n) => STAGES.find((s) => s.name === n) || STAGES[0];
 const isWon = (n) => n === "Closed Won" || n === "Implementation";
 const isLost = (n) => n === "Closed Lost";
@@ -2693,6 +2709,49 @@ function RenewalSection({ d, set, medEC }) {
   </div>;
 }
 
+function LifeEditor({ d, set, c }) {
+  const lf = d.life || {};
+  const setLf = (patch) => set({ ...d, life: { ...lf, ...patch } });
+  const lines = [
+    { key: "life", label: "Basic Life / AD&D" },
+    { key: "std", label: "Short-Term Disability (STD)" },
+    { key: "ltd", label: "Long-Term Disability (LTD)" },
+  ];
+  const money = (n) => "$" + Math.round(n || 0).toLocaleString();
+  return (
+    <div>
+      <div style={{ fontSize: 13, color: INK60, marginBottom: 14 }}>Monthly premiums, current vs proposed. Set the employer share per line (the rest is the employee payroll deduction).</div>
+      <table style={{ width: "100%", borderCollapse: "collapse", ...card, overflow: "hidden" }}>
+        <thead><tr style={{ background: INK, color: "#fff" }}>
+          <th style={th}>Coverage</th><th style={thR}>Current $/mo</th><th style={thR}>Proposed $/mo</th><th style={thR}>Employer %</th>
+        </tr></thead>
+        <tbody>
+          {lines.map(({ key, label }) => (
+            <tr key={key} style={{ borderBottom: `1px solid ${LINE}` }}>
+              <td style={{ padding: "8px 10px", fontSize: 13, fontWeight: 600 }}>{label}</td>
+              <td style={{ padding: "6px 10px", textAlign: "right" }}><input type="number" value={lf[key + "Cur"] ?? 0} onChange={(e) => setLf({ [key + "Cur"]: +e.target.value })} style={{ ...inputStyle, width: 110, textAlign: "right" }} /></td>
+              <td style={{ padding: "6px 10px", textAlign: "right" }}><input type="number" value={lf[key + "Prop"] ?? 0} onChange={(e) => setLf({ [key + "Prop"]: +e.target.value })} style={{ ...inputStyle, width: 110, textAlign: "right" }} /></td>
+              <td style={{ padding: "6px 10px", textAlign: "right" }}><input type="number" value={Math.round((lf[key + "ER"] ?? 1) * 100)} onChange={(e) => setLf({ [key + "ER"]: Math.max(0, Math.min(100, +e.target.value)) / 100 })} style={{ ...inputStyle, width: 80, textAlign: "right" }} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
+        <div style={{ ...card, padding: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: INK60, marginBottom: 8 }}>EMPLOYER COST (annual)</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4 }}><span>Current</span><b>{money(c.lifeEC)}</b></div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}><span>Proposed</span><b style={{ color: GUAVA }}>{money(c.lifeEP)}</b></div>
+        </div>
+        <div style={{ ...card, padding: 14 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: INK60, marginBottom: 8 }}>EMPLOYEE SHARE (annual)</div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, marginBottom: 4 }}><span>Current</span><b>{money(c.lifeTC - c.lifeEC)}</b></div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}><span>Proposed</span><b>{money(c.lifeTP - c.lifeEP)}</b></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
   const b = d[kind];
   const opts = plans.map((p) => p.name);
@@ -2739,7 +2798,7 @@ function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
     </>}
 
     {banded && <>
-      <SectionTitle>Age-banded rates — one row per enrolled employee (from current invoice)</SectionTitle>
+      <SectionTitle>Age-banded rates - one row per enrolled employee (from current invoice)</SectionTitle>
       <div style={{ ...card, overflow: "hidden" }}>
         <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1.2fr 1fr 1fr 30px", background: OFF, fontWeight: 700, fontSize: 12 }}>
           <div style={cellHd}>Employee</div><div style={cellHd}>Enrollment tier</div><div style={{ ...cellHd, textAlign: "center" }}>Current $/mo</div><div style={{ ...cellHd, textAlign: "center" }}>Proposed $/mo</div><div></div>
@@ -2765,7 +2824,7 @@ function BenefitEditor({ d, set, kind, plans, rows, erKey, totals, advanced }) {
 
     {advanced && <RenewalSection d={d} set={set} medEC={totals.tc * d[erKey]} />}
 
-    <SectionTitle>Plan design — side by side</SectionTitle>
+    <SectionTitle>Plan design - side by side</SectionTitle>
     <DesignGrid rows={rows} cur={cur} prop={prop} />
   </div>;
 }
@@ -2797,9 +2856,19 @@ function Results({ c, d }) {
         <Line l="Medical (ER share)" cur={c.medEC} prop={c.medEP} />
         <Line l="Dental (ER share)" cur={c.denEC} prop={c.denEP} />
         <Line l="Vision (ER share)" cur={c.visEC} prop={c.visEP} />
-        <Line l="Life / STD / LTD" cur={d.lifeCur} prop={d.lifeProp} />
+        <Line l="Life / STD / LTD (ER share)" cur={c.lifeEC} prop={c.lifeEP} />
         <Line l="Payroll/HR Admin (Gusto → PEO)" cur={c.adminC} prop={c.adminP} />
         <Line l="Total annualized cost" cur={c.curTotal} prop={c.propTotal} bold />
+      </tbody>
+    </table>
+    <table style={{ width: "100%", borderCollapse: "collapse", ...card, overflow: "hidden", marginTop: 14 }}>
+      <thead><tr style={{ background: "#5B6470", color: "#fff" }}><th style={th}>Employee share (payroll deductions)</th><th style={thR}>Current</th><th style={thR}>Proposed</th></tr></thead>
+      <tbody>
+        <Line l="Medical (EE share)" cur={c.medTC - c.medEC} prop={c.medTP - c.medEP} />
+        <Line l="Dental (EE share)" cur={c.denTC - c.denEC} prop={c.denTP - c.denEP} />
+        <Line l="Vision (EE share)" cur={c.visTC - c.visEC} prop={c.visTP - c.visEP} />
+        <Line l="Life / STD / LTD (EE share)" cur={c.lifeTC - c.lifeEC} prop={c.lifeTP - c.lifeEP} />
+        <Line l="Total employee share" cur={(c.medTC - c.medEC) + (c.denTC - c.denEC) + (c.visTC - c.visEC) + (c.lifeTC - c.lifeEC)} prop={(c.medTP - c.medEP) + (c.denTP - c.denEP) + (c.visTP - c.visEP) + (c.lifeTP - c.lifeEP)} bold />
       </tbody>
     </table>
     <div style={{ ...card, marginTop: 14, padding: 14, background: OFF }}>
@@ -2830,10 +2899,10 @@ function Packet({ d, c }) {
   return <div className="packet">
     <header style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: `3px solid ${KALE}`, paddingBottom: 8, marginBottom: 4 }}>
       <div style={{ fontFamily: "Arial", fontWeight: 800, fontSize: 30, color: GUAVA }}>gusto</div>
-      <div style={{ textAlign: "right", fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700 }}>FOR ILLUSTRATIVE PURPOSES ONLY — NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</div>
+      <div style={{ textAlign: "right", fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700 }}>FOR ILLUSTRATIVE PURPOSES ONLY · NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</div>
     </header>
     <div style={{ background: KALE, color: "#fff", padding: "8px 12px", fontSize: 17, fontWeight: 700, borderRadius: 4 }}>PEO Cost Comparison & ROI Analysis</div>
-    <div style={{ fontSize: 11, color: INK60, margin: "6px 2px 12px" }}>Prepared for {domainFor(d) ? <img src={"https://www.google.com/s2/favicons?sz=64&domain=" + domainFor(d)} alt="" style={{ width: 14, height: 14, verticalAlign: "middle", marginRight: 5, borderRadius: 3 }} /> : null}<b style={{ color: INK }}>{d.clientName || "—"}</b>{d.contacts && d.contacts[0] && d.contacts[0].name ? <> · Attn: {d.contacts[0].name}{d.contacts[0].title ? ", " + d.contacts[0].title : ""}</> : ""} · {d.employees} employees · by {d.preparedBy || "—"} · {d.proposalDate} · Provider: {d.provider}</div>
+    <div style={{ fontSize: 11, color: INK60, margin: "6px 2px 12px" }}>Prepared for {domainFor(d) ? <img src={"https://www.google.com/s2/favicons?sz=64&domain=" + domainFor(d)} alt="" style={{ width: 14, height: 14, verticalAlign: "middle", marginRight: 5, borderRadius: 3 }} /> : null}<b style={{ color: INK }}>{d.clientName || "-"}</b>{d.contacts && d.contacts[0] && d.contacts[0].name ? <> · Attn: {d.contacts[0].name}{d.contacts[0].title ? ", " + d.contacts[0].title : ""}</> : ""} · {d.employees} employees · by {d.preparedBy || "-"} · {d.proposalDate} · Provider: {d.provider}</div>
     <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 14 }}>
       {[["Current annual", money(c.curTotal), false], ["Proposed annual", money(c.propTotal), false], ["Total economic value", money(c.totalValue), true], ["4-yr total value", money(c.total4), true]].map(([l, v, a]) =>
         <div key={l} style={{ background: a ? PEACH : OFF, border: `1px solid ${a ? GUAVA20 : LINE}`, borderRadius: 6, padding: "8px 10px" }}>
@@ -2846,7 +2915,7 @@ function Packet({ d, c }) {
         <Row l="Medical (employer share)" cur={c.medEC} prop={c.medEP} />
         <Row l="Dental (employer share)" cur={c.denEC} prop={c.denEP} />
         <Row l="Vision (employer share)" cur={c.visEC} prop={c.visEP} />
-        <Row l="Life / STD / LTD" cur={d.lifeCur} prop={d.lifeProp} />
+        <Row l="Life / STD / LTD (ER)" cur={c.lifeEC} prop={c.lifeEP} />
         <Row l="Payroll / HR Admin (Gusto → PEO)" cur={c.adminC} prop={c.adminP} />
         <Row l="Total annualized cost" cur={c.curTotal} prop={c.propTotal} bold />
       </tbody></table>
@@ -2868,7 +2937,7 @@ function Packet({ d, c }) {
       <tr style={{ fontWeight: 700 }}><td style={ptdL}>Annual reclaimed-time value</td><td style={ptdR}>{money(c.soft)}</td></tr>
       <tr><td style={ptdL}>NAPEO benchmark ($1,775/EE/yr · 27.2% ROI)</td><td style={ptdR}>{money(1775 * d.employees)}</td></tr>
     </tbody></table>
-    <p style={{ fontSize: 8, color: INK60, marginTop: 14, fontStyle: "italic" }}>Confidential. Estimates based on data and assumptions entered. Soft-cost figures reference NAPEO/McBassi (2019). Rates and plan benefits are illustrative — replace with the prospect's actual quotes and SBCs. A binding agreement exists only upon execution of the required service agreement.</p>
+    <p style={{ fontSize: 8, color: INK60, marginTop: 14, fontStyle: "italic" }}>Confidential. Estimates based on data and assumptions entered. Soft-cost figures reference NAPEO/McBassi (2019). Rates and plan benefits are illustrative. Replace with the prospect's actual quotes and SBCs. A binding agreement exists only upon execution of the required service agreement.</p>
   </div>;
 }
 const ph = { fontSize: 13, color: KALE, margin: "12px 0 5px", borderBottom: `2px solid ${KALE20}`, paddingBottom: 2 };
@@ -2983,12 +3052,12 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
       <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
     </div> : view === "myday" ? <div style={{ marginTop: 4 }}><MyDay onAdd={onAddProspect} existing={index} /></div> : view === "forecast" ? <>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(165px,1fr))", gap: 12, marginBottom: 20 }}>
-        <PipeStat label="Open pipeline" value={money(openACV)} sub={open.length + " active" + (omit.length ? " · " + omit.length + " omitted" : "")} info="Total ACV of your active open deals — started and not omitted. Your live opportunity volume before any probability is applied." />
-        <PipeStat label="Weighted forecast" value={money(weighted)} sub="Σ ACV × stage probability" info="Each active deal's ACV multiplied by the win-probability of its stage, then summed. It's the conservative, expected-value view of your pipeline — what you'd realistically book if every deal converted at its stage's odds (Meeting 10% → First Meeting 20% → Quote Info 30% → Deep Dive 45% → Proposal 60%). Not-started and omitted deals are excluded. Stage drives this number, not your Commit/Best-Case tags." />
+        <PipeStat label="Open pipeline" value={money(openACV)} sub={open.length + " active" + (omit.length ? " · " + omit.length + " omitted" : "")} info="Total ACV of your active open deals (started, not omitted. Your live opportunity volume before any probability is applied." />
+        <PipeStat label="Weighted forecast" value={money(weighted)} sub="Σ ACV × stage probability" info="Each active deal's ACV multiplied by the win-probability of its stage, then summed. It's the conservative, expected-value view of your pipeline, what you'd realistically book if every deal converted at its stage's odds (Meeting 10% → First Meeting 20% → Quote Info 30% → Deep Dive 45% → Proposal 60%). Not-started and omitted deals are excluded. Stage drives this number, not your Commit/Best-Case tags." />
         <PipeStat label="Commit" value={money(commit)} sub="Won + committed" accent info="What you're confident you'll book: Closed-Won ACV plus open deals you've tagged Commit (the prospect gave a verbal). Your floor." />
         <PipeStat label="Best case" value={money(bestCase)} sub="Won + commit + best case" info="The upside scenario: Won + Commit + Best Case deals. What you book if the deals you think are likely actually land. Your ceiling for the period." />
         <PipeStat label="Closed Won (ACV)" value={money(wonACV)} sub={won.length + " won"} info="Annual contract value already won (Closed Won + Implementation) in this view." />
-        <PipeStat label="Win rate" value={decided ? Math.round(winRate * 100) + "%" : "—"} sub={won.length + " won · " + lost.length + " lost"} info="Won ÷ (Won + Lost). Your close rate on decided deals only — open and not-started accounts don't count yet." />
+        <PipeStat label="Win rate" value={decided ? Math.round(winRate * 100) + "%" : "-"} sub={won.length + " won · " + lost.length + " lost"} info="Won ÷ (Won + Lost). Your close rate on decided deals only, open and not-started accounts don't count yet." />
         <PipeStat label="Follow-ups due" value={String(dueCount)} sub={noNext ? noNext + " open w/o a next step" : "overdue or today"} accent={dueCount > 0} info="Active deals whose follow-up date is today or overdue. Not-started and omitted accounts are excluded so this stays a real worklist." />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "start" }}>
@@ -3008,7 +3077,7 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
           <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
             <div style={{ flex: 1, background: "#EAF6F0", borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Won</div><div style={{ fontWeight: 800, fontSize: 18, color: "#1F7E54" }}>{won.length}</div></div>
             <div style={{ flex: 1, background: "#FBEEEC", borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Lost</div><div style={{ fontWeight: 800, fontSize: 18, color: "#C2544A" }}>{lost.length}</div></div>
-            <div style={{ flex: 1, background: OFF, borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Close %</div><div style={{ fontWeight: 800, fontSize: 18 }}>{decided ? Math.round(winRate * 100) + "%" : "—"}</div></div>
+            <div style={{ flex: 1, background: OFF, borderRadius: 8, padding: "8px 10px" }}><div style={{ fontSize: 11, color: INK60 }}>Close %</div><div style={{ fontWeight: 800, fontSize: 18 }}>{decided ? Math.round(winRate * 100) + "%" : "-"}</div></div>
           </div>
           <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Why we're losing</div>
           {reasonCounts.length ? <>
@@ -3083,7 +3152,7 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
             </div>; })}</div>}
         </div>;
         return <>
-          <Group title="Overdue" items={overdue} color="#C2544A" empty="Nothing overdue — nice." />
+          <Group title="Overdue" items={overdue} color="#C2544A" empty="Nothing overdue. Nice." />
           <Group title="Today" items={todayD} color={GUAVA} empty="Nothing scheduled for today." />
           <Group title="Upcoming" items={upcoming} color={KALE} empty="No upcoming follow-ups scheduled." />
           <Group title="Needs a next step" items={noStep} color={INK60} empty="Every open deal has a next step. 👏" />
@@ -3133,7 +3202,7 @@ function ContactTab({ d, set }) {
     </div>
     <div style={grid2}>
       <Field label="Company name"><Txt v={d.clientName} on={(v) => set({ ...d, clientName: v })} /></Field>
-      <Field label="Company website" hint="Powers the logo — e.g. acme.com"><Txt v={d.domain || ""} on={(v) => set({ ...d, domain: v })} /></Field>
+      <Field label="Company website" hint="Powers the logo, e.g. acme.com"><Txt v={d.domain || ""} on={(v) => set({ ...d, domain: v })} /></Field>
       {fld("industry", "Industry")}
       {fld("incumbent", "Current PEO / payroll provider")}
       {fld("leadSource", "Lead source")}
@@ -3165,8 +3234,8 @@ function StatusTab({ d, set, onManage }) {
   const firstMeeting = meetings.length ? meetings[meetings.length - 1] : null;
   const lastMeeting = meetings.length ? meetings[0] : null;
   const si = stageInfo(d.stage);
-  const fmtD = (s) => { if (!s) return "—"; const dt = new Date(s + (s.length === 7 ? "-01" : "") + "T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); };
-  const fmtMonth = (s) => { if (!s) return "—"; const dt = new Date(s + "-01T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
+  const fmtD = (s) => { if (!s) return "-"; const dt = new Date(s + (s.length === 7 ? "-01" : "") + "T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }); };
+  const fmtMonth = (s) => { if (!s) return "-"; const dt = new Date(s + "-01T00:00:00"); return isNaN(dt) ? s : dt.toLocaleDateString("en-US", { month: "long", year: "numeric" }); };
   let c = {};
   try { c = compute(d); } catch { c = { acv: d.acv || 0 }; }
   const Stat = ({ label, value, sub, accent }) => <div style={{ ...card, padding: "12px 14px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600, textTransform: "uppercase", letterSpacing: .3 }}>{label}</div><div style={{ fontSize: 19, fontWeight: 800, marginTop: 3, color: accent || INK }}>{value}</div>{sub && <div style={{ fontSize: 12, color: INK60, marginTop: 1 }}>{sub}</div>}</div>;
@@ -3183,10 +3252,10 @@ function StatusTab({ d, set, onManage }) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10, marginBottom: 18 }}>
         <Stat label="Annual value" value={money(c.acv || 0)} accent={GUAVA} />
         <Stat label="Expected close" value={fmtMonth(d.expectedClose)} sub={d.forecast} />
-        <Stat label="Employees" value={d.employees || "—"} sub={d.industry || ""} />
+        <Stat label="Employees" value={d.employees || "-"} sub={d.industry || ""} />
         <Stat label="First meeting" value={firstMeeting ? fmtD(firstMeeting.date) : "Not yet"} />
         <Stat label="Last touch" value={lastMeeting ? fmtD(lastMeeting.date) : "Not yet"} sub={lastMeeting ? lastMeeting.type : ""} />
-        <Stat label="Incumbent" value={d.incumbent || "—"} />
+        <Stat label="Incumbent" value={d.incumbent || "-"} />
       </div>
 
       <SectionTitle>Next steps to win</SectionTitle>
@@ -3257,7 +3326,7 @@ const MOTION_COLOR = { "Upsell": "#0A8080", "Displacement": "#F45D48", "Likely M
 const HR_TECH = ["gusto", "adp", "paychex", "oasis", "trinet", "insperity", "justworks", "rippling", "bamboohr", "namely", "paylocity", "paycor", "workday", "successfactors", "ukg", "dayforce", "zenefits", "sequoia", "vensure", "deel", "remote", "sap", "quickbooks", "bambee", "trnet"];
 const isHRTech = (t) => HR_TECH.some((h) => (t || "").toLowerCase().includes(h));
 function InfoCard({ label, value }) {
-  return <div style={{ ...card, padding: "11px 13px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value || "—"}</div></div>;
+  return <div style={{ ...card, padding: "11px 13px" }}><div style={{ fontSize: 11, color: INK60, fontWeight: 600 }}>{label}</div><div style={{ fontSize: 16, fontWeight: 700, marginTop: 2 }}>{value || "-"}</div></div>;
 }
 function ListBlock({ title, items, color }) {
   if (!items || !items.length) return null;
@@ -3323,7 +3392,7 @@ function BriefTab({ d, set, onSave, onDeepResearch, deepRunning }) {
       </div>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Fast brief from category knowledge · run deeper research for live web signals</div>
-    {deepRunning && <div style={{ ...card, padding: "11px 13px", borderColor: KALE20, background: KALE20, color: INK, fontSize: 12.5, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={14} style={{ color: KALE }} /> Deep research is running in the background. Keep working — you'll get a ping when it's ready, and this brief will update automatically.</div>}
+    {deepRunning && <div style={{ ...card, padding: "11px 13px", borderColor: KALE20, background: KALE20, color: INK, fontSize: 12.5, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={14} style={{ color: KALE }} /> Deep research is running in the background. Keep working, you'll get a ping when it's ready, and this brief will update automatically.</div>}
     {err && <div style={{ ...card, padding: 12, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 13, marginBottom: 12 }}>{err}</div>}
     {!b && !loading && <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}>
       <Sparkles size={30} style={{ color: KALE, marginBottom: 8 }} />
@@ -3332,16 +3401,16 @@ function BriefTab({ d, set, onSave, onDeepResearch, deepRunning }) {
       <Btn onClick={() => run(false)} disabled={loading}><Sparkles size={15} /> {loading ? "Researching…" : "Run research (fast)"}</Btn>
       <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Fast brief · deeper research available</div>
     </div>}
-    {(loading || deepLoading) && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>{deepLoading ? "Deep research running — searching the web for specific, verifiable signals. This can take up to a minute…" : "Researching the account from category knowledge… (a few seconds)"}</div>}
+    {(loading || deepLoading) && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>{deepLoading ? "Deep research running, searching the web for specific, verifiable signals. This can take up to a minute…" : "Researching the account from category knowledge… (a few seconds)"}</div>}
     {b && <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
-        <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "—"} />
+        <InfoCard label="Employees" value={b.employees ? Number(b.employees).toLocaleString() : "-"} />
         <InfoCard label="Industry" value={b.industry} />
         <InfoCard label="HQ" value={b.hq} />
         <InfoCard label="Revenue" value={b.revenue} />
         <InfoCard label="Incumbent" value={b.incumbent} />
       </div>
-      <ListBlock title={"Why now — signals"} items={b.signals} color={GUAVA} />
+      <ListBlock title={"Why now - signals"} items={b.signals} color={GUAVA} />
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", margin: "18px 0 14px" }}>
         {SUBS.map(([id, label]) => <button key={id} onClick={() => setSub(id)} style={{ padding: "6px 12px", borderRadius: 20, border: `1px solid ${sub === id ? KALE : LINE}`, background: sub === id ? KALE : "#fff", color: sub === id ? "#fff" : INK, fontWeight: 600, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>{label}</button>)}
       </div>
@@ -3364,7 +3433,7 @@ function BriefTab({ d, set, onSave, onDeepResearch, deepRunning }) {
         <CopyBox label="Phone opener" text={b.outreach && b.outreach.call} />
         {(!b.outreach || (!b.outreach.email && !b.outreach.linkedin && !b.outreach.call)) && <div style={{ color: INK60, fontSize: 13 }}>No outreach drafted yet.</div>}
       </div>}
-      <div style={{ fontSize: 11, color: INK60, marginTop: 14, fontStyle: "italic" }}>Apollo + AI research is a starting point — verify headcount and contacts before outreach.</div>
+      <div style={{ fontSize: 11, color: INK60, marginTop: 14, fontStyle: "italic" }}>Apollo + AI research is a starting point, verify headcount and contacts before outreach.</div>
     </div>}
   </div>;
 }
@@ -3405,7 +3474,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch,
   const c = useMemo(() => compute(d), [d]);
   const field = (k, label, opts = {}) => <Field label={label} hint={opts.hint}>{opts.pct ? <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} pct step={0.1} /> : opts.text ? <Txt v={d[k]} on={(v) => set({ ...d, [k]: v })} /> : <Num v={d[k]} on={(v) => set({ ...d, [k]: v })} step={opts.step || 1} />}</Field>;
   const PRIMARY = [["Status", "Deal Status"], ["Brief", "Account Brief"], ["Contacts", "Contacts"], ["Analysis", "Return on Analysis"]];
-  const QTABS = ["Assumptions", "Medical", "Dental", "Vision", "Workers' Comp", "Gusto Invoice", "Soft-Cost", "Summary"];
+  const QTABS = ["Assumptions", "Medical", "Dental", "Vision", "Life / STD / LTD", "Workers' Comp", "Gusto Invoice", "Soft-Cost", "Summary"];
   return <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 20px 60px" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "8px 0 14px", flexWrap: "wrap", gap: 10 }}>
       <Btn kind="ghost" onClick={onBack}><ChevronLeft size={16} /> Pipeline</Btn>
@@ -3436,11 +3505,12 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch,
             <SectionTitle>Contribution & trend assumptions</SectionTitle>
             <div style={grid3}>{field("medER", "Medical ER %", { pct: true })}{field("denER", "Dental ER %", { pct: true })}{field("visER", "Vision ER %", { pct: true })}{field("curTrend", "Current med trend", { pct: true })}{field("propTrend", "Proposed med trend", { pct: true })}</div>
             <SectionTitle>Admin & other</SectionTitle>
-            <div style={grid3}>{field("proposedPEPM", "Proposed PEO fee (PEPM)")}{field("implFee", "One-time implementation fee")}{field("lifeCur", "Life/STD/LTD — current")}{field("lifeProp", "Life/STD/LTD — proposed")}</div>
+            <div style={grid3}>{field("proposedPEPM", "Proposed PEO fee (PEPM)")}{field("implFee", "One-time implementation fee")}</div>
           </div>}
           {qtab === "Medical" && <BenefitEditor d={d} set={set} kind="med" plans={MED_PLANS} rows={MED_ROWS} erKey="medER" totals={{ tc: c.medTC, tp: c.medTP }} advanced />}
           {qtab === "Dental" && <BenefitEditor d={d} set={set} kind="den" plans={DEN_PLANS} rows={DEN_ROWS} erKey="denER" totals={{ tc: c.denTC, tp: c.denTP }} />}
           {qtab === "Vision" && <BenefitEditor d={d} set={set} kind="vis" plans={VIS_PLANS} rows={VIS_ROWS} erKey="visER" totals={{ tc: c.visTC, tp: c.visTP }} />}
+          {qtab === "Life / STD / LTD" && <LifeEditor d={d} set={set} c={c} />}
           {qtab === "Workers' Comp" && <div>
             <SectionTitle>Workers' compensation (8810 Clerical class shown)</SectionTitle>
             <div style={grid2}>
@@ -3457,7 +3527,7 @@ function Editor({ data, setData, onBack, onSave, saved, onPrint, onDeepResearch,
           </div>}
           {qtab === "Gusto Invoice" && <InvoiceEditor d={d} set={set} adminC={c.adminC} />}
           {qtab === "Soft-Cost" && <div>
-            <SectionTitle>Administrative time — current state</SectionTitle>
+            <SectionTitle>Administrative time - current state</SectionTitle>
             <div style={grid3}>
               <Field label="Hours / week on HR & payroll" hint="Owner + admin staff"><Num v={d.soft.hours} on={(v) => set({ ...d, soft: { ...d.soft, hours: v } })} step={0.5} /></Field>
               <Field label="Blended loaded hourly cost"><Num v={d.soft.rate} on={(v) => set({ ...d, soft: { ...d.soft, rate: v } })} /></Field>
@@ -3486,7 +3556,7 @@ function InvoiceEditor({ d, set, adminC }) {
   const groups = [...new Set(d.invoice.map((l) => l.g))];
   const upd = (idx, field, v) => { const inv = d.invoice.map((l, i) => i === idx ? { ...l, [field]: v } : l); set({ ...d, invoice: inv }); };
   return <div>
-    <SectionTitle>Current Gusto invoice — every billable line is absorbed by the PEO</SectionTitle>
+    <SectionTitle>Current Gusto invoice - every billable line is absorbed by the PEO</SectionTitle>
     {groups.map((g) => <div key={g} style={{ marginBottom: 14 }}>
       <div style={{ fontWeight: 700, fontSize: 13, color: KALE, margin: "6px 0" }}>{g}</div>
       <div style={{ ...card, overflow: "hidden" }}>
@@ -3648,7 +3718,7 @@ function VantageApp() {
     await save();
     const el = document.querySelector(".packet");
     if (!el) return;
-    const html = '<!doctype html><html><head><meta charset="utf-8"><title>' + ((data.clientName || "Client") + " — PEO Packet") +
+    const html = '<!doctype html><html><head><meta charset="utf-8"><title>' + ((data.clientName || "Client") + " · PEO Packet") +
       '</title><style>body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:20px;color:' + INK + ';-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
       'table{border-collapse:collapse}.pbreak{page-break-after:always}@page{size:letter;margin:13mm}</style></head><body>' +
       el.innerHTML + '<scr' + 'ipt>window.onload=function(){setTimeout(function(){window.print();},350);};</scr' + 'ipt></body></html>';
@@ -3668,7 +3738,7 @@ function VantageApp() {
       <Sparkles size={18} />
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 800, fontSize: 13 }}>{toast.error ? "Deep research didn't finish" : "Deep research ready"}</div>
-        <div style={{ fontSize: 12, opacity: .9 }}>{toast.clientName}{toast.error ? " — try again" : " · tap to view"}</div>
+        <div style={{ fontSize: 12, opacity: .9 }}>{toast.clientName}{toast.error ? ", try again" : " · tap to view"}</div>
       </div>
       <X size={16} onClick={(e) => { e.stopPropagation(); setToast(null); }} />
     </div>}
@@ -3695,7 +3765,7 @@ function VantageApp() {
               <span style={{ fontWeight: 800, fontSize: 17, color: INK, letterSpacing: -0.2 }}>{APP_NAME}</span>
             </span>
           </div>
-          <span style={{ fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700, textAlign: "right" }}>FOR ILLUSTRATIVE PURPOSES ONLY —<br />NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</span>
+          <span style={{ fontSize: 9, fontStyle: "italic", color: GUAVA, fontWeight: 700, textAlign: "right" }}>FOR ILLUSTRATIVE PURPOSES ONLY ·<br />NOT AN OFFICIAL GUSTO PRODUCT OR TOOL</span>
         </div>
       </div>
       {loading ? <div style={{ textAlign: "center", padding: 60, color: INK60 }}>Loading your client files…</div>
