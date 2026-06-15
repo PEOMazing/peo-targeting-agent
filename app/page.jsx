@@ -3272,15 +3272,15 @@ function BriefTab({ d, set, onDeepResearch, deepRunning }) {
         {b && <Btn kind="kale" onClick={() => onDeepResearch && onDeepResearch(d.id)} disabled={loading || deepRunning}><Search size={15} /> {deepRunning ? "Deep research running…" : "Conduct deeper research"}</Btn>}
       </div>
     </div>
-    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Firmographics &amp; contacts powered by Apollo · signals via live web search</div>
+    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, color: INK60, marginBottom: 12, fontWeight: 600 }}><span style={{ width: 6, height: 6, borderRadius: 6, background: KALE }} /> Fast brief from category knowledge · run deeper research for live web signals</div>
     {deepRunning && <div style={{ ...card, padding: "11px 13px", borderColor: KALE20, background: KALE20, color: INK, fontSize: 12.5, marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}><Sparkles size={14} style={{ color: KALE }} /> Deep research is running in the background. Keep working — you'll get a ping when it's ready, and this brief will update automatically.</div>}
     {err && <div style={{ ...card, padding: 12, borderColor: "#f0cfca", background: "#FBEEEC", color: "#b4392b", fontSize: 13, marginBottom: 12 }}>{err}</div>}
     {!b && !loading && <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}>
       <Sparkles size={30} style={{ color: KALE, marginBottom: 8 }} />
       <div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>Build the account brief</div>
-      <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Pull firmographics, the tech stack, and decision-maker contacts from Apollo, plus recent "why now" signals from the web. It classifies the motion (Upsell / Displacement / Likely Multi-vendor) and drafts your value prop, objection handling, benefits play, and outreach — then auto-fills the deal.</div>
+      <div style={{ fontSize: 14, maxWidth: 460, margin: "0 auto 14px" }}>Get a fast brief in seconds: the motion (Upsell / Displacement / Likely Multi-vendor), value prop, objection handling, benefits play, and outreach. Then run deeper research for live web signals and verified contacts.</div>
       <Btn onClick={() => run(false)} disabled={loading}><Sparkles size={15} /> {loading ? "Researching…" : "Run research (fast)"}</Btn>
-      <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Powered by Apollo</div>
+      <div style={{ fontSize: 11, color: INK60, marginTop: 10, fontWeight: 600 }}>Fast brief · deeper research available</div>
     </div>}
     {(loading || deepLoading) && <div style={{ ...card, padding: "30px 20px", textAlign: "center", color: INK60, fontSize: 14 }}>{deepLoading ? "Deep research running — searching the web for specific, verifiable signals. This can take up to a minute…" : "Researching the account from category knowledge… (a few seconds)"}</div>}
     {b && <div>
