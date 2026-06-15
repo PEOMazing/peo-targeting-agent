@@ -3461,12 +3461,6 @@ function VantageApp() {
     setIndex(idx); setLoading(false);
   })(); }, []);
   useEffect(() => { if (data) setSaved(false); }, [data]);
-  // autosave: debounce every change so the rep never clicks save
-  useEffect(() => {
-    if (!data || saved) return;
-    const t = setTimeout(() => { save(); }, 700);
-    return () => clearTimeout(t);
-  }, [data, saved, save]);
 
   const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
 
@@ -3477,6 +3471,12 @@ function VantageApp() {
     const idx = [...index.filter((x) => x.id !== rec.id), indexEntry(rec)];
     setIndex(idx); await writeIndex(idx); setSaved(true);
   }, [data, index]);
+  // autosave: debounce every change so the rep never clicks save (defined after `save` to avoid TDZ)
+  useEffect(() => {
+    if (!data || saved) return;
+    const t = setTimeout(() => { save(); }, 700);
+    return () => clearTimeout(t);
+  }, [data, saved, save]);
 
   // quick stage/forecast change straight from the pipeline board (no full open)
   const quickUpdate = async (id, patch) => {
