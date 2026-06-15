@@ -1918,10 +1918,12 @@ function GTMTab() {
         <div className="eyebrow">GO-TO-MARKET STRATEGY</div>
         <h1>How Gusto wins this market<span className="hl">.</span></h1>
         <p className="lede">
-          Two horizons. Short term, Gusto earns the right to scale: pricing, distribution,
-          underwriting, and a certified founding team. Long term, it builds the moats,
-          certification, benefits scale, channel, and a retention engine. The sequencing is
-          the strategy: every risk gets its control before the throttle opens.
+          Start with what's already true: Gusto is losing customers to PEOs today. The demand is
+          proven and it's leaving through the front door. The whole strategy is to capture it from
+          inside the base before competing on the open market. Two horizons. Short term, Gusto earns
+          the right to scale: pricing, distribution, underwriting, and a certified founding team.
+          Long term, it builds the moats, certification, benefits scale, channel, and a retention
+          engine. The sequencing is the strategy: every risk gets its control before the throttle opens.
         </p>
       </div>
 
@@ -1929,7 +1931,7 @@ function GTMTab() {
         <div className="phase-head"><span className="phase-days">SHORT TERM · MONTHS 0–12</span><h3>Earn the right to scale</h3></div>
         <p className="theme">Prove the motion with the in-base pilot while the operating controls come online.</p>
         <ul>
-          <li><b>Distribution before advertising.</b> The in-base motion is the whole short-term GTM: ICP-score the payroll base (NAPEO: nearly two-thirds of all PEO clients are 10–49 employees, exactly where Gusto's base lives), and work lifecycle triggers, new state registrations, headcount crossings, benefits-seeking signals, renewal windows.</li>
+          <li><b>The install base is the opportunity.</b> Gusto is already losing customers to PEOs, so the demand is proven and it is walking out the door. The first move is to defend and upgrade the base before a competitor's broker gets there: ICP-score the payroll book (NAPEO: nearly two-thirds of all PEO clients are 10 to 49 employees, exactly where Gusto's base lives), find the clients who look like the ones we are losing, and get in front of them with the PEO upgrade. We do it without cannibalizing by routing every play through the account owner who already holds the relationship, timing it to lifecycle triggers (new state registrations, headcount crossings, benefits-seeking signals, renewal windows), and leading with the real cost comparison rather than a discount. This is churn defense and expansion revenue in one motion, not outbound to strangers.</li>
           <li><b>Internal partnership before external motion.</b> Week one belongs to peer sales leaders: written rules of engagement for install-base conversion, who owns the account, how credit and comp are shared, when a payroll AE brings PEO in, so converting the base makes allies of the payroll org, never victims. Co-selling into a shared customer base only works when the peer team wins every time we win.</li>
           <li><b>Plan around the season.</b> PEO selling concentrates September through December ahead of January 1 starts, which means pipeline builds in summer, underwriting and proposal capacity surges in fall, and implementation peaks in December. Season planning with marketing, risk, and ops is a Q3 deliverable, not a December scramble.</li>
           <li><b>An AI operating standard from day one.</b> Every rep works with AI as a daily teammate, agent-driven account prep, the Prospecting Agent for prioritization, AI-drafted follow-ups reviewed by a human. Set the expectation in onboarding the way it's been proven inside Gusto's own GTM: build a few high-impact workflows to show what's possible, then teach the team to build their own.</li>
@@ -1958,16 +1960,22 @@ function GTMTab() {
       </div>
 
       <div className="card" style={{ marginBottom: 14 }}>
-        <div className="kicker">THE SCOREBOARD</div>
-        <h2>North-star metrics</h2>
+        <div className="kicker">THE NORTH STAR</div>
+        <h2>Gross profit per WSE</h2>
+        <p className="body" style={{ marginTop: 6 }}>
+          One number tells us whether the machine works: gross profit per worksite employee, per month. It
+          captures all three things at once, whether we are adding the right WSEs, retaining them, and pricing
+          the risk well. Volume without margin is a trap, so GP per WSE is the number the whole org moves
+          together. Everything below is how we move it.
+        </p>
         <div className="stat-grid" style={{ marginTop: 16 }}>
           <div className="stat"><div className="v">WSEs</div><div className="l">Worksite employees added and retained, the industry's unit of scale</div></div>
-          <div className="stat"><div className="v">GP / WSE</div><div className="l">Gross profit per WSE per month, one number for whether the machine works</div></div>
           <div className="stat"><div className="v">Retention</div><div className="l">Logo and net revenue retention, in PEO economics, the renewal is the product</div></div>
           <div className="stat"><div className="v">% Channel</div><div className="l">Share of revenue originated by accountant partners, the moat, measured</div></div>
           <div className="stat"><div className="v">Underwriting yield</div><div className="l">Share of submitted deals passing the desk, sales quality, not just volume</div></div>
           <div className="stat"><div className="v">First-payroll SLA</div><div className="l">Time to a clean first payroll, the strongest early predictor of retention</div></div>
         </div>
+        <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 12, fontWeight: 600 }}>The supporting scoreboard: the five inputs that drive GP per WSE.</div>
       </div>
 
       <div className="callout"><span className="tag">WHAT KILLS PEOs, AND THE CONTROL FOR EACH</span>
@@ -2121,6 +2129,9 @@ function PlanTab() {
           state, partner with the people already here, build the product and the motion, and prove
           it with a real pilot. Every phase ends with something shipped, not something scheduled.
         </p>
+        <p className="lede" style={{ fontWeight: 700, color: "var(--ink)", marginTop: 14 }}>
+          The whole quarter earns the right to scale: prove the in-base motion works, with real unit economics, before we spend a dollar on outside growth.
+        </p>
       </div>
 
       <div className="callout" style={{ marginBottom: 18 }}><span className="tag">HOW THIS PLAN IS STRUCTURED</span>
@@ -2178,6 +2189,7 @@ function PlanTab() {
           <li><b>Write Playbook v1.</b> Discovery checklist (census, renewal dates, SUI notices, comp dec pages), the total-cost-of-employment quoting toolkit, talk tracks for the top objections, and the honest year-two renewal story.</li>
           <li><b>Build the underwriting feedback loop.</b> A weekly sales-and-risk review of every declined and repriced deal, so the ICP, pricing, and pitch sharpen each cycle.</li>
           <li><b>Train the first team.</b> Onboard the founding reps through the training course on this site, every rep completes all five modules before touching a prospect.</li>
+          <li><b>Stand up the internal PEO certification.</b> Finish and formalize the certification course into Gusto's real enablement, then certify the wider group who will touch PEO: key stakeholders, current payroll account managers, and the existing sales consultants. The base converts faster when the people already talking to customers can speak PEO fluently and spot the right accounts, so the certification is how we scale the motion past the founding team.</li>
         </ul>
 
         <div className="callout"><span className="tag">DAY-60 DELIVERABLES</span>Co-sell rules of engagement live with peer leaders, AM feedback loop running, accountant-channel pilot defined, prioritized platform and pricing roadmap, Playbook v1 in hand, and the first rep class trained.</div>
