@@ -54,11 +54,28 @@ export async function POST(req) {
       return Response.json({ ok: false, message: "Research call failed (" + r.status + ").", detail: t.slice(0, 400) }, { status: 200 });
     }
     const data = await r.json();
-    const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
-    const m = text.match(/\{[\s\S]*\}/);
-    if (!m) return Response.json({ ok: false, message: "No data returned — try again." }, { status: 200 });
-    let parsed;
-    try { parsed = JSON.parse(m[0]); } catch { return Response.json({ ok: false, message: "Could not parse research result." }, { status: 200 }); }
+    let text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
+    // Robust JSON extraction: strip markdown fences, then try the largest {...} block.
+    text = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+    let parsed = null;
+    // strategy 1: first { to last } (greedy)
+    const greedy = text.match(/\{[\s\S]*\}/);
+    if (greedy) { try { parsed = JSON.parse(greedy[0]); } catch {} }
+    // strategy 2: if that failed, the whole trimmed text might already be JSON
+    if (!parsed) { try { parsed = JSON.parse(text); } catch {} }
+    // strategy 3: find a balanced object by scanning braces
+    if (!parsed) {
+      const start = text.indexOf("{");
+      if (start >= 0) {
+        let depth = 0, end = -1;
+        for (let i = start; i < text.length; i++) {
+          if (text[i] === "{") depth++;
+          else if (text[i] === "}") { depth--; if (depth === 0) { end = i; break; } }
+        }
+        if (end > start) { try { parsed = JSON.parse(text.slice(start, end + 1)); } catch {} }
+      }
+    }
+    if (!parsed) return Response.json({ ok: false, message: "No data returned — try again." }, { status: 200 });
     return Response.json({ ok: true, result: parsed }, { status: 200 });
   } catch (e) {
     return Response.json({ ok: false, message: "Research is unavailable right now.", detail: String(e).slice(0, 200) }, { status: 200 });
