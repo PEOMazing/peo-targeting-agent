@@ -1209,6 +1209,21 @@ function buildTalkTrack(acct, chosen) {
   return "Based on what we're seeing, you look like a strong fit for the Gusto PEO. It usually takes about fifteen minutes to gather the few documents I need to build a full quote, and more often than not we can show a net-positive ROI for you and your team. Want to grab those together?";
 }
 
+function dealScore(c) {
+  // PEO propensity score from what a deal knows: headcount sweet spot, multi-state, industry fit.
+  let p = 40;
+  const e = Number(c.employees) || 0;
+  if (e >= 10 && e <= 100) p += 25; else if (e > 100 && e <= 250) p += 12; else if (e >= 5 && e < 10) p += 8;
+  const txt = ((c.industry || "") + " " + (c.winPlan || "")).toLowerCase();
+  if (/multi.?state|, [A-Z]{2}|CO, |, NY|, TX|, WY/.test((c.winPlan || ""))) p += 10;
+  if (/dental|health|medical|veterinar|clinic|practice/.test(txt)) p += 10;
+  if (/construct|contract|logistic|manufactur|hospitality|restaurant/.test(txt)) p += 8;
+  if (/account|cpa|advisor|professional/.test(txt)) p += 7;
+  if (/renewal|comp|claim|benefits/.test(txt)) p += 6;
+  return Math.max(20, Math.min(99, Math.round(p)));
+}
+function scoreTier(s) { return s >= 80 ? ["HOT", GUAVA] : s >= 60 ? ["WARM", "#D98B2B"] : ["WATCH", INK60]; }
+
 function scoreAccount(acct) {
   const pts = acct.signals.reduce((s, id) => {
     const sig = SIGNAL_LIBRARY.find((x) => x.id === id);
@@ -2888,6 +2903,7 @@ function Bar({ label, value, max, count, color }) {
 }
 function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onPrintDeal }) {
   const [q, setQ] = useState("");
+  const [stageFilter, setStageFilter] = useState("All");
   const [view, setView] = useState("myday"); // forecast | deals
   const list = index.filter((c) => (c.clientName || "Untitled").toLowerCase().includes(q.toLowerCase())).sort((a, b) => b.updatedAt - a.updatedAt);
 
@@ -2912,12 +2928,16 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
   const funnel = STAGES.filter((s) => s.name !== "Assigned").map((s) => ({ ...s, items: index.filter((c) => c.stage === s.name && c.forecast !== "Omit") }));
   const maxStageACV = Math.max(1, ...funnel.map((s) => sum(s.items)));
   const matchQ = (c) => (c.clientName || "Untitled").toLowerCase().includes(q.toLowerCase());
-  const assignedList = index.filter(matchQ).sort((a, b) => (b.acv || 0) - (a.acv || 0));
-  const activeList = open.filter(matchQ).sort((a, b) => (b.acv || 0) - (a.acv || 0));
+  const matchStage = (c) => stageFilter === "All" || c.stage === stageFilter;
+  const assignedList = notStarted.filter((c) => matchQ(c) && matchStage(c)).sort((a, b) => (dealScore(b) - dealScore(a)) || (b.acv || 0) - (a.acv || 0));
+  const activeList = open.filter((c) => matchQ(c) && matchStage(c)).sort((a, b) => (dealScore(b) - dealScore(a)) || (b.acv || 0) - (a.acv || 0));
   const tam = sum(index);
   const renderCard = (c) => { const si = stageInfo(c.stage); return <div key={c.id} style={{ ...card, padding: 16, position: "relative" }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
       <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: si.c, borderRadius: 20, padding: "3px 10px" }}>{c.stage}</span>
+      {(() => { const sc = dealScore(c); const [lab, col] = scoreTier(sc); return <span style={{ fontSize: 11, fontWeight: 800, color: col, border: `1px solid ${col}`, borderRadius: 20, padding: "2px 9px" }} title="PEO Targeting Agent score">{sc} · {lab}</span>; })()}
+      </span>
       <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>{onPrintDeal && <FileText size={16} style={{ color: INK60, cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); onPrintDeal(c.id); }} />}<Trash2 size={16} style={{ color: INK60, cursor: "pointer" }} onClick={() => { if (confirm("Delete this deal? This can't be undone.")) onDelete(c.id); }} /></span>
     </div>
     <div style={{ display: "flex", alignItems: "center", gap: 11, marginTop: 12 }}>
@@ -2947,7 +2967,7 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
       </div>
       <div style={{ display: "flex", gap: 8 }}>
         <div style={{ display: "flex", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, overflow: "hidden" }}>
-          {[["myday", "My Day"], ["forecast", "Forecast"], ["assigned", "Assigned"], ["active", "Active"], ["today", "Today"]].map(([v, l]) => <button key={v} onClick={() => setView(v)} style={{ padding: "8px 14px", border: "none", background: view === v ? KALE : "#fff", color: view === v ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{l}{v === "active" ? " (" + open.length + ")" : ""}{v === "today" && dueCount > 0 ? " (" + dueCount + ")" : ""}</button>)}
+          {[["myday", "My Day"], ["forecast", "Forecast"], ["assigned", "Assigned"], ["active", "Active"], ["today", "Today"]].map(([v, l]) => <button key={v} onClick={() => { setView(v); setStageFilter("All"); }} style={{ padding: "8px 14px", border: "none", background: view === v ? KALE : "#fff", color: view === v ? "#fff" : INK, fontWeight: 600, fontSize: 13, cursor: "pointer", fontFamily: "inherit" }}>{l}{v === "active" ? " (" + open.length + ")" : ""}{v === "today" && dueCount > 0 ? " (" + dueCount + ")" : ""}</button>)}
         </div>
         <Btn onClick={onNew}><Plus size={16} /> New deal</Btn>
       </div>
@@ -3013,6 +3033,14 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
         <Search size={15} style={{ position: "absolute", left: 11, top: 11, color: INK60 }} />
         <input placeholder="Search assigned accounts" value={q} onChange={(e) => setQ(e.target.value)} style={{ ...inputStyle, background: "#fff", paddingLeft: 33 }} />
       </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+        {["All", ...STAGES.map((s) => s.name)].map((sName) => {
+          const n = sName === "All" ? index.filter(matchQ).length : index.filter((c) => matchQ(c) && c.stage === sName).length;
+          if (sName !== "All" && n === 0) return null;
+          const on = stageFilter === sName;
+          return <button key={sName} onClick={() => setStageFilter(sName)} style={{ padding: "5px 12px", borderRadius: 18, border: `1px solid ${on ? KALE : LINE}`, background: on ? KALE : "#fff", color: on ? "#fff" : INK, fontWeight: 600, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>{sName} <span style={{ opacity: .7 }}>{n}</span></button>;
+        })}
+      </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 16 }}>{assignedList.map(renderCard)}</div>
     </> : view === "active" ? <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, flexWrap: "wrap", gap: 10 }}>
@@ -3021,6 +3049,14 @@ function Dashboard({ index, onOpen, onNew, onDelete, onQuick, onAddProspect, onP
           <Search size={15} style={{ position: "absolute", left: 11, top: 11, color: INK60 }} />
           <input placeholder="Search active deals" value={q} onChange={(e) => setQ(e.target.value)} style={{ ...inputStyle, background: "#fff", paddingLeft: 33 }} />
         </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+        {["All", ...STAGES.filter((s) => isActive(s.name)).map((s) => s.name)].map((sName) => {
+          const n = sName === "All" ? open.filter(matchQ).length : open.filter((c) => matchQ(c) && c.stage === sName).length;
+          if (sName !== "All" && n === 0) return null;
+          const on = stageFilter === sName;
+          return <button key={sName} onClick={() => setStageFilter(sName)} style={{ padding: "5px 12px", borderRadius: 18, border: `1px solid ${on ? KALE : LINE}`, background: on ? KALE : "#fff", color: on ? "#fff" : INK, fontWeight: 600, fontSize: 12.5, cursor: "pointer", fontFamily: "inherit" }}>{sName} <span style={{ opacity: .7 }}>{n}</span></button>;
+        })}
       </div>
       {activeList.length === 0 ? <div style={{ ...card, padding: "40px 20px", textAlign: "center", color: INK60 }}><div style={{ fontWeight: 700, color: INK, marginBottom: 4 }}>No active evaluations</div><div style={{ fontSize: 14 }}>Move an assigned account into a stage to start working it.</div></div>
         : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(310px,1fr))", gap: 16 }}>{activeList.map(renderCard)}</div>}
@@ -3423,7 +3459,7 @@ function VantageApp() {
   useEffect(() => { (async () => {
     let idx = await readIndex();
     let dirty = false;
-    const mkEntry = (rec) => { const cc = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: cc.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
+    const mkEntry = (rec) => { const cc = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: cc.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec), employees: rec.employees, industry: rec.industry || "", winPlan: rec.winPlan || "" }; };
     // first-run: seed sample deals (once; respects later deletes via the flag)
     let seeded = false;
     try { const f = LS.get("peo:seeded"); seeded = !!(f && f.value); } catch { seeded = false; }
@@ -3462,7 +3498,7 @@ function VantageApp() {
   })(); }, []);
   useEffect(() => { if (data) setSaved(false); }, [data]);
 
-  const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec) }; };
+  const indexEntry = (rec) => { const c = compute(rec); return { id: rec.id, clientName: rec.clientName, provider: rec.provider, updatedAt: rec.updatedAt, acv: c.acv, stage: rec.stage, forecast: rec.forecast, lostReason: rec.lostReason, expectedClose: rec.expectedClose, nextStep: rec.nextStep, contact: (rec.contacts && rec.contacts[0] && rec.contacts[0].name) || "", domain: domainFor(rec), employees: rec.employees, industry: rec.industry || "", winPlan: rec.winPlan || "" }; };
 
   const save = useCallback(async () => {
     if (!data) return;
