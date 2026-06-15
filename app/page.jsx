@@ -1051,7 +1051,7 @@ function AboutTab() {
     <div className="shell">
       <div className="hero">
         <div className="eyebrow">CANDIDATE · HEAD OF PEO SALES</div>
-        <h1>Gabriel Revnew<span className="hl">.</span><br />PEO operator, builder, player-coach.</h1>
+        <h1>Gabriel Revnew<span className="hl">.</span><br />PEO leader, builder, player-coach.</h1>
         <p className="lede">
           Eight years selling and leading PEO sales at TriNet, Sales Leader of the Year,
           top Sales Director in % to plan four years running, plus founder of an independent
