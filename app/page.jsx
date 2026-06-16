@@ -1774,8 +1774,10 @@ function ProfitPerWseCalc() {
   const [sec125, setSec125] = useState(3);       // Section 125 admin margin $/WSE/mo
   const [markups, setMarkups] = useState(3);     // bg checks, T&A, screens $/WSE/mo
   const [float, setFloat] = useState(2);         // float interest $/WSE/mo
-  // CAC inputs
-  const [cac, setCac] = useState(1800);          // fully-loaded cost to acquire one WSE-account-share
+  // CAC builder: rolls up to CAC per WSE
+  const [salesCost, setSalesCost] = useState(33000); // loaded sales cost per won account
+  const [onboardCost, setOnboardCost] = useState(12000); // implementation/onboarding per account
+  const [wsePerAccount, setWsePerAccount] = useState(25); // avg WSEs per account
 
   const e = Math.max(1, Number(ees) || 0);
   const w = Math.max(0, Number(wage) || 0);
@@ -1811,7 +1813,11 @@ function ProfitPerWseCalc() {
   const gpWseMo = pools.reduce((s, x) => s + x.v, 0);
   const gpWseYr = gpWseMo * 12;
   const gpAccountYr = gpWseYr * e;
-  const paybackMonths = gpWseMo > 0 ? (Number(cac) || 0) / gpWseMo : 0;
+  const wpa = Math.max(1, Number(wsePerAccount) || 1);
+  const cacPerAccount = (Number(salesCost) || 0) + (Number(onboardCost) || 0);
+  const cac = cacPerAccount / wpa; // CAC per WSE
+  const paybackMonths = gpWseMo > 0 ? cac / gpWseMo : 0;
+  const INDUSTRY_PAYBACK = 18; // months, typical PEO CAC payback
 
   const fmt = (n) => "$" + Math.round(n).toLocaleString();
   const fmt2 = (n) => "$" + (Math.round(n * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -1830,7 +1836,7 @@ function ProfitPerWseCalc() {
       <div className="roi-grid">
         {numField("WORKSITE EMPLOYEES", ees, setEes, 1)}
         {numField("AVG ANNUAL WAGE", wage, setWage, 1000)}
-        {numField("FULLY-LOADED CAC ($/WSE)", cac, setCac, 100)}
+        {numField("HEALTH TAKE-UP (% ON PLAN)", benTake, setBenTake, 5)}
       </div>
 
       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".4px", margin: "20px 0 8px" }}>The 10 profit pools, monthly margin per WSE</div>
@@ -1839,7 +1845,6 @@ function ProfitPerWseCalc() {
         {numField("WC arbitrage", wcRate, setWcRate, 0.1, "% payroll")}
         {numField("SUTA arbitrage", sutaRate, setSutaRate, 0.1, "% payroll")}
         {numField("FICA/FUTA arb", ficaRate, setFicaRate, 0.01, "% payroll")}
-        {numField("Health take-up", benTake, setBenTake, 5, "% on plan")}
         {numField("Benefits margin", benMargin, setBenMargin, 5, "$/enrolled")}
         {numField("Ben-admin", benAdmin, setBenAdmin, 1, "$/WSE")}
         {numField("Broker comm", brokerComm, setBrokerComm, 1, "$/enrolled")}
@@ -1849,10 +1854,20 @@ function ProfitPerWseCalc() {
         {numField("Float / interest", float, setFloat, 1, "$/WSE")}
       </div>
 
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".4px", margin: "20px 0 8px" }}>Cost to acquire, rolled up to CAC per WSE</div>
+      <div className="roi-grid">
+        {numField("LOADED SALES COST / ACCOUNT", salesCost, setSalesCost, 1000)}
+        {numField("ONBOARDING COST / ACCOUNT", onboardCost, setOnboardCost, 1000)}
+        {numField("AVG WSEs / ACCOUNT", wsePerAccount, setWsePerAccount, 1)}
+      </div>
+      <div style={{ fontSize: 12.5, color: "var(--ink-soft)", marginTop: 8 }}>
+        Fully-loaded CAC: <b style={{ color: "var(--ink)" }}>{fmt(cacPerAccount)}</b> per account, or <b style={{ color: "var(--ink)" }}>{fmt(cac)}</b> per WSE.
+      </div>
+
       <div className="stat-grid" style={{ marginTop: 18 }}>
         <div className="stat"><div className="v">{fmt(gpWseMo)}</div><div className="l">Net gross profit per WSE, per month, across all 10 pools</div></div>
         <div className="stat"><div className="v">{fmt(gpAccountYr)}</div><div className="l">Annual GP from this account ({e} WSEs)</div></div>
-        <div className="stat"><div className="v">{gpWseMo > 0 ? paybackMonths.toFixed(1) : "n/a"}</div><div className="l">Months to recover CAC of {fmt(cac)} per WSE</div></div>
+        <div className="stat"><div className="v" style={{ color: gpWseMo > 0 && paybackMonths <= INDUSTRY_PAYBACK ? "var(--guava)" : "var(--ink)" }}>{gpWseMo > 0 ? paybackMonths.toFixed(1) : "n/a"}</div><div className="l">Months to recover CAC ({fmt(cac)}/WSE). Industry norm is about {INDUSTRY_PAYBACK} months, {gpWseMo > 0 ? (paybackMonths <= INDUSTRY_PAYBACK ? "this account beats it" : "this account is slower") : ""}.</div></div>
       </div>
 
       <div style={{ ...{}, marginTop: 16 }}>
@@ -2144,6 +2159,7 @@ function KeysTab() {
     { n: "06", h: "Service model matched to segment", p: "Dedicated HRBP vs self-serve isn't branding, it's a cost structure choice. Mismatched service models churn books.", g: "Gusto's base skews simple and software-native: lead self-serve with human escalation, and resist over-building white glove too early." },
     { n: "07", h: "The retention engine", p: "Accounts reach true profitability deep into the relationship. Implementation quality and the first payroll are the strongest retention predictors.", g: "Instrument GP/WSE and retention from client one, the metrics that tell you whether the machine works." },
     { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Prospecting Agent exists to exploit it systematically." },
+    { n: "09", h: "CAC discipline and payback math", p: "A PEO carries heavy upfront cost to land a client (sales plus implementation), and the typical account takes around 18 months of gross profit to pay it back. The business only compounds when payback is short enough that retained clients turn profit, so CAC and retention are the same equation.", g: "Gusto's in-base motion is structurally lower-CAC (the client already trusts us, the cycle is shorter), which shortens payback and turns profit faster. The net-profit-per-WSE and CAC model on the Construct tab is how we rank the base by who pays back quickest." },
   ];
   return (
     <div className="shell">
@@ -2151,7 +2167,7 @@ function KeysTab() {
         <div className="eyebrow">OPERATING PRINCIPLES</div>
         <h1>What makes a PEO win<span className="hl">.</span></h1>
         <p className="lede">
-          Eight imperatives, each with the Gusto-specific implication. The pattern underneath:
+          Nine imperatives, each with the Gusto-specific implication. The pattern underneath:
           select risk, price it, serve the book, retain it.
         </p>
       </div>
