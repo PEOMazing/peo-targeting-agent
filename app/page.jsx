@@ -1956,7 +1956,7 @@ function ConstructTab() {
         "Published, transparent PEPM, the pricing DNA the incumbents can't match without blowing up their own books",
       ],
       who: "The classic 5–100 employee benefits-driven buyer: multi-state, hiring, losing candidates over benefits, or staring down a brutal small-group renewal.",
-      vs: "Head-to-head with Justworks Plus, TriNet, ADP TotalSource, and Insperity, won on distribution, continuity, and honest totals." },
+      vs: "Head-to-head with Justworks, Rippling, Vensure, Obsidian HR, DecisionHR, and the smaller boutique firms, won on distribution, continuity, and honest totals." },
     { badge: "GUSTO PEO 2", name: "Full PEO without Benefits", theme: "Co-employment for clients who keep their own coverage.",
       items: [
         "Everything in the co-employment core, payroll, taxes, workers' comp, compliance, HR, with the client's existing benefits left exactly where they are",
