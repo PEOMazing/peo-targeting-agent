@@ -2107,6 +2107,20 @@ function GTMTab() {
         </ul>
       </div>
 
+      <div className="phase">
+        <div className="phase-head"><span className="phase-days">EXPANSION · CROSS-PLAYS & UPSELLS</span><h3>The whitespace nobody else has aggregated</h3></div>
+        <p className="theme">The PEO value prop is aggregation: giving a 15-person company Fortune-500 access. The expansion motion is everywhere a large-employer benefit or system exists but hasn't been aggregated down to small groups yet. We land the client, then upsell into these.</p>
+        <ul>
+          <li><b>Fertility and full family-building.</b> The single biggest gap in the market: roughly 80% of parental support needs go unmet by current employer plans, and demand is spiking. Carrot, Progyny, and Kindbody serve self-funded employers with hundreds of workers; small businesses are locked out. Aggregated through the master program, we hand a 15-person company IVF, egg freezing, and adoption support nobody else offers them.</li>
+          <li><b>Women's health across life stages, including menopause.</b> Almost unheard of in small-group PEO, and the business case is hard: women who seek care for menopause symptoms earn about 10% less four years later because they cut hours or quit. A women's-health benefit is retention math, not a perk, and it's wide-open whitespace.</li>
+          <li><b>Mental health as a real platform, not a phone-number EAP.</b> The standard PEO EAP is the thing nobody uses. The upsell is large-employer-grade platforms (Lyra, Spring Health) and AI-driven, stigma-free coaching, aggregated down to small groups, with anonymized workforce insight for the employer.</li>
+          <li><b>Financial wellness and emergency savings.</b> The sleeper. Most employees say money stress is hurting their wellbeing and many have already raided retirement funds. Emergency savings accounts, earned wage access, and student-loan-repayment matching are easy, differentiated, and almost nobody in PEO packages them.</li>
+          <li><b>The gap-coverage stack, engineered on purpose.</b> Pair a lower-premium high-deductible plan with employer-funded accident, critical-illness, and hospital-indemnity coverage that absorbs the deductible. The employee experiences rich coverage, the employer pays less total premium. Plan design as a product, and a clean upsell on every renewal.</li>
+          <li><b>The platform edge legacy PEOs structurally can't match.</b> Most PEOs are insurance operations with a dated HR portal bolted on; Gusto is a modern platform that can bolt on the insurance. That means real API integrations instead of data exports, AI benefits decision-support that helps an employee actually choose a plan, and embedded fintech surfaced at the moment of work. The incumbents are years behind here, and it is the one advantage they can't buy their way out of quickly.</li>
+        </ul>
+        <div className="callout"><span className="tag">THE THESIS IN ONE LINE</span>Most PEOs are insurance companies with a dated HR portal bolted on. Gusto is a modern platform that can bolt on the insurance, which means it can ship aggregated benefits and embedded fintech the incumbents structurally can't.</div>
+      </div>
+
       <div className="card" style={{ marginBottom: 14 }}>
         <div className="kicker">THE NORTH STAR</div>
         <h2>Gross profit per WSE</h2>
