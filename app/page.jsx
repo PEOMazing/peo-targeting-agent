@@ -2040,14 +2040,7 @@ function ConstructTab() {
         </div>
       </div>
 
-      <div className="card" style={{ marginBottom: 14 }}>
-        <div className="kicker">LEADERSHIP LENS · NET PROFIT PER WSE</div>
-        <h2>What does a client earn us per WSE?</h2>
-        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Not a sales tool. Model the net GP per WSE a client profile throws off across all ten PEO profit pools, then read CAC payback against it to rank the base by PEO fit.</p>
-        <div style={{ marginTop: 16 }}>
-          <ProfitPerWseCalc />
-        </div>
-      </div>
+      
 
       <div className="callout"><span className="tag">THE GAP THIS STACK EXPLOITS</span>
         Fertility platforms serve large self-funded employers; small business is locked out until
@@ -2159,7 +2152,7 @@ function KeysTab() {
     { n: "06", h: "Service model matched to segment", p: "Dedicated HRBP vs self-serve isn't branding, it's a cost structure choice. Mismatched service models churn books.", g: "Gusto's base skews simple and software-native: lead self-serve with human escalation, and resist over-building white glove too early." },
     { n: "07", h: "The retention engine", p: "Accounts reach true profitability deep into the relationship. Implementation quality and the first payroll are the strongest retention predictors.", g: "Instrument GP/WSE and retention from client one, the metrics that tell you whether the machine works." },
     { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Prospecting Agent exists to exploit it systematically." },
-    { n: "09", h: "CAC discipline and payback math", p: "A PEO carries heavy upfront cost to land a client (sales plus implementation), and the typical account takes around 18 months of gross profit to pay it back. The business only compounds when payback is short enough that retained clients turn profit, so CAC and retention are the same equation.", g: "Gusto's in-base motion is structurally lower-CAC (the client already trusts us, the cycle is shorter), which shortens payback and turns profit faster. The net-profit-per-WSE and CAC model on the Construct tab is how we rank the base by who pays back quickest." },
+    { n: "09", h: "CAC discipline and payback math", p: "A PEO carries heavy upfront cost to land a client (sales plus implementation), and the typical account takes around 18 months of gross profit to pay it back. The business only compounds when payback is short enough that retained clients turn profit, so CAC and retention are the same equation.", g: "Gusto's in-base motion is structurally lower-CAC (the client already trusts us, the cycle is shorter), which shortens payback and turns profit faster. The net-profit-per-WSE and CAC model in Resources is how we rank the base by who pays back quickest." },
   ];
   return (
     <div className="shell">
@@ -2218,6 +2211,15 @@ function ResourcesTab({ onTerm }) {
         <a className="btn primary" href="/competitive-landscape.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 14, display: "inline-block" }}>
           Download the PDF
         </a>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">SAMPLE TOOL · BENCHMARK CAC / GP MODEL</div>
+        <h2>Net profit per WSE and CAC payback</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>A leadership model, not a sales tool. It estimates the net gross profit a client profile throws off across all ten PEO profit pools, builds CAC from sales and onboarding cost, and reads payback against the roughly 18-month industry norm. The defaults are directional benchmarks; a live version runs on the book's real pricing and remittance data. Use it to rank the base by which clients are the best PEO fit.</p>
+        <div style={{ marginTop: 16 }}>
+          <ProfitPerWseCalc />
+        </div>
       </div>
 
       <div className="card" style={{ marginBottom: 14 }}>
