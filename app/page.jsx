@@ -282,6 +282,11 @@ const css = `
 .phase-days { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .1em; color: #fff; background: var(--guava); border-radius: 999px; padding: 4px 12px; }
 .phase h3 { margin: 0; font-size: 18px; font-weight: 800; }
 .phase .theme { color: var(--ink-soft); font-size: 13.5px; margin: 4px 0 12px; }
+.phase ul { margin: 4px 0 0; padding-left: 0; list-style: none; }
+.phase li { font-size: 14px; line-height: 1.65; margin-bottom: 14px; padding-left: 18px; position: relative; }
+.phase li:last-child { margin-bottom: 0; }
+.phase li::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--guava); }
+.phase li b { display: inline; }
 .gate { min-height: 88vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
 .gate-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; padding: 44px 38px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 8px 40px rgba(35,42,53,0.06); }
 .gate-card p.gate-copy { font-size: 14px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 22px; }
@@ -2009,6 +2014,8 @@ function ConstructTab() {
         <ul>
           <li><b>Fertility and family-building.</b> Nearly 40% of large employers now offer fertility benefits through platforms like Carrot, Progyny, and Kindbody. Small businesses are locked out: those platforms serve self-funded employers with hundreds of workers. A PEO aggregating hundreds of thousands of WSEs can negotiate one master partnership and hand a 15-person company IVF support, egg freezing, adoption and surrogacy assistance, and maternity return-to-work programs. Nobody in the SMB market offers this today. For talent-competing small companies, it is the single most differentiating benefit we could put in a quote.</li>
           <li><b>The gap-coverage stack, engineered on purpose.</b> Accident, critical illness, and hospital indemnity plans exist everywhere as voluntary add-ons. The play is using them deliberately: pair a lower-premium high-deductible medical plan with employer-funded gap coverage that absorbs the deductible. The employee experiences rich coverage; the employer pays less in total premium. That's plan design as a product, and almost nobody packages it for small groups.</li>
+          <li><b>Mental health and virtual care, built in, not bolted on.</b> Large employers offer EAPs, dedicated mental-health platforms like Lyra or Spring Health, and on-demand telehealth as standard. A 15-person company can't buy those alone. Aggregated through the PEO master program, they become a line item every client gets, which lowers absenteeism and turnover for the employer and lands as a benefit employees actually use. It's the kind of thing that makes a small employer feel like a big one to the people who work there.</li>
+          <li><b>The point isn't any single benefit, it's the bundle no competitor can match.</b> Each of these exists somewhere as a standalone vendor. What no one offers the 15-to-50-life market is all of it, aggregated, administered, and priced as one package through a single relationship. That bundle is the benefits moat: easy to describe, hard to assemble, and impossible for a point solution to replicate.</li>
         </ul>
       </div>
 
@@ -2018,6 +2025,7 @@ function ConstructTab() {
         <ul>
           <li><b>Performance credits for lean groups.</b> Clients with clean loss runs earn a renewal credit, real dollars back, structured as a retention credit. Yes, it trades comp spread for retention. That's the right trade: the renewal is where PEO clients are lost, a visible reward for safety changes client behavior in the direction underwriting wants, and sharing the spread we teach clients to look for is the most credible transparency move in the industry.</li>
           <li><b>A secondary high-risk comp program.</b> Mainstream and tech-forward PEOs decline high-mod groups and tough class codes outright. An entire specialty-broker industry exists just to place the construction, trucking, and staffing groups everyone else turns away, and those are precisely the businesses where PEO value is largest, because high class rates make the savings absolute dollars, not rounding. A second program with a specialty carrier, separate underwriting, and its own pricing expands our appetite into that whitespace while protecting the main master policy's loss experience. Scope expansion without contaminating the flagship book.</li>
+          <li><b>Safety services that earn the margin, not just price it.</b> The workers' comp spread is only durable if losses stay controlled, so the program has to come with the services that drive that: loss-run reviews, claims advocacy, return-to-work programs, OSHA and safety training for the higher-risk groups. This is the part most PEOs underinvest in and the part that actually protects the arbitrage. Done well, good safety performance lowers the mod, lowers our cost, and funds the performance credits, which is the same flywheel running in the client's favor and ours.</li>
         </ul>
       </div>
 
@@ -2027,20 +2035,9 @@ function ConstructTab() {
         <ul>
           <li><b>A credits analysis in every quote.</b> WOTC screening and the R&D payroll-tax credit (worth up to hundreds of thousands per year for qualifying startups) get evaluated up front and shipped as a page of the proposal, found money, quantified before the client signs. Gusto already runs R&D credit services inside payroll, so this is native plumbing, not a new build. And CPEO certification preserves these credits at the customer level, which makes the credits page a permanent feature, not a transition casualty.</li>
           <li><b>One pricing model wraps all of it.</b> One flat published PEPM admin fee, set by tier and headcount band rather than negotiated deal by deal. Every pass-through, wages, taxes, comp, premiums, itemized at cost on its own line. Our renewal philosophy, how increases are driven and allocated, in writing before signing. The admin fee is the only thing we earn, and it is the only thing on the bill that looks like a fee.</li>
-          <li><b>The 3-to-5 year ROI model, in every consultant's hands.</b> NAPEO's research gives us defensible economics: 27% ROI, $1,775 saved vs $1,395 spent per employee, 12% lower turnover, double the growth rate. Put a calculator on it, train every consultant to run it live in discovery, and the long-term case stops being a claim and becomes arithmetic. Working demo below.</li>
+          <li><b>The 3-to-5 year ROI model, in every consultant's hands.</b> NAPEO's research gives us defensible economics: 27% ROI, $1,775 saved vs $1,395 spent per employee, 12% lower turnover, double the growth rate. Put a calculator on it, train every consultant to run it live in discovery, and the long-term case stops being a claim and becomes arithmetic. A working version lives in Resources.</li>
         </ul>
       </div>
-
-      <div className="card" style={{ marginBottom: 14 }}>
-        <div className="kicker">DEMO · THE CONSULTANT'S ROI MODEL</div>
-        <h2>What does a PEO return over 3 to 5 years?</h2>
-        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>The tool every consultant runs live in discovery. Adjust the inputs.</p>
-        <div style={{ marginTop: 16 }}>
-          <RoiCalc />
-        </div>
-      </div>
-
-      
 
       <div className="callout"><span className="tag">THE GAP THIS STACK EXPLOITS</span>
         Fertility platforms serve large self-funded employers; small business is locked out until
@@ -2219,6 +2216,15 @@ function ResourcesTab({ onTerm }) {
         <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>A leadership model, not a sales tool. It estimates the net gross profit a client profile throws off across all ten PEO profit pools, builds CAC from sales and onboarding cost, and reads payback against the roughly 18-month industry norm. The defaults are directional benchmarks; a live version runs on the book's real pricing and remittance data. Use it to rank the base by which clients are the best PEO fit.</p>
         <div style={{ marginTop: 16 }}>
           <ProfitPerWseCalc />
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">SAMPLE TOOL · CLIENT ROI MODEL</div>
+        <h2>What does a PEO return over 3 to 5 years?</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>A directional model built entirely on NAPEO-published benchmarks: HR cost savings plus turnover avoidance, with growth effects deliberately excluded so it stays the conservative case. A live engagement runs on the client's own census and invoices. Adjust the inputs to see the shape.</p>
+        <div style={{ marginTop: 16 }}>
+          <RoiCalc />
         </div>
       </div>
 
