@@ -176,6 +176,17 @@ const css = `
 .roi-input:focus { outline: none; border-color: var(--guava); }
 .roi-label { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .12em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
 .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.profit-inputs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 820px) { .profit-inputs { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .profit-inputs { grid-template-columns: 1fr; } }
+.pool-bars { display: flex; flex-direction: column; gap: 6px; }
+.pool-row { display: grid; grid-template-columns: 200px 1fr 110px; gap: 10px; align-items: center; }
+@media (max-width: 640px) { .pool-row { grid-template-columns: 130px 1fr 92px; gap: 6px; } }
+.pool-name { font-size: 12.5px; color: var(--ink); }
+.pool-track { height: 8px; background: var(--off); border-radius: 999px; overflow: hidden; }
+.pool-fill { height: 100%; background: var(--guava); border-radius: 999px; }
+.pool-val { font-size: 12.5px; font-weight: 700; text-align: right; color: var(--ink); }
+.pool-pct { font-weight: 400; color: var(--ink-soft); }
 @media (max-width: 640px) { .roi-grid { grid-template-columns: 1fr; } }
 .workstream { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: var(--guava-deep); margin: 18px 0 2px; font-weight: 600; }
 .cmp-table { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
@@ -1745,6 +1756,129 @@ function SwotTab() {
   );
 }
 
+function ProfitPerWseCalc() {
+  // Leadership portfolio lens: given a client profile, what net GP per WSE per month
+  // does this account throw off across all 10 PEO profit pools, and what's the CAC payback.
+  const [ees, setEes] = useState(25);
+  const [wage, setWage] = useState(65000);
+  // Per-pool monthly margin assumptions (per WSE unless noted). Editable.
+  const [pepm, setPepm] = useState(95);         // admin fee margin kept per WSE/mo
+  const [wcRate, setWcRate] = useState(0.6);     // WC arbitrage as % of payroll kept
+  const [sutaRate, setSutaRate] = useState(0.3); // SUTA arbitrage as % of payroll kept
+  const [ficaRate, setFicaRate] = useState(0.03);// FICA/FUTA arbitrage % of payroll
+  const [benTake, setBenTake] = useState(55);    // % of WSEs on the health plan
+  const [benMargin, setBenMargin] = useState(35);// $/mo margin per enrolled medical
+  const [benAdmin, setBenAdmin] = useState(10);  // ben-admin charge $/WSE/mo
+  const [brokerComm, setBrokerComm] = useState(14); // master-plan broker comm $/enrolled/mo
+  const [ancillary, setAncillary] = useState(6); // life/disability/ancillary margin $/WSE/mo
+  const [sec125, setSec125] = useState(3);       // Section 125 admin margin $/WSE/mo
+  const [markups, setMarkups] = useState(3);     // bg checks, T&A, screens $/WSE/mo
+  const [float, setFloat] = useState(2);         // float interest $/WSE/mo
+  // CAC inputs
+  const [cac, setCac] = useState(1800);          // fully-loaded cost to acquire one WSE-account-share
+
+  const e = Math.max(1, Number(ees) || 0);
+  const w = Math.max(0, Number(wage) || 0);
+  const monthlyPayrollPerWse = w / 12;
+  const enrolledFrac = Math.max(0, Math.min(100, Number(benTake) || 0)) / 100;
+
+  // Per-WSE monthly margin by pool
+  const p_admin = Number(pepm) || 0;
+  const p_wc = monthlyPayrollPerWse * (Number(wcRate) || 0) / 100;
+  const p_suta = monthlyPayrollPerWse * (Number(sutaRate) || 0) / 100;
+  const p_fica = monthlyPayrollPerWse * (Number(ficaRate) || 0) / 100;
+  const p_ben = enrolledFrac * (Number(benMargin) || 0);
+  const p_benadmin = Number(benAdmin) || 0;
+  const p_broker = enrolledFrac * (Number(brokerComm) || 0);
+  const p_anc = Number(ancillary) || 0;
+  const p_125 = Number(sec125) || 0;
+  const p_markup = Number(markups) || 0;
+  const p_float = Number(float) || 0;
+
+  const pools = [
+    { k: "Admin fee (PEPM)", v: p_admin },
+    { k: "Workers' comp arbitrage", v: p_wc },
+    { k: "SUTA arbitrage", v: p_suta },
+    { k: "FICA / FUTA arbitrage", v: p_fica },
+    { k: "Benefits margin", v: p_ben },
+    { k: "Ben-admin charge", v: p_benadmin },
+    { k: "Master-plan broker commission", v: p_broker },
+    { k: "Ancillary (life / disability)", v: p_anc },
+    { k: "Section 125 admin", v: p_125 },
+    { k: "Service markups", v: p_markup },
+    { k: "Float / interest", v: p_float },
+  ];
+  const gpWseMo = pools.reduce((s, x) => s + x.v, 0);
+  const gpWseYr = gpWseMo * 12;
+  const gpAccountYr = gpWseYr * e;
+  const paybackMonths = gpWseMo > 0 ? (Number(cac) || 0) / gpWseMo : 0;
+
+  const fmt = (n) => "$" + Math.round(n).toLocaleString();
+  const fmt2 = (n) => "$" + (Math.round(n * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const numField = (label, val, setter, step, suffix) => (
+    <div>
+      <span className="roi-label">{label}</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <input className="roi-input" type="number" step={step || 1} value={val} onChange={(ev) => setter(ev.target.value)} style={{ width: "100%" }} />
+        {suffix && <span style={{ fontSize: 12, color: "var(--ink-soft)", whiteSpace: "nowrap" }}>{suffix}</span>}
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="roi-grid">
+        {numField("WORKSITE EMPLOYEES", ees, setEes, 1)}
+        {numField("AVG ANNUAL WAGE", wage, setWage, 1000)}
+        {numField("FULLY-LOADED CAC ($/WSE)", cac, setCac, 100)}
+      </div>
+
+      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".4px", margin: "20px 0 8px" }}>The 10 profit pools, monthly margin per WSE</div>
+      <div className="profit-inputs">
+        {numField("Admin PEPM kept", pepm, setPepm, 5, "$/WSE")}
+        {numField("WC arbitrage", wcRate, setWcRate, 0.1, "% payroll")}
+        {numField("SUTA arbitrage", sutaRate, setSutaRate, 0.1, "% payroll")}
+        {numField("FICA/FUTA arb", ficaRate, setFicaRate, 0.01, "% payroll")}
+        {numField("Health take-up", benTake, setBenTake, 5, "% on plan")}
+        {numField("Benefits margin", benMargin, setBenMargin, 5, "$/enrolled")}
+        {numField("Ben-admin", benAdmin, setBenAdmin, 1, "$/WSE")}
+        {numField("Broker comm", brokerComm, setBrokerComm, 1, "$/enrolled")}
+        {numField("Ancillary (life/dis)", ancillary, setAncillary, 1, "$/WSE")}
+        {numField("Section 125", sec125, setSec125, 1, "$/WSE")}
+        {numField("Service markups", markups, setMarkups, 1, "$/WSE")}
+        {numField("Float / interest", float, setFloat, 1, "$/WSE")}
+      </div>
+
+      <div className="stat-grid" style={{ marginTop: 18 }}>
+        <div className="stat"><div className="v">{fmt(gpWseMo)}</div><div className="l">Net gross profit per WSE, per month, across all 10 pools</div></div>
+        <div className="stat"><div className="v">{fmt(gpAccountYr)}</div><div className="l">Annual GP from this account ({e} WSEs)</div></div>
+        <div className="stat"><div className="v">{gpWseMo > 0 ? paybackMonths.toFixed(1) : "n/a"}</div><div className="l">Months to recover CAC of {fmt(cac)} per WSE</div></div>
+      </div>
+
+      <div style={{ ...{}, marginTop: 16 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-soft)", textTransform: "uppercase", letterSpacing: ".4px", marginBottom: 8 }}>Where the margin comes from</div>
+        <div className="pool-bars">
+          {pools.filter((x) => x.v !== 0).sort((a, b) => b.v - a.v).map((x) => {
+            const pctOfTotal = gpWseMo > 0 ? (x.v / gpWseMo) * 100 : 0;
+            return (
+              <div key={x.k} className="pool-row">
+                <div className="pool-name">{x.k}</div>
+                <div className="pool-track"><div className="pool-fill" style={{ width: Math.max(2, Math.min(100, pctOfTotal)) + "%" }} /></div>
+                <div className="pool-val">{fmt2(x.v)}<span className="pool-pct"> · {pctOfTotal.toFixed(0)}%</span></div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <p style={{ fontSize: 12.5, color: "var(--ink-soft)", lineHeight: 1.6, marginTop: 14 }}>
+        A leadership lens, not a sales tool: model the net GP per WSE a client profile throws off across every PEO profit pool, then read CAC payback against it to rank the base by PEO fit. Defaults are directional industry ranges, the real version runs on the book's actual pricing and remittance data. Profit pools per industry practice (admin, WC and SUTA and FICA/FUTA arbitrage, benefits and ben-admin, master-plan commissions, ancillary, Section 125, service markups, and float). Diverse pools expand GP per WSE and protect it when any single pool erodes, for example when SUTA arbitrage compresses in a high-unemployment cycle.
+      </p>
+    </div>
+  );
+}
+
+
 function RoiCalc() {
   const [ees, setEes] = useState(25);
   const [wage, setWage] = useState(65000);
@@ -1891,6 +2025,15 @@ function ConstructTab() {
         </div>
       </div>
 
+      <div className="card" style={{ marginBottom: 14 }}>
+        <div className="kicker">LEADERSHIP LENS · NET PROFIT PER WSE</div>
+        <h2>What does a client earn us per WSE?</h2>
+        <p style={{ color: "var(--ink-soft)", marginTop: 4 }}>Not a sales tool. Model the net GP per WSE a client profile throws off across all ten PEO profit pools, then read CAC payback against it to rank the base by PEO fit.</p>
+        <div style={{ marginTop: 16 }}>
+          <ProfitPerWseCalc />
+        </div>
+      </div>
+
       <div className="callout"><span className="tag">THE GAP THIS STACK EXPLOITS</span>
         Fertility platforms serve large self-funded employers; small business is locked out until
         someone aggregates. High-risk comp groups get declined by mainstream PEOs and absorbed by
@@ -1995,9 +2138,9 @@ function KeysTab() {
   const keys = [
     { n: "01", h: "Risk selection discipline", p: "The deal desk is the profit engine. Two PEOs with identical fees have wildly different economics based purely on the books they chose to write.", g: "Sales comp and culture must reward qualified deals, not raw logos, reps who package clean underwriting files win twice." },
     { n: "02", h: "Funds-flow & credit control", p: "A PEO extends unsecured credit equal to a full payroll, every cycle. Collection discipline, deposit policy, and remittance controls are the operating core.", g: "Build credit screening into the sales process itself so bad-fit deals die before implementation, not after." },
-    { n: "03", h: "Benefits underwriting + renewal philosophy", p: "Year-one rates buy the deal; renewal allocation decides whether the book stays. Underpriced new business is a loan against year two.", g: "Sell the renewal story honestly from day one, it's the single biggest trust gap incumbents leave open." },
+    { n: "03", h: "Benefits underwriting + renewal philosophy", p: "Year-one rates buy the deal; renewal allocation decides whether the book stays. Underpriced new business is a loan against year two.", g: "Sell the renewal philosophy, committed in writing, not a track record we don't have yet. Most PEOs win on a teaser year-one rate and recover it at renewal with an allocation the client never sees coming. Because Gusto is new and built on a transparent platform, we can do the honest version from scratch: underwrite to real risk up front so there's no clawback, show the client exactly what drives their renewal when it comes, and put that philosophy in the proposal before they sign. Being new is the credibility here, not the gap, no incumbent can say it because they've all been playing the other game for years." },
     { n: "04", h: "Claims management as profit", p: "Under large-deductible comp structures, every claim dollar avoided is the PEO's dollar. Safety and return-to-work are underwriting profit, not customer service.", g: "Bake safety value into the pitch for the right verticals; it differentiates against software-first rivals." },
-    { n: "05", h: "Credentials: CPEO & ESAC", p: "Sole federal tax liability, no wage-base restart, bonded financial assurance, certification converts trust from a claim into a statute.", g: "For a new entrant, CPEO is the fastest answer to 'why trust the new guy with my payroll taxes?'" },
+    { n: "05", h: "Credentials: CPEO & ESAC", p: "Sole federal tax liability, no wage-base restart, bonded financial assurance, certification converts trust from a claim into a statute.", g: "For a new entrant, CPEO is the fastest answer to 'why trust the new guy with my payroll taxes?'", link: "https://www.irs.gov/tax-professionals/how-do-i-apply-for-professional-employer-organization-certification", linkText: "How to register as a CPEO (IRS)" },
     { n: "06", h: "Service model matched to segment", p: "Dedicated HRBP vs self-serve isn't branding, it's a cost structure choice. Mismatched service models churn books.", g: "Gusto's base skews simple and software-native: lead self-serve with human escalation, and resist over-building white glove too early." },
     { n: "07", h: "The retention engine", p: "Accounts reach true profitability deep into the relationship. Implementation quality and the first payroll are the strongest retention predictors.", g: "Instrument GP/WSE and retention from client one, the metrics that tell you whether the machine works." },
     { n: "08", h: "Distribution advantage", p: "CAC and cycle length define PEO sales economics. Selling into an installed base structurally beats cold acquisition.", g: "This is Gusto's unfair advantage: the payroll base plus the accountant channel. The Prospecting Agent exists to exploit it systematically." },
@@ -2018,7 +2161,7 @@ function KeysTab() {
             <span className="kn">{k.n}</span>
             <h3>{k.h}</h3>
             <p>{k.p}</p>
-            <p className="gusto"><b>For Gusto:</b> {k.g}</p>
+            <p className="gusto"><b>For Gusto:</b> {k.g}{k.link && <> <a href={k.link} target="_blank" rel="noopener noreferrer" style={{ color: "var(--guava)", fontWeight: 700, textDecoration: "underline" }}>{k.linkText || "Learn more"}</a></>}</p>
           </div>
         ))}
       </div>
