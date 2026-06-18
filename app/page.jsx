@@ -1102,6 +1102,7 @@ function AboutTab() {
               <li><b>100% of the team</b> to President's Club, 2023–24. The only team at TriNet to do it</li>
               <li><b>35%+ year-over-year growth</b>, five consecutive years</li>
               <li><b>7× Summit Achiever</b> at 150%+ of quota (2019–2025)</li>
+              <li><b>Expanded into new geographic markets</b>, standing up the sales motion in cities and states with no prior TriNet footprint</li>
             </ul>
           </div>
           <div className="t-item">
@@ -1145,20 +1146,34 @@ function AboutTab() {
 
         <h3>Why this role, why me</h3>
         <p>
-          Gusto's PEO is a distribution play: selling co-employment into an installed base that
-          already trusts the platform, amplified through the accountant channel. That motion needs a
-          leader who knows the PEO category cold, underwriting, pricing mechanics, the competitive
-          landscape, and who builds systems, playbooks, and reps rather than just carrying a bag.
-          That intersection is exactly where I've spent the last eight years.
+          The pattern underneath my whole career is simple: I build and launch revenue-generating
+          products everywhere I go, and I build the teams that sell them. College Parent Magazine
+          ($1MM+ in its first year). PEO Consulting Partners, an independent brokerage spanning 28
+          PEOs across 46 states. PEOLens, a forensic proposal-audit engine. And the PEO Prospecting
+          Agent and Vantage CRM I built live during this very process. At TriNet I expanded the
+          business into new geographic markets, taking the motion into cities and states where we
+          had no footprint and standing it up from the ground. Gusto is launching a PEO product into
+          its base. Launching products, and launching them into new markets, is the thing I have
+          done at every single stop.
         </p>
         <p>
-          And there's a pattern underneath it: I've launched a revenue-generating product at
-          every stop, College Parent Magazine ($1MM+ in year one), PEO Consulting Partners,
-          PEOLens, and the PEO Prospecting Agent built live during this process. Gusto is
-          launching a product. I launch products.
+          And I know this category cold. Eight years selling and leading PEO at TriNet, plus building
+          an independent brokerage and an audit tool, means I know the underwriting, the pricing
+          mechanics, the profit pools, and the competitive landscape, Justworks, Rippling, Vensure,
+          the boutiques, well enough to know exactly where each one is beatable. This is not a
+          category I would be learning on the job. It is the one I have spent my career inside, from
+          every seat: rep, leader, broker, and builder.
+        </p>
+        <p>
+          The leadership is the part I am proudest of. I lead as a servant first: my job is to clear
+          the obstacles, fight the cross-functional fights, and put the tools in my reps' hands so
+          they can win, then get out of their way. And I develop the whole team, not just my top two,
+          because a team carried by a couple of stars is fragile. That is how my team became the only
+          one at TriNet to put 100 percent of its consultants in President's Club. Not two heroes and
+          a long tail, everyone over the bar.
         </p>
         <div className="callout"><span className="tag">SALES PHILOSOPHY</span>
-          Player-coach. Metrics over vibes. Consultants, not pitchmen: reps who can read a census,
+          Player-coach. Servant leader. Metrics over vibes. Consultants, not pitchmen: reps who can read a census,
           build an honest total-cost baseline, and tell a buyer the truth about year two, because that's what
           retains the book that makes PEO economics work.
         </div>
