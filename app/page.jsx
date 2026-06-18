@@ -1146,15 +1146,20 @@ function AboutTab() {
 
         <h3>Why this role, why me</h3>
         <p>
-          The pattern underneath my whole career is simple: I build and launch revenue-generating
-          products everywhere I go, and I build the teams that sell them. College Parent Magazine
-          ($1MM+ in its first year). PEO Consulting Partners, an independent brokerage spanning 28
-          PEOs across 46 states. PEOLens, a forensic proposal-audit engine. And the PEO Prospecting
-          Agent and Vantage CRM I built live during this very process. At TriNet I expanded the
-          business into new geographic markets, taking the motion into cities and states where we
-          had no footprint and standing it up from the ground. Gusto is launching a PEO product into
-          its base. Launching products, and launching them into new markets, is the thing I have
-          done at every single stop.
+          The pattern underneath my whole career is simple: I build sales teams, I partner across
+          the org to give them what they need to grow, and I hit the number. I have never missed a
+          revenue goal in my career, not once. At TriNet I expanded the business into new geographic
+          markets, taking the motion into cities and states where we had no footprint and standing
+          up the team from the ground. That is the same job Gusto is hiring for now: launch PEO into
+          the base, build the team that sells it, and deliver the revenue.
+        </p>
+        <p>
+          I also go deep on this category in ways most sellers don't. I founded an independent PEO
+          brokerage spanning 28 PEOs across 46 states, and I built PEOLens, a forensic
+          proposal-audit tool, plus the prospecting agent and CRM you see here, which I put together
+          live during this process. I am not a software engineer, that is not the claim. The point is
+          that I get obsessed enough with this category to build the things that help a team sell it
+          better, and I partner with the people who can take them the rest of the way.
         </p>
         <p>
           And I know this category cold. Eight years selling and leading PEO at TriNet, plus building
@@ -1162,15 +1167,21 @@ function AboutTab() {
           mechanics, the profit pools, and the competitive landscape, Justworks, Rippling, Vensure,
           the boutiques, well enough to know exactly where each one is beatable. This is not a
           category I would be learning on the job. It is the one I have spent my career inside, from
-          every seat: rep, leader, broker, and builder.
+          every seat: rep, sales leader, and independent broker.
         </p>
         <p>
-          The leadership is the part I am proudest of. I lead as a servant first: my job is to clear
-          the obstacles, fight the cross-functional fights, and put the tools in my reps' hands so
-          they can win, then get out of their way. And I develop the whole team, not just my top two,
-          because a team carried by a couple of stars is fragile. That is how my team became the only
-          one at TriNet to put 100 percent of its consultants in President's Club. Not two heroes and
-          a long tail, everyone over the bar.
+          The leadership is the part I am proudest of. I develop and empower salespeople, that is the
+          whole job to me. I clear the obstacles, partner across the org to get my team what they
+          need, think creatively to solve the problems in front of them, and challenge the status quo
+          where it's holding back growth, then I get out of their way and let them run. I develop the
+          whole team, not just my top two, because a team carried by a couple of stars is fragile.
+          That is how my team became the only one at TriNet to put 100 percent of its consultants in
+          President's Club. Not two heroes and a long tail, everyone over the bar.
+        </p>
+        <p>
+          The way I see the role: I am here to add real value to the organization as a strong
+          partner. The wins belong to the team and the company, my job is to put them in the best
+          possible position to go get them.
         </p>
         <div className="callout"><span className="tag">SALES PHILOSOPHY</span>
           Player-coach. Servant leader. Metrics over vibes. Consultants, not pitchmen: reps who can read a census,
