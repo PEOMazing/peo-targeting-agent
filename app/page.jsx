@@ -1072,10 +1072,9 @@ function AboutTab() {
         <h1>Gabriel Revnew<span className="hl">.</span><br />PEO leader, builder, player-coach.</h1>
         <p className="lede">
           Eight years selling and leading PEO sales at TriNet, Sales Leader of the Year,
-          top Sales Director in % to plan four years running, plus founder of an independent
-          PEO brokerage and a forensic proposal-audit product. I've sold this category from
-          inside a national PEO, brokered it independently, and built software to take it
-          apart line by line.
+          top Sales Director in % to plan four years running, running the number one team in
+          the country and developing reps who win. I know this category cold, and I know how to
+          build a team that wins in it.
         </p>
       </div>
 
