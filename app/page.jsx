@@ -2337,7 +2337,7 @@ function PlanTab() {
           it with a real pilot. Every phase ends with something shipped, not something scheduled.
         </p>
         <p className="lede" style={{ fontWeight: 700, color: "var(--ink)", marginTop: 14 }}>
-          The whole quarter earns the right to scale: prove the in-base motion works, with real unit economics, before we spend a dollar on outside growth.
+          Getting it right the first time, and building a PEO that changes the industry. That takes my PEO expertise and the standard I've led teams to, Gusto's ownership culture, and partnering with the org to develop a product and team that meets our customers where they are, and where they're going.
         </p>
       </div>
 
