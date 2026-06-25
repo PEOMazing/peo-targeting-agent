@@ -78,10 +78,18 @@ async function streamClaude(key, prompt, deep, maxTokens) {
 
 function parseBrief(text) {
   text = (text || "").replace(/```json/gi, "").replace(/```/g, "").trim();
+  // Normalize smart quotes the model sometimes emits, which break JSON.parse
+  text = text.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'");
   let parsed = null;
+  const tryParse = (str) => {
+    try { return JSON.parse(str); } catch {}
+    // second chance: strip trailing commas before } or ]
+    try { return JSON.parse(str.replace(/,\s*([}\]])/g, "$1")); } catch {}
+    return null;
+  };
   const greedy = text.match(/\{[\s\S]*\}/);
-  if (greedy) { try { parsed = JSON.parse(greedy[0]); } catch {} }
-  if (!parsed) { try { parsed = JSON.parse(text); } catch {} }
+  if (greedy) parsed = tryParse(greedy[0]);
+  if (!parsed) parsed = tryParse(text);
   if (!parsed) {
     const start = text.indexOf("{");
     if (start >= 0) {
@@ -112,11 +120,14 @@ export async function POST(req) {
 
   if (!res.ok) {
     const msg = res.aborted
-      ? "Research timed out. Try again — it usually works on the second attempt."
+      ? "Research timed out, try again. It usually works on the second attempt."
       : "Research call failed" + (res.status ? " (" + res.status + ")." : ".");
     return Response.json({ ok: false, message: msg, detail: res.detail, elapsed }, { status: 200 });
   }
   const parsed = parseBrief(res.text);
-  if (!parsed) return Response.json({ ok: false, message: "No data returned — try again.", elapsed }, { status: 200 });
+  if (!parsed) {
+    const snippet = (res.text || "").slice(0, 160).replace(/\s+/g, " ").trim();
+    return Response.json({ ok: false, message: "Could not parse the research response, try again.", debug: snippet, elapsed }, { status: 200 });
+  }
   return Response.json({ ok: true, result: parsed, elapsed }, { status: 200 });
 }
